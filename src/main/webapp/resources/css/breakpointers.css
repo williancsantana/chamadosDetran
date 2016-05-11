@@ -1,0 +1,37 @@
+/* para os menus */
+@media (min-width:768px) {
+    .mobile.only {
+        display: none !important;
+    }
+
+    .computer.only {
+        display: flex !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .mobile.only {
+        display: flex !important;
+    }
+
+    .computer.only {
+        display: none !important;
+    }
+}
+
+/* para o conteúdo */
+@media (min-width:768px) {
+    .content.slot {
+        position: absolute !important;
+        right: 5px !important;
+        left: 130px !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .content.slot {
+        position: absolute !important;
+        right: 5px !important;
+        left: 5px !important;
+    }
+}

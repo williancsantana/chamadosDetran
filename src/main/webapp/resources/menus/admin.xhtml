@@ -1,0 +1,41 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <div class="computer only side block flex column menu">
+        <div id="menu-principal" class="ui vertical labeled grey inverted icon menu">
+            <div class="header item">Administração</div>
+            <a class="#{menuItem == 'home' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin">
+                <i class="home icon"></i>
+                Início
+            </a>
+
+            <a class="#{menuItem == 'usuarios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
+                <i class="user icon"></i>
+                Usuários
+            </a>
+
+            <a class="#{menuItem == 'grupos' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/grupos/list.jsf">
+                <i class="users icon"></i>
+                Grupos
+            </a>
+
+            <a class="#{menuItem == 'servicos' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/servicos/list.jsf">
+                <i class="configure icon"></i>
+                Catálogo de Serviços
+            </a>
+            <a class="#{menuItem == 'recorrentes' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/recorrents/list.jsf">
+                <i class="wait icon"></i>
+                Serviços Recorrentes
+            </a>
+
+            <a class="#{menuItem == 'relatorios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/relatorios/list.jsf">
+                <i class="bar chart icon"></i>
+                Relatórios
+            </a>                
+        </div>
+    </div>
+
+</ui:composition>

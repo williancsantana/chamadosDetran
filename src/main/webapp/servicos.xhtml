@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:param name="menu" value="abrir" />    
+
+    <ui:define name="page-title">
+        Detran - TO | Abrir Chamado
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form prependId="false">
+            <h:inputHidden id="categoryPath" value="#{ticketSupportController.categoriePath}" />
+            <p:remoteCommand name="filterCategories" actionListener="#{ticketSupportController.filter()}" update="tableServices" />
+            <h4 class="ui top attached header">Abrir chamado</h4>
+            <div id="services-tree-bottom" class="ui bottom attached segment">
+                <div class="ui centered page grid">
+                    <div class="row">
+                        <div class="column">
+                            <div class="ui centered segment">
+                                <div class="ui huge breadcrumb">                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="categories-grid" class="doubling two column calls row"></div>
+                </div>
+                <div id="categories-divider" class="ui divider small top margin"></div>
+                <table class="ui striped no margin table" jsf:id="tableServices">
+                    <thead>
+                        <tr>
+                            <th>Serviços</th>
+                            <th class="collapsing"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ui:repeat var="service" value="#{ticketSupportController.services}">
+                            <tr>
+                                <td id="markup_#{service.id}"></td>
+                                <td class="collapsing">                                                                        
+                                    <h:commandLink styleClass="small compact green ui button" 
+                                                   actionListener="#{ticketSupportController.click(service, 'chamadoServiceInstance', service.pageChamado())}">
+                                            Abrir chamado</h:commandLink>
+                                </td>
+                                <script>markupName('markup_#{service.id}', '#{service.categoria}', '#{service.descricao}');</script>
+                            </tr>                            
+                        </ui:repeat>                                               
+                    </tbody>
+                </table>
+            </div>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+            $(document).ready(function () {
+                var categoryPath = "";
+                var allCategories = JSON.parse('#{ticketSupportController.allcategoriesJson}');
+
+                var t = _.filter(allCategories, function (obj) {
+                    return obj.match(new RegExp('^' + categoryPath));
+                });
+
+                filter(t, categoryPath);
+
+
+                function resetClickButton() {
+                    $('.category.button').on('click', function (event) {
+                        console.log("CATEGORIA: " + categoryPath);
+                        if (categoryPath !== $(event.currentTarget).attr('data-path')) {
+                            //$('#services-tree-bottom').addClass('loading');                        
+                            categoryPath = $(event.currentTarget).attr('data-path');
+                            var t = _.filter(allCategories, function (obj) {
+                                return obj.match(new RegExp('^' + categoryPath));
+                            });
+                            filter(t, categoryPath);
+                        }
+                    });
+                }
+
+                function navBreadcrumb() {
+                    var cats = ['<a class="section category button" data-path=""><i class="home icon"></i></a>'];
+                    var cat_names = [];
+                    if (categoryPath !== '')
+                        _.each(categoryPath.split(':'), function (e) {
+                            cat_names.push(e);
+                            cats.push('<a class="section category button" data-path="' + cat_names.join(':') + '">' + e + '</a>');
+                        });
+
+                    cats = cats.join('<i class="right chevron icon divider"></i>');
+                    $('.breadcrumb').html(cats);
+                    
+                }
+                
+                function markups(){                                       
+                     _.each($('.markup'), function (e) {
+                          var e = $(e).text();
+                          console.log(e);   
+                          markupName(e);
+                        });
+                }
+
+                markupName = function (pathName, service, name) {
+                    console.log(service);
+                    var cats = [];
+                    var cat_names = [];
+
+                    if (service !== '') {
+                        var path = service.replace(new RegExp('^' + categoryPath + '(?::|$)'), '');
+                        _.each(path.split(':'), function (e) {
+                            if (e !== '') {
+                                cat_names.push(e);
+                                cats.push('<a class="section category button" data-path="' +
+                                        (categoryPath !== '' ? (categoryPath + ':') : '') +
+                                        cat_names.join(':') + '">' + e + '</a>');
+                            }
+                        });
+                    }
+
+                    cats.push('<div class="active section">' + name + '</div>');
+
+                    var result = '<div class="ui breadcrumb">' + _.compact(cats).join('<i class="right chevron icon divider"></i>') + '</div>';
+                    $('#' + pathName).html(result);
+                }
+
+
+                function filter(services, _filter) {
+
+                    var filtered = _.compact(_.uniq(_.map(services, function (e) {
+                        return e.replace(new RegExp('^' + _filter + '(:|$)'), '').split(':').shift();
+                    }), true));
+
+                    var cats = '';
+
+                    _.each(filtered, function (e) {
+                        cats += '<div class="column"> <div class="ui fluid vk massive category button" data-path="' + ((categoryPath != '') ? (categoryPath + ':') : '') + e + '">' + e + '</div> </div>';
+                    });
+
+                    if (filtered.length % 2 != 0)
+                        cats += '<div class="column"></div>';
+
+                    if (filtered.length == 0)
+                        $('#categories-divider').hide();
+                    else
+                        $('#categories-divider').show();
+
+                    console.log(cats);
+                    $('#categories-grid').html(cats);
+                    navBreadcrumb();
+                    resetClickButton();
+                    $('#categoryPath').val(_filter);
+                    filterCategories();            
+                }                                
+            });
+        </script>
+    </ui:define>
+
+</ui:composition>

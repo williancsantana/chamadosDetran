@@ -1,0 +1,151 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:param name="menu" value="admin" />
+    <ui:param name="menuItem" value="usuarios" />
+
+    <ui:define name="page-title">
+        Detran - TO | Usuários
+    </ui:define>    
+
+    <ui:define name="content">        
+        <h4 class="ui top attached header">Usuários</h4>
+        <div class="ui bottom attached segment">
+            <h:form>
+                <h:panelGroup layout="block">
+                    <table class="ui striped table">
+                        <thead>
+                            <tr>
+                                <th colspan="5">
+                                    <div class="ui small fluid icon input">
+                                        <p:inputText id="groups-filter" placeholder="Filtrar" value="#{userController.pagination.filterValue}" >
+                                            <p:ajax event="keyup" update="tableData paginationInfo" listener="#{userController.pagination.actionFilter(fn:split('name', ','))}" />
+                                        </p:inputText>                                            
+                                        <i class="search icon"></i>
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="collapsing">Status</th>
+                                <th class="collapsing">Nome de usuário</th>
+                                <th>Nome</th>
+                                <th class="collapsing">Tipo de autenticação</th>
+                                <th class="collapsing">Grupos</th>
+                            </tr>
+                        </thead>                        
+                        <tbody jsf:id="tableData">                        
+                            <tr jsf:rendered="#{userController.pagination.data.isEmpty()}">
+                                <td colspan="5" class="center aligned"><i class="users icon"></i> <b>Nenhum grupo localizado</b></td>
+                            </tr>                
+                            <ui:repeat var="user" value="#{userController.pagination.data}">
+                                <tr>
+                                    <td class="collapsing">                                        
+                                        <i class="green user icon" title="Online"></i>                                        
+                                        <ui:remove><i class="light gray user icon" title="Offline"></i></ui:remove>
+                                    </td>
+                                    <td>
+                                        <i class="users icon"></i>
+                                        <h:commandLink class="group-name" 
+                                                       actionListener="#{userController.click(user, 'usuarioInstance', '/admin/usuarios/edit.jsf')}">
+                                            #{user.cpf}</h:commandLink>
+                                    </td>                                    
+                                    <td>
+                                        #{user.name}
+                                    </td>
+                                    <td class="collapsing">
+                                        #{user.authenticationType.name()}
+                                    </td>
+                                    <td class="collapsing">
+                                        <h:outputText value="nenhum grupo" rendered="#{user.grupos.size() == 0}" style="font-weight: bold"/>
+                                        <div class="ui floating labeled icon dropdown button" jsf:rendered="#{user.grupos.size() > 0}">
+                                            <i class="users icon"></i>
+                                            <span class="text">#{user.grupos.size()}&ensp;Grupos</span>
+                                            <div class="menu">
+                                                <div class="header">
+                                                    <i class="users icon"></i>
+                                                    Grupos
+                                                </div>
+                                                <ui:repeat var="grupo" value="#{user.grupos}">
+                                                    <div class="item">                                                        
+                                                        <h:commandLink class="group-name" 
+                                                                actionListener="#{userController.click(grupo.ticketGroup, 'grupoInstance', 
+                                                                                  '/admin/grupos/edit.jsf')}">
+                                                            #{grupo.ticketGroup.descricao}</h:commandLink>
+                                                    </div>                                                    
+                                                </ui:repeat>
+                                            </div>
+                                        </div>                                        
+                                    </td>
+                                </tr>
+                            </ui:repeat>                            
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="right aligned" colspan="5">
+                                    <div id="add-user-dropdown" class="ui left floated labeled icon small green floating dropdown button">
+                                        <i class="plus icon"></i> Novo
+                                        <div class="menu">
+                                            <div class="item">
+                                                <a class="ui google plus small fluid button" 
+                                                   accesskey="" href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/importAd.jsf">
+                                                    <i class="download icon"></i>
+                                                    Importar do AD
+                                                </a>
+                                            </div>
+                                            <div class="item">
+                                                <a class="ui google plus small fluid disabled button" href="{{pathFor 'admin.usuarios.novo'}}">
+                                                    <i class="add user icon"></i>
+                                                    Criar usuário local
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ui small pagination menu">
+                                        <div class="ui dropdown link item" jsf:id="paginationInfo">
+                                            <span class="text">#{userController.pagination.first} - #{userController.pagination.last} de #{userController.pagination.rowCount}</span>
+                                            <div class="menu">
+                                                <div class="item active selected">#{userController.pagination.pageSize} por página</div>
+                                                <div class="item">10 por página</div>
+                                                <div class="item">20 por página</div>
+                                            </div>
+                                        </div>
+                                        <p:commandLink id="groups-prev-page" styleClass="icon item"
+                                                       actionListener="#{userController.pagination.previousPage()}"
+                                                       update="tableData paginationInfo">
+                                            <i class="chevron left icon"></i>
+                                        </p:commandLink>
+                                        <p:commandLink id="groups-next-page" styleClass="icon item"
+                                                       actionListener="#{userController.pagination.nextPage()}"
+                                                       update="tableData paginationInfo">
+                                            <i class="chevron right icon"></i>
+                                        </p:commandLink>                                    
+                                    </div>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+            $(document).ready(function () {
+                $('.ui.dropdown').dropdown({
+                    action: 'select',
+                    direction: 'upward',
+                    onChange: function (value, text) {                        
+                    }
+                });
+            });
+        </script>
+    </ui:define>
+
+</ui:composition>

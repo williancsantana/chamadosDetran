@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:param name="menu" value="chamados" />    
+
+    <ui:define name="page-title">
+        Detran - TO | Estante de Chamados
+    </ui:define>    
+
+    <ui:define name="content">       
+        <h:form prependId="false">
+            <p:remoteCommand name="updateTicketSupportTable" actionListener="#{ticketSupportTableController.supportTable.update()}"
+                             update=":tableData :paginationInfo :activeTitle" />
+            <h4 class="ui top attached header" jsf:id="activeTitle">#{ticketSupportTableController.supportTable.activeTitle()}</h4>
+            <div class="ui bottom attached segment">
+                <table id="chamados-table" class="ui table striped">
+                    <thead>
+                        <tr>
+                            <th colspan="6">
+                                <div id="chamados-table-dropdowns" class="pull left">
+                                    <div jsf:id="with-groups-dropdown"
+                                         class="ui icon top left pointing dropdown button" title="{{groupsDropdownTitle}}">
+                                        <i class="#{ticketSupportTableController.supportTable.groupsFilterIcon()} icon"></i>
+                                        <div class="menu">
+                                            <div class="header">Exibir chamados</div>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getGrupoFilterActive('MEUS')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeGroup('MEUS')}"
+                                                           update=":tableData :paginationInfo :with-groups-dropdown"
+                                                           oncomplete="setGroupDropdown()">
+                                                <i class="user icon"></i> Apenas os meus
+                                            </p:commandLink>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getGrupoFilterActive('TODOS')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeGroup('TODOS')}"
+                                                           update=":tableData :paginationInfo :with-groups-dropdown"
+                                                           oncomplete="setGroupDropdown()">
+                                                <i class="users icon"></i> Dos meu grupos
+                                            </p:commandLink>
+                                        </div>
+                                    </div>
+                                    <div jsf:id="time-interval-dropdown" class="ui icon top left pointing dropdown button">
+                                        <i class="#{ticketSupportTableController.supportTable.timeIntervalFilterIcon()} icon"></i>
+                                        <div class="menu">
+                                            <div class="header">Período de tempo</div>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getTimeIntervalFilterActive('HOJE')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeInterval('HOJE')}"
+                                                           update=":tableData :paginationInfo :time-interval-dropdown"
+                                                           oncomplete="setIntervalDropdown()">
+                                                <i class="calendar outline icon"></i> Hoje
+                                            </p:commandLink>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getTimeIntervalFilterActive('U7DIAS')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeInterval('U7DIAS')}"
+                                                           update=":tableData :paginationInfo :time-interval-dropdown"
+                                                           oncomplete="setIntervalDropdown()">
+                                                <i class="calendar icon"></i> Últimos 7 dias
+                                            </p:commandLink>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getTimeIntervalFilterActive('U30DIAS')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeInterval('U30DIAS')}"
+                                                           update=":tableData :paginationInfo :time-interval-dropdown"
+                                                           oncomplete="setIntervalDropdown()">
+                                                <i class="calendar icon"></i> Últimos 30 dias
+                                            </p:commandLink>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getTimeIntervalFilterActive('TODOS')}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeInterval('TODOS')}"
+                                                           update=":tableData :paginationInfo :time-interval-dropdown"
+                                                           oncomplete="setIntervalDropdown()">
+                                                <i class="asterisk icon"></i> Todos
+                                            </p:commandLink>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="chamados-table-filter" class="ui small fluid icon input">
+                                    <p:inputText id="groups-filter" placeholder="Filtrar" value="#{ticketSupportTableController.supportTable.filterValue}" >
+                                        <p:ajax event="keyup" update="tableData" listener="#{ticketSupportTableController.supportTable.actionFilter()}" />
+                                    </p:inputText>
+                                    <i class="search icon"></i>
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th class="collapsing"></th>
+                            <th class="collapsing">Número</th>
+                            <th>Assunto</th>
+                            <th class="collapsing">Solicitante</th>
+                            <th class="collapsing">Atendente</th>
+                            <th class="collapsing">Última resposta</th>
+                        </tr>
+                    </thead>
+                    <tbody jsf:id="tableData">                                                
+                        <tr jsf:rendered="#{ticketSupportTableController.supportTable.data.isEmpty()}">
+                            <td colspan="6" class="center aligned"><i class="comments outline icon"></i> <b>Nenhum chamado localizado</b></td>
+                        </tr> 
+                        <ui:repeat var="chamado" value="#{ticketSupportTableController.supportTable.data}" >
+                            <tr class="#{chamado.unseen ? 'bold active' : ''}">
+                                <td class="collapsing">
+                                    <i class="#{ticketSupportTableController.supportTable.icon(chamado)} icon" title="{{iconTitle status}}"></i>
+                                </td>
+                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado)}">
+                                            #{chamado.numero}</h:commandLink></td>
+                                <td><a href="#">    
+                                        <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
+                                        <i class="warning sign orange icon" jsf:rendered="#{chamado.status == 'PENDENTE_USUARIO'}"
+                                           title="Esse chamado está pendente com o solicitante"></i>                                    
+                                        #{chamado.assunto}
+                                    </a></td>
+                                <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante.name}</td>
+                                <td class="collapsing" title="{{ifNeedsTitle attendant.name}}">
+                                    <h:outputText value="#{chamado.atendente.name}" rendered="#{chamado.atendente != null}"/>
+                                    <h:outputText value="Não Definido" rendered="#{chamado.atendente == null}"/>
+                                </td>
+                                <td class="collapsing">
+                                    <h:outputText value="#{chamado.ultimaResposta}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt-BR" />
+                                    </h:outputText>                                
+                                </td>
+                            </tr>
+                        </ui:repeat>                    
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="right aligned" colspan="6">
+                                <div class="ui small pagination menu">
+                                    <div id="pagination-dropdown" class="ui dropdown link item" jsf:id="paginationInfo">
+                                        <span class="text">#{ticketSupportTableController.supportTable.first} - #{ticketSupportTableController.supportTable.last} de #{ticketSupportTableController.supportTable.rowCount}</span>
+                                        <div class="menu">
+                                            <div class="item" data-value="5">5 por página</div>
+                                            <div class="item active selected" data-value="10">10 por página</div>
+                                            <div class="item" data-value="20">20 por página</div>
+                                        </div>
+                                    </div>
+                                    <p:commandLink id="groups-prev-page" styleClass="icon item"
+                                                   actionListener="#{ticketSupportTableController.supportTable.previousPage()}"
+                                                   update="tableData paginationInfo">
+                                        <i class="chevron left icon"></i>
+                                    </p:commandLink>
+                                    <p:commandLink id="groups-next-page" styleClass="icon item"
+                                                   actionListener="#{ticketSupportTableController.supportTable.nextPage()}"
+                                                   update="tableData paginationInfo">
+                                        <i class="chevron right icon"></i>
+                                    </p:commandLink> 
+                                </div>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+            var myTable = function () {                
+                updateTicketSupportTable();
+            };            
+
+            var setIntervalDropdown = function () {
+                $('#time-interval-dropdown').dropdown({
+                    action: 'select'
+                });
+            }
+
+            var setGroupDropdown = function () {
+                $('#with-groups-dropdown').dropdown({
+                    action: 'select'
+                });
+            }
+
+            $('#pagination-dropdown').dropdown({
+                action: 'select',
+                direction: 'upward',
+                onChange: function (value, text) {
+                    Session.set('chamados-take', value);
+                }
+            });
+
+            setGroupDropdown();
+            setIntervalDropdown();
+        </script>
+    </ui:define>
+
+</ui:composition>

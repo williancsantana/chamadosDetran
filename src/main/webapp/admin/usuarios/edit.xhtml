@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:param name="menu" value="admin" />
+    <ui:param name="menuItem" value="usuarios" />
+
+    <ui:define name="page-title">
+        Detran - TO | Detalhe de Usuário
+    </ui:define>    
+
+    <ui:define name="content">
+        <h4 class="ui top attached header">Detalhes de #{userController.instance.name}</h4>
+        <div class="ui bottom attached segment">
+            <h:form id="user-form" class="ui form" prependId="false">
+                <div class="field">
+                    <label>Nome</label>
+                    <p>#{userController.instance.name}</p>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <label>CPF</label>
+                    <p>#{userController.instance.cpf}</p>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <label>Autenticação</label>                    
+                    <p jsf:rendered="#{userController.instance.isLdap()}">Esse usuário se autentica através do Active Directory</p>
+                    <p jsf:rendered="#{userController.instance.isLocal()}">Esse é um usuário local do sistema</p>
+                    <p jsf:rendered="#{userController.instance.isLocal()}"><a id="reset-password" href="">RESETAR SENHA</a></p>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <label>E-mail</label>
+                    <p>#{userController.instance.email}</p>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <label>Status</label>
+                    <table>
+                        <ui:remove transient="true">
+                            <tr>                            
+                                {{#if user.status.online}}
+                                <td><i class="green circle icon"></i></td>
+                                <td colspan="2"><b>Online em {{user.status.lastLogin.ipAddr}}</b></td>
+                                {{else}}
+                                <td><i class="red circle icon"></i></td>
+                                <td colspan="2"><em>Offline. {{#if user.status.lastLogin.ipAddr}}Último acesso através de {{user.status.lastLogin.ipAddr}}{{/if}}</em></td>
+                                {{/if}}                            
+                            </tr>
+                        </ui:remove>
+                        <tr>
+                            <td></td>
+                            <td class="user-form-status-col"><b>Visto por último em:</b></td>
+                            <td><h:outputText value="#{userController.instance.lastLogin.created}" >
+                                    <f:convertDateTime pattern="dd/MM/yyy HH:mm" locale="pt-BR" />
+                                </h:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><b>Cadastrado nesse sistema em:</b></td>
+                            <td>#{userController.instance.created}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <div id="user-form-away" class="ui checkbox">
+                        <input type="checkbox" name="away" checked="{{user.options.away}}" />
+                        <label><strong>Estado ausente</strong></label>
+                    </div>
+                </div>
+                <p>Ao ativar o estado ausente, novos chamados não serão automaticamente escalonados para esse usuário.<br/>
+                    <strong>O estado ausente só faz efeito em usuários que possam atender chamados</strong></p>
+                <div class="ui divider"></div>
+                <div class="field">
+                    <label>Grupos</label>
+                    <div class="ui segment no padding">
+                        <div class="ui divided list" jsf:id="grupoList">
+                            <ui:repeat var="grupo" value="#{userController.instance.grupos}">
+                                <div class="user item small padding" >
+                                    <i class="users icon"></i>
+                                    <div class="content">
+                                        <div class="header">#{grupo.ticketGroup.descricao}</div>
+                                        <div class="description">
+                                            <p:commandLink actionListener="#{userController.removeGrupo(grupo)}"
+                                                           value="Remover" update="grupoList"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                            <div id="empty-groups" class="item small padding"
+                                 jsf:rendered="#{userController.instance.grupos.size() == 0}">
+                                <i class="blue info icon"></i>
+                                <div class="content">
+                                    <div class="header">Nenhum grupo</div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <table class="ui very basic table">
+                        <tbody>
+                            <tr>
+                                <td class="collapsing center aligned"><strong>Adicionar</strong></td>
+                                <td class="center aligned">
+                                    <div id="add-group-dropdown" class="ui fluid selection dropdown">
+                                        <i class="dropdown icon"></i>
+                                        <input id="add-group-input" name="group-input" type="hidden" value="default" />
+                                        <div class="default text" ><i class="users icon"></i> Adicionar grupo</div>                                        
+                                        <div class="menu">
+                                            <ui:repeat var="ticketGroup" value="#{userController.listGrupos}" >
+                                                <div class="item" data-value="#{ticketGroup.id}" data-text="#{ticketGroup.descricao}"
+                                                     jsf:onclick="rc_#{ticketGroup.id}();">
+                                                    <p:remoteCommand name="rc_#{ticketGroup.id}" actionListener="#{userController.addTicketGroup(ticketGroup)}" />
+                                                    <i class="users icon"></i> #{ticketGroup.descricao}
+                                                    <div class="right floated">
+                                                        <i class="{{#if call.open}}green{{else}}disabled{{/if}} plus icon" title="Abrir chamados"></i>
+                                                        <i class="{{#if call.answer}}green{{else}}disabled{{/if}} comments outline icon" title="Atender chamados"></i>
+                                                        <i class="{{#if manager.users}}red{{else}}disabled{{/if}} user icon" title="Gerenciar usuários"></i>
+                                                        <i class="{{#if manager.groups}}red{{else}}disabled{{/if}} users icon" title="Gerenciar grupos"></i>
+                                                        <i class="{{#if manager.services}}red{{else}}disabled{{/if}} configure icon" title="Gerenciar catálogo de serviços"></i>
+                                                        <i class="{{#if manager.calls}}red{{else}}disabled{{/if}} inbox icon" title="Gerenciar chamados"></i>
+                                                        <i class="{{#if developer.apiKeys}}blue{{else}}disabled{{/if}} privacy icon" title="Gerenciar chaves de API"></i>
+                                                        <i class="{{#if developer.mongoShell}}blue{{else}}disabled{{/if}} cubes icon" title="Utilizar o Console MongoDB"></i>
+                                                        <i class="{{#if report.services}}orange{{else}}disabled{{/if}} bar chart icon" title="Ver relatórios de atendimento"></i>
+                                                        <i class="{{#if report.system}}orange{{else}}disabled{{/if}} database icon" title="Ver relatórios do sistema"></i>
+                                                    </div>
+                                                </div>
+                                            </ui:repeat>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="collapsing center aligned">                                    
+                                    <p:commandLink id="add-group-btn" value="Adicionar" styleClass="ui disabled green button" 
+                                                   actionListener="#{userController.adicionarTicketGroup()}" update="grupoList"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui buttons">
+                    <p:commandLink value="Salvar alterações" styleClass="ui submit blue button" 
+                                   actionListener="#{userController.update()}"/>
+                    <div class="or" data-text="ou"></div>
+                    <a href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf" class="ui button">Descartar alterações</a>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+            $('#add-group-dropdown').dropdown({
+                onChange: function (value, text, $choice) {
+                    $('#add-group-btn').removeClass('disabled');
+                    $('#add-group-input').attr('data-text', text);
+                }
+            });
+            $('.ui.checkbox').checkbox();
+        </script>
+    </ui:define>
+
+</ui:composition>

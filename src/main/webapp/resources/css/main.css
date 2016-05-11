@@ -1,0 +1,458 @@
+html, body {
+    height: 100% !important;
+    /*overflow: auto !important;
+    position: relative !important;*/
+}
+
+body {
+    background-image: url("#{resource['images/stripe.png']}");
+}
+
+.cursor.pointer {
+    cursor: pointer !important;
+    cursor: hand !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.light.gray {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.light.blue.bg {
+    background-color: #E9FAFF !important;
+}
+
+.light.red.bg {
+    background-color: #FFF0F0 !important;
+}
+
+.light.blue.bg > .header {
+    color: #337b92 !important;
+}
+
+.light.red.bg > .header {
+    color: #a94442 !important;
+}
+
+.full.width {
+    margin: 0px !important;
+    width: 100% !important;
+}
+
+.no.margin:not(.top) {
+    margin: 0 !important;
+}
+
+.no.padding {
+    padding: 0 !important;
+}
+
+.no.top.margin {
+    margin-top: 0 !important;
+}
+
+.small.margin:not(.top) {
+    margin: 5px !important;
+}
+
+.small.top.margin {
+    margin-top: 5px !important;
+}
+
+.standard.top.margin {
+    margin-top: 14px !important;
+}
+
+.standard.left.margin {
+    margin-left: 14px !important;
+}
+
+.indented {
+    margin-left: 36px !important;
+}
+
+.pull.left {
+    float: left !important;
+}
+
+.pull.right {
+    float: right !important;
+}
+
+.clearer {
+    clear: both !important;
+}
+
+.bold {
+    font-weight: bold !important;
+}
+
+.ui.mobile.icon.menu {
+    margin: 0 6px 5px !important;
+}
+
+.small.padding {
+    padding: 5px !important;
+}
+
+.cursor.auto {
+    cursor: auto !important;
+}
+
+.vertical.centered {
+    position: relative !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+}
+
+.ui.segments {
+    margin-top: 0 !important;
+}
+
+.ui.attached.header {
+    margin-top: 0 !important;
+}
+
+.ui.top.attached.header {  
+    border-bottom: none !important;  
+}
+
+.ui.segment {
+    margin-top: 0 !important;
+}
+
+.ui.icon.attached.message > img {
+    width: 46px !important;
+    height: 46px !important;
+    float: left !important;
+}
+
+.ui.icon.attached.message > .content {
+    padding-left: 0px !important;
+}
+
+.flash.margin {
+    margin-top: 0 !important;
+    margin-bottom: 5px !important;
+}
+
+.side.menu {
+    float: left !important;
+    width: 120px !important;
+    margin-left: 5px !important;
+}
+
+.ui.labeled.icon.menu {
+    width: 120px !important;
+    margin-bottom: 5px !important;
+    margin-top: 0 !important;
+}
+
+.main.container {
+    margin-top: 60px !important;
+}
+
+.ui.fluid.input > input {
+    width: 100% !important;
+}
+
+.servico.btns {
+    width: 237px !important;
+}
+
+.centered.statistics {
+    text-align: center;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.centered.segment {
+    margin: 0 auto;
+}
+
+.user-form-status-col {
+    width: 200px !important;
+}
+
+.wysiwyg.editor > .ql-editor {
+    min-height: 90px !important;
+}
+
+#cancel-btn, #cancel-btn > a.item {
+    height: 83px !important;
+}
+
+#cancel-btn > a.item > i.icon {
+    margin-bottom: 15px !important;
+}
+
+#chamados-table-filter {
+    margin-left: 92px !important;
+}
+
+.reply > .content {
+    font-size: 120% !important;
+}
+
+@media (min-width:992px) {
+    .calls.row > .column {
+        margin-bottom: 30px !important;
+    }
+}
+
+#api-key {
+    height: 13em;
+}
+
+.width.auto {
+    width: auto !important;
+}
+
+.ui.inverted.red.header {
+    color: #db2828 !important;
+}
+
+.ui.page.dimmer {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.text.align.left {
+    text-align: left !important;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.vk.colored {
+    background-color: #41648a !important;
+}
+
+.google.plus.colored {
+    background-color: #dc4a38 !important;
+}
+
+.bottom.floating.label:not(.attached) {
+    top: 2em !important;
+}
+
+.ui.menu.leftMenu{
+    border: none !important;
+    box-shadow: none !important; 
+}
+
+/* ie6 */* html .ui-growl {
+    position: absolute;
+}
+* html .ui-growl-item {
+    padding-bottom: 0;
+}
+* html .ui-growl-icon-close {
+    top: 7px;
+    right: 7px;
+}
+.ui-growl {
+    position: fixed;
+    top: 50px !important;
+    right: 15px !important;
+    width: 301px;
+}
+.ui-growl-item-container {
+    position: relative;
+    margin: 0 0 10px 0;
+    opacity: 0.99 !important;
+    filter: alpha(opacity=85);
+    background: white ! important;
+    color: rgba(0,0,0,.6) !important;
+    text-shadow: none !important;
+    border-radius: 0px !important;
+    border: none !important;
+    box-shadow: 0px 5px 10px rgba(0,0,0,0.5) !important;
+    font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif !important;
+}
+.ui-growl-item {
+    display: block;
+    padding: 10px 15px;
+}
+.ui-growl-item p {
+    padding: 0;
+    margin: 0;
+}
+.ui-growl-icon-close {
+    position: absolute;
+    top: 5px;
+    right: 3px;
+    cursor: pointer;
+}
+.ui-growl-title {
+    font-weight: bold;
+    padding: 0 0 7px 0;
+    display: block;
+}
+.ui-growl-image {
+    width: 32px;
+    height: 32px;
+    float: left;
+    margin: 0;
+    padding: 0;
+    display: block;
+    background: url("/chamados/javax.faces.resource/messages/messages.png.jsf?ln=primefaces&v=5.2") no-repeat;
+}
+.ui-growl-image-info {
+    background: none !important;    
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.ui-growl-image-info:before {
+    display: inline-block;
+    opacity: 1;        
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content: "\f05a";
+    color: #0E6EB8;
+    font-size: 32px;    
+}
+
+.ui-growl-image-warn {
+    background: none !important;    
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.ui-growl-image-warn:before {
+    display: inline-block;
+    opacity: 1;        
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content: "\f06a";
+    color: #FE9A76;
+    font-size: 32px;    
+}
+
+.ui-growl-image-error {
+    background: none !important;    
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.ui-growl-image-error:before {
+    display: inline-block;
+    opacity: 1;        
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content: "\f057";
+    color: #B03060;
+    font-size: 32px;    
+}
+
+.ui-growl-image-fatal {
+    background: none !important;    
+    vertical-align: middle;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.ui-growl-image-fatal:before {
+    display: inline-block;
+    opacity: 1;        
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    content: "\f057";
+    color: #B03060;
+    font-size: 32px;    
+}
+
+.ui-growl-message {
+    padding: 0 0 5px 0;
+    width: 220px;
+    float: right;
+}
+.ui-growl-message p {
+    font-weight: normal;
+}
+
+.proj-page-section {
+    padding: 15px 15px 20px;
+    border-top: solid 1px #d8e2e7;
+}
+
+.proj-page-attach {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: top;
+    position: relative;
+    padding: 0 30px 0 60px;
+    height: 54px;
+    margin: 0 0 20px;
+    font-size: .9375rem;
+    line-height: 18px;
+}
+
+.proj-page-attach .font-icon {
+    font-size: 2.875rem;
+    position: absolute;
+    left: 0;
+    top: 7px;
+    line-height: 1;
+    color: #adb7be;
+}
+
+
+.proj-page-attach .name {
+    font-weight: 600;
+}
+.proj-page-attach p {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.proj-page-attach p a {
+    margin: 0 15px 0 0;
+}
+
+

@@ -1,0 +1,35 @@
+.green.box:checked ~ label {
+    color: #5bbd72 !important;
+}
+
+.green.box:checked ~ .box:before,
+.green.box:checked ~ label:before {
+    background-color: #5bbd72 !important;
+}
+
+.red.box:checked ~ label {
+    color: #d95c5c !important;
+}
+
+.red.box:checked ~ .box:before,
+.red.box:checked ~ label:before {
+    background-color: #d95c5c !important;
+}
+
+.blue.box:checked ~ label {
+    color: #3b83c0 !important;
+}
+
+.blue.box:checked ~ .box:before,
+.blue.box:checked ~ label:before {
+    background-color: #3b83c0 !important;
+}
+
+.orange.box:checked ~ label {
+    color: #e07b53 !important;
+}
+
+.orange.box:checked ~ .box:before,
+.orange.box:checked ~ label:before {
+    background-color: #e07b53 !important;
+}

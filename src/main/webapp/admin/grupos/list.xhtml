@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:param name="menu" value="admin" />
+    <ui:param name="menuItem" value="grupos" />
+
+    <ui:define name="page-title">
+        Detran - TO | Grupos
+    </ui:define>    
+
+    <ui:define name="content">        
+        <h4 class="ui top attached header">Grupos</h4>
+        <div class="ui bottom attached segment">
+            <h:form>
+                <h:panelGroup layout="block">
+                    <table class="ui striped table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">
+                                    <div class="ui small fluid icon input">
+                                        <p:inputText id="groups-filter" placeholder="Filtrar" value="#{ticketGroupController.pagination.filterValue}" >
+                                            <p:ajax event="keyup" update="tableData paginationInfo" listener="#{ticketGroupController.pagination.actionFilter(fn:split('descricao', ','))}" />
+                                        </p:inputText>                                            
+                                        <i class="search icon"></i>
+                                    </div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Permissões</th>
+                            </tr>
+                        </thead>                        
+                        <tbody jsf:id="tableData">                        
+                            <tr jsf:rendered="#{ticketGroupController.pagination.data.isEmpty()}">
+                                <td colspan="2" class="center aligned"><i class="users icon"></i> <b>Nenhum grupo localizado</b></td>
+                            </tr>                
+                            <ui:repeat var="grupo" value="#{ticketGroupController.pagination.data}">
+                                <tr>
+                                    <td>
+                                        <i class="users icon"></i>
+                                        <h:commandLink class="group-name" 
+                                                       actionListener="#{ticketGroupController.click(grupo, 'grupoInstance', '/admin/grupos/edit.jsf')}">
+                                            #{grupo.descricao}</h:commandLink>
+                                    </td>
+                                    <td class="collapsing">
+                                        <i class="#{grupo.containPermission('chamado:abrir') ? 'green' : 'disabled'} plus icon" title="Abrir chamados"></i>
+                                        <i class="#{grupo.containPermission('chamado:atender') ? 'green' : 'disabled'} comments outline icon" title="Atender chamados"></i>
+                                        <i class="#{grupo.containPermission('gerenciar:usuarios') ? 'red' : 'disabled'} user icon" title="Gerenciar usuários"></i>
+                                        <i class="#{grupo.containPermission('gerenciar:grupos') ? 'red' : 'disabled'} users icon" title="Gerenciar grupos"></i>
+                                        <i class="#{grupo.containPermission('gerenciar:servicos') ? 'red' : 'disabled'} configure icon" title="Gerenciar catálogo de serviços"></i>
+                                        <i class="#{grupo.containPermission('gerenciar:chamados') ? 'red' : 'disabled'} inbox icon" title="Gerenciar chamados"></i>
+                                        <i class="#{grupo.containPermission('api:chaves') ? 'blue' : 'disabled'} privacy icon" title="Gerenciar chaves de API"></i>                                
+                                        <i class="#{grupo.containPermission('relatorio:atendimento') ? 'orange' : 'disabled'} bar chart icon" title="Ver relatórios de atendimento"></i>
+                                        <i class="#{grupo.containPermission('relatorio:sistema') ? 'orange' : 'disabled'} database icon" title="Ver relatórios do sistema"></i>
+                                    </td>
+                                </tr>
+                            </ui:repeat>                            
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th class="right aligned" colspan="3">
+                                    <a class="ui left floated labeled icon small green button" href="#{facesContext.externalContext.applicationContextPath}/admin/grupos/edit.jsf">
+                                        <i class="plus icon"></i> Novo
+                                    </a>
+                                    <div class="ui small pagination menu">
+                                        <div class="ui dropdown link item" jsf:id="paginationInfo">
+                                            <span class="text">#{ticketGroupController.pagination.first} - #{ticketGroupController.pagination.last} de #{ticketGroupController.pagination.rowCount}</span>
+                                            <div class="menu">
+                                                <div class="item active selected">#{ticketGroupController.pagination.pageSize} por página</div>
+                                                <div class="item">10 por página</div>
+                                                <div class="item">20 por página</div>
+                                            </div>
+                                        </div>
+                                        <p:commandLink id="groups-prev-page" styleClass="icon item"
+                                                       actionListener="#{ticketGroupController.pagination.previousPage()}"
+                                                       update="tableData paginationInfo">
+                                            <i class="chevron left icon"></i>
+                                        </p:commandLink>
+                                        <p:commandLink id="groups-next-page" styleClass="icon item"
+                                                       actionListener="#{ticketGroupController.pagination.nextPage()}"
+                                                       update="tableData paginationInfo">
+                                            <i class="chevron right icon"></i>
+                                        </p:commandLink>                                    
+                                    </div>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </h:panelGroup>
+            </h:form>
+        </div>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+            $(document).ready(function () {
+                $('.ui.dropdown').dropdown({
+                    action: 'select',
+                    direction: 'upward',
+                    onChange: function (value, text) {
+                        Session.set('groups-take', value);
+                    }
+                });
+            });
+        </script>
+    </ui:define>
+
+</ui:composition>

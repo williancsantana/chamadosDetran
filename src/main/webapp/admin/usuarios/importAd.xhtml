@@ -1,0 +1,73 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:param name="menu" value="admin" />
+    <ui:param name="menuItem" value="usuarios" />
+
+    <ui:define name="page-title">
+        Detran TO | Importar Usuário LDAP
+    </ui:define>    
+
+    <ui:define name="content">
+        <h:form id="import-ad-form" class="ui form" prependId="false">
+            <h4 class="ui top attached header">
+                Importar usuário do Active Directory
+            </h4>
+            <div class="ui bottom attached segment">            
+                <div class="field">
+                    <label>CPF do usuário</label>
+                    <p:inputText id="query-cpf" value="#{userController.ldapCpf}" />
+                </div>
+                <div class="ui buttons">                    
+                        <p:commandLink value="Buscar" actionListener="#{userController.searchLdapUser()}" 
+                                       styleClass="ui blue button" update="result"/>
+                        <div class="or" data-text="ou"></div>
+                        <a href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf" 
+                           class="ui button">Cancelar</a>
+                </div>            
+
+                <div jsf:id="result" class="ui #{userController.ldapUserResult == null ? ' disabled ' : ''} basic segment no padding standard top margin">
+                    <div id="result-message" class="ui top attached message">
+                        <i class="#{userController.ldapUserResult.mensagemIcon} icon"></i>
+                        <span>#{userController.ldapUserResult.mensagemResult}</span>
+                    </div>
+                    <div class="ui bottom attached tertiary segment">
+                        <table id="result-tbl" class="ui compact table">
+                            <tbody>
+                                <tr>
+                                    <td class="collapsing"><strong>CPF:</strong></td>
+                                    <td id="result-cpf">#{userController.ldapUserResult.userResult.displayName}</td>
+                                </tr>
+                                <tr>
+                                    <td class="collapsing"><strong>Nome:</strong></td>
+                                    <td id="result-name">#{userController.ldapUserResult.userResult.displayName}</td>
+                                </tr>
+                                <tr>
+                                    <td class="collapsing"><strong>E-mail:</strong></td>
+                                    <td id="result-email">#{userController.ldapUserResult.userResult.displayName}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>                    
+                    <p:commandLink styleClass="ui google plus standard top margin button"
+                                   disabled="#{userController.showImportButton}"
+                                   actionListener="#{userController.insertLdapUser()}" update="@form">
+                        <i class="download icon"></i> Importar
+                    </p:commandLink>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+
+        </script>
+    </ui:define>
+
+</ui:composition>

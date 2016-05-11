@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pt="http://java.sun.com/jsf/passthrough">
+    <h:head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <h:outputStylesheet library="semantic" name="semantic.min.css" />        
+        <h:outputStylesheet library="css" name="main.css" />        
+        <h:outputStylesheet library="css" name="flex.css" />                
+        <h:outputScript library="semantic" name="semantic.min.js" />        
+
+        <style type="text/css">
+            body > .grid {
+                height: 100%;
+            }
+            .image {
+                margin-top: -100px;
+            }
+            .column {
+                max-width: 450px;
+            }
+            .ui-growl {                
+                top: 20px !important;                
+            }
+        </style>
+
+        <title>Detran - TO | Login</title>
+    </h:head>
+    <h:body>
+        <p:dialog />
+        <p:growl autoUpdate="true" sticky="true" showDetail="true">            
+        </p:growl>
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui blue image header">
+                    <img src="#{facesContext.externalContext.applicationContextPath}/resources/images/detran_logo.png" class="image" ></img>
+                    <div class="content">
+                        Sistema de Chamados
+                        <div class="sub header">
+                            Faça login para continuar
+                        </div>
+                    </div>
+                </h2>
+
+                <h:form id="login-form" class="ui large form">
+                    <div class="ui error message">
+                        <div class="header">
+                            <i class="warning sign icon"></i>
+                            <span id="error-msg">Detalhes do erro</span>
+                        </div>
+                    </div>
+                    <div class="ui raised segment">                        
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <p:inputText id="cpf" pt:placeholder="CPF" value="#{subjectController.username}"
+                                             rendered="true" requiredMessage="É necessário fornecer o cpf"></p:inputText>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <p:password id="pwd" pt:placeholder="Senha" value="#{subjectController.password}"
+                                            rendered="true" requiredMessage="É necessário fornecer a senha"></p:password>
+                            </div>
+                        </div>                        
+                        <h:commandButton actionListener="#{subjectController.signIn()}" value="Entrar" 
+                                         styleClass="ui fluid large blue submit button"/>
+                    </div>
+                </h:form>
+                <div class="ui icon info message">
+                    <i class="info circle icon"></i>
+                    <div class="content">
+                        <div class="header">Sistema em Desenvolvimento</div>
+                        <p>
+                            Caso ele não se comporte como esperado, entre em contato conosco pelo e-mail
+                            <a href="mailto:desenvolvimento.ti@detran.to.gov.br">desenvolvimento.ti@detran.to.gov.br</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>
+
+

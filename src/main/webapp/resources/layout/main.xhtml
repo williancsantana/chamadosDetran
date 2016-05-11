@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:shiro="http://shiro.apache.org/tags"
+      xmlns:jsf="http://xmlns.jcp.org/jsf">
+    <h:head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="shortcut icon" type="image/x-icon" href="#{resource['images/detran_logo.png']}"/>
+
+        <h:outputStylesheet library="semantic" name="semantic.min.css" />        
+        <h:outputStylesheet library="css" name="main.css" />        
+        <h:outputStylesheet library="css" name="flex.css" />                
+        <h:outputStylesheet library="css" name="breakpointers.css" />
+        <h:outputStylesheet library="css" name="checkbox.css" />
+        <h:outputScript library="semantic" name="semantic.min.js" />        
+        <h:outputScript library="js" name="underscore-min.js" />                
+
+        <ui:insert name="head-include" />
+
+        <title><ui:insert name="page-title" /></title>
+    </h:head>
+    <h:body>
+        <p:dialog />
+        <p:growl autoUpdate="true" sticky="true" showDetail="true"/>
+        <div class="ui fixed vk colored inverted secondary menu">
+            <div class="item">
+                <img src="#{facesContext.externalContext.applicationContextPath}/resources/images/detran_logo.png" />
+            </div>
+            <div class="computer only header item">Sistema de Chamados</div>
+            <a class="item #{menu == 'chamados' ||  menu == 'abrir' ? 'active' : ''}" title="Service Desk"
+               href="#{facesContext.externalContext.applicationContextPath}">
+                <i class="comments outline no margin icon"></i>
+                <div jsf:id="navbar-todos-badge" class="bottom floating ui red label"
+                     jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.todos > 0}">
+                    #{ticketSupportTableController.supportTable.updateCount.todos}
+                </div>
+            </a>        
+            <a class="item #{menu == 'admin' ? 'active' : ''}" title="Painel de Administração"
+               href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
+                <i class="settings no margin icon"></i>
+            </a>        
+            <a class="item" title="Painel do Desenvolvedor">
+                <i class="code no margin icon"></i>
+            </a>        
+            <a class="item" title="Opções do Usuário">
+                <i class="options no margin icon"></i>
+            </a>
+            <div class="item no margin padding"></div>
+            <div class="computer only right menu">
+                <div class="item">
+                    <i class="user icon"></i> <shiro:principal />
+                </div>
+                <p:commandLink id="logout-btn" styleClass="item"
+                               actionListener="#{subjectController.signOut()}">
+                    <i class="power icon"></i> Sair
+                </p:commandLink>
+                <div class="item no margin padding"></div>
+            </div>           
+        </div>
+
+        <div class="main container">
+
+            <ui:include src="../menus/#{menu}.xhtml" />
+
+            <div class="content slot" id="contentTeste">
+                <ui:insert name="content" />
+            </div>
+        </div>
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+            <p:commandButton value="Sim" type="button" styleClass="White ui-confirmdialog-yes" icon="fa fa-check" />
+            <p:commandButton value="Não" type="button" styleClass="White ui-confirmdialog-no" icon="fa fa-times" />
+        </p:confirmDialog>
+
+
+        <ui:insert name="page-js" />
+        <script>
+            //https://wmarkito.wordpress.com/2012/04/05/adding-global-exception-handling-using-jsf-2-x-exceptionhandler/
+            function handleDialogSubmit(xhr, status, args, dialog) {
+                if (args.validationFailed) {
+                    dialog.show();
+                } else {
+                    dialog.hide();
+                }
+            }
+
+            var wsocket;
+            var serviceLocation = "ws://localhost:8080/chamados/support/#{userLogged.user.id}";
+
+            function onMessageReceived(evt) {
+                try {
+                    if (myTable !== undefined) {
+                        myTable();
+                    }
+                } catch (e) {}
+                try {
+                    if (updateView !== undefined) {
+                        updateView();
+                    }
+                } catch (e) {
+                    notifyMe(evt.data);
+                }
+                updateTicketSupportTableCount();                
+            }
+
+            function connectTo() {
+                wsocket = new WebSocket(serviceLocation);
+                wsocket.onmessage = onMessageReceived;
+            }
+
+            $(document).ready(function () {
+                connectTo();
+            });
+            
+
+            function notifyMe(msg) {
+                msg = JSON.parse(msg);
+                if (!("Notification" in window)) {
+                    alert("Seu navegador não possui suporte para notificações");
+                } else if (Notification.permission === "granted") {
+                    var notification = new Notification(msg.title, {
+                        icon: '#{facesContext.externalContext.applicationContextPath}/resources/images/detran_logo.png',
+                        body: msg.mensagem
+                    });                    
+                    notification.onclick = function () {                        
+                        document.location.href = msg.url;
+                    };
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission(function (permission) {
+                        var notification = new Notification(msg.title, {
+                            icon: '#{facesContext.externalContext.applicationContextPath}/resources/images/detran_logo.png',
+                            body: msg.mensagem,
+                        });                        
+                        notification.onclick = function () {                            
+                            document.location.href = msg.url;
+                        };
+                    });
+                }
+            }
+        </script>
+    </h:body>
+</html>
+
+
