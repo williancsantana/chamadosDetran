@@ -2,7 +2,8 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:f="http://java.sun.com/jsf/core"
     xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:ui="http://java.sun.com/jsf/facelets">
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:shiro="http://shiro.apache.org/tags">
 
     <div class="computer only side block flex column menu">
         <div id="menu-principal" class="ui vertical labeled grey inverted icon menu">
@@ -12,29 +13,44 @@
                 Início
             </a>
 
-            <a class="#{menuItem == 'usuarios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
-                <i class="user icon"></i>
-                Usuários
-            </a>
+			<shiro:hasPermission name="admin:usuarios"></shiro:hasPermission>
+	            <a class="#{menuItem == 'usuarios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
+	                <i class="user icon"></i>
+	                Usuários
+	            </a>
+            
+            
+            <shiro:hasPermission name="admin:grupos"></shiro:hasPermission>
 
             <a class="#{menuItem == 'grupos' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/grupos/list.jsf">
                 <i class="users icon"></i>
                 Grupos
             </a>
+            
+            
 
+			<shiro:hasPermission name="admin:servicos"></shiro:hasPermission>
             <a class="#{menuItem == 'servicos' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/servicos/list.jsf">
                 <i class="configure icon"></i>
                 Catálogo de Serviços
             </a>
+            
+            
+            
+            <shiro:hasPermission name="admin:recorrentes"></shiro:hasPermission>
             <a class="#{menuItem == 'recorrentes' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/recorrents/list.jsf">
                 <i class="wait icon"></i>
                 Serviços Recorrentes
             </a>
+            
+            
 
+			<shiro:hasPermission name="admin:relatorios"></shiro:hasPermission>
             <a class="#{menuItem == 'relatorios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/relatorios/list.jsf">
                 <i class="bar chart icon"></i>
                 Relatórios
             </a>                
+                        
         </div>
     </div>
 

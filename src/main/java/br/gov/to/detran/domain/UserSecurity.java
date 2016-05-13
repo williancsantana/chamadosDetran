@@ -147,9 +147,11 @@ public class UserSecurity extends AbstractEntity implements Security{
 
     public List<TicketGroup> getAllGrupos() {
         List<TicketGroup> tempGrupos = new ArrayList<>();
-        for(UserSecurityGroup g : this.grupos){
-            tempGrupos.add(g.getTicketGroup());
-        }
+        if(this.grupos != null){
+        	for(UserSecurityGroup g : this.grupos){
+                tempGrupos.add(g.getTicketGroup());
+            }
+        }        
         return tempGrupos;
     }
 

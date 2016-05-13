@@ -5,11 +5,33 @@
  */
 package br.gov.to.detran.dao;
 
-import br.gov.to.detran.domain.AbstractEntity;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceException;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.EntityPath;
+import com.querydsl.core.types.Ops;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.PredicateOperation;
+import com.querydsl.core.types.dsl.BooleanPath;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.SimplePath;
@@ -17,21 +39,8 @@ import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAQueryBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAUpdateClause;
-import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceException;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.transaction.Transactional;
-import javax.validation.ConstraintViolationException;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
+
+import br.gov.to.detran.domain.AbstractEntity;
 
 /**
  * Dao de Acesso ao banco de dados Generico. Serve para todas os dominios do
@@ -235,24 +244,29 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
 
     public LazyResult<T> lazyLoad(Map<String, Object> fkEntities, EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values, BooleanBuilder where, Boolean or) {
         this.applyFilter(entity, fkEntities, where, false);
-        this.applyFilter(entity, values, where, or);
+        if(or){
+        	this.applyFilterAndOfAllOf(entity, values, where);
+        }        
+        BooleanPath removed = (BooleanPath) Expressions.booleanPath(entity, "removed");
+        where.and(removed.isFalse());
         JPAQueryBase queryCount = (JPAQueryBase) this.query().from(entity).where(where);
         Long count = queryCount.fetchCount();
         JPAQueryBase query = (JPAQueryBase) this.query().from(entity).where(where).offset(first).limit(pageSize);
         if (sortField != null && !sortField.isEmpty()) {
             query.orderBy(new OrderSpecifier(order.equalsIgnoreCase("ASCENDING") ? Order.ASC : Order.DESC, Expressions.stringPath(entity, sortField)));
         }
-        List<T> result = query.fetch();
+        System.out.println(query.toString());
+        List<T> result = query.fetch();        
         return new LazyResult<>(result, count);
     }
 
-    private void applyFilter(EntityPathBase<T> entity, Map<String, Object> attrs, BooleanBuilder where, Boolean or) {
+    private void applyFilter(EntityPathBase<T> entity, Map<String, Object> attrs, BooleanBuilder where, Boolean or) {    	
         if (attrs != null && !attrs.isEmpty()) {
             for (String filterProperty : attrs.keySet()) {
                 Field field = this.getFieldFrom(filterProperty);
                 if (field != null) {
                     String filterValue = String.valueOf(attrs.get(filterProperty));
-                    SimplePath path = Expressions.path(field.getType(), entity, filterProperty);
+                    SimplePath path = Expressions.path(field.getType(), entity, filterProperty);                    
                     StringExpression template = Expressions.stringTemplate("cast({0} as text)", path);
                     if (or) {
                         where.or(template.containsIgnoreCase(filterValue));
@@ -261,6 +275,27 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
                     }
                 }
             }
+        }
+    }
+    
+    private void applyFilterAndOfAllOf(EntityPathBase<T> entity, Map<String, Object> attrs, BooleanBuilder where) {    	
+        if (attrs != null && !attrs.isEmpty()) {
+        	List<Predicate> predicados = new ArrayList<>();
+            for (String filterProperty : attrs.keySet()) {
+                Field field = this.getFieldFrom(filterProperty);
+                if (field != null) {
+                    String filterValue = String.valueOf(attrs.get(filterProperty));
+                    SimplePath path = Expressions.path(field.getType(), entity, filterProperty);
+                    StringExpression template = Expressions.stringTemplate("cast({0} as text)", path);
+                    //predicados.add(template.containsIgnoreCase(filterValue));
+                    Predicate predicateOperation = Expressions.predicate(Ops.LIKE,
+                    		path, Expressions.constant("1%"));
+                    //predicados.add(template.equalsIgnoreCase(filterValue));
+                    predicados.add(predicateOperation);
+                }
+            }
+            Predicate[] pred = new Predicate[predicados.size()]; 
+            where.andAnyOf(predicados.toArray(pred));
         }
     }
 

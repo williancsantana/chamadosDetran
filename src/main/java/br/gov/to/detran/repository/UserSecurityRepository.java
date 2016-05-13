@@ -45,7 +45,7 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
         where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.id.ne(solicitante.getId()));
         where.and(QUserSecurityGroup.userSecurityGroup
                 .ticketGroup.id.in(
-                        JPAExpressions.select(QTicketGroupService.ticketGroupService.servico.id)
+                        JPAExpressions.select(QTicketGroupService.ticketGroupService.grupo.id)
                                 .from(QTicketGroupService.ticketGroupService)
                                 .leftJoin(QTicketGroupService.ticketGroupService.servico)
                                 .where(new BooleanBuilder().and(QTicketGroupService.ticketGroupService

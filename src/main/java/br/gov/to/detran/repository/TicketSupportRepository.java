@@ -159,7 +159,7 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
                         .from(QUserSecurityGroup.userSecurityGroup)
                         .where(QUserSecurityGroup.userSecurityGroup.userSecurity.id.eq(onlineUser.getId()))
                 ));
-        where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.ATENDENTE));                
+        //where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.ATENDENTE));                
         JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
         query.from(QTicketGroupService.ticketGroupService)
                 .select(QTicketGroupService.ticketGroupService.servico.id)
@@ -195,7 +195,7 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
             parameters.put("solViewat", new Date());
             parameters.put("id", instance.getId());
             this.getPersistenceDao().executeRawQuery("update TicketSupport set solViewat =:solViewat where id =:id", parameters);
-        } else if (instance.getAtendente().getId().equals(user.getId())) {         
+        } else if (instance.getAtendente() != null && instance.getAtendente().getId().equals(user.getId())) {         
             HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("atViewat", new Date());
             parameters.put("id", instance.getId());

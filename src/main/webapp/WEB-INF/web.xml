@@ -53,7 +53,17 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
         <dispatcher>ERROR</dispatcher>
-    </filter-mapping>       
+    </filter-mapping>      
+    
+    <error-page>  
+	    <error-code>404</error-code>  
+	    <location>/error.jsf</location>  
+	</error-page>
+	
+	<error-page>  
+	    <error-code>401</error-code>  
+	    <location>/permissao.jsf</location>  
+	</error-page> 
 
     <mime-mapping>
         <extension>eot</extension>

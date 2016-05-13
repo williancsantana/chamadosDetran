@@ -103,12 +103,12 @@
                                 </td>
                                 <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado)}">
                                             #{chamado.numero}</h:commandLink></td>
-                                <td><a href="#">    
+                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado)}">
                                         <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
                                         <i class="warning sign orange icon" jsf:rendered="#{chamado.status == 'PENDENTE_USUARIO'}"
                                            title="Esse chamado está pendente com o solicitante"></i>                                    
                                         #{chamado.assunto}
-                                    </a></td>
+                                    </h:commandLink></td>
                                 <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante.name}</td>
                                 <td class="collapsing" title="{{ifNeedsTitle attendant.name}}">
                                     <h:outputText value="#{chamado.atendente.name}" rendered="#{chamado.atendente != null}"/>
@@ -129,9 +129,26 @@
                                     <div id="pagination-dropdown" class="ui dropdown link item" jsf:id="paginationInfo">
                                         <span class="text">#{ticketSupportTableController.supportTable.first} - #{ticketSupportTableController.supportTable.last} de #{ticketSupportTableController.supportTable.rowCount}</span>
                                         <div class="menu">
-                                            <div class="item" data-value="5">5 por página</div>
-                                            <div class="item active selected" data-value="10">10 por página</div>
-                                            <div class="item" data-value="20">20 por página</div>
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getSizeFilterActive(5)}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeSize(5)}"
+                                                           update=":tableData :paginationInfo"
+                                                           oncomplete="setPaginationDropdown()">
+                                                <i class="user icon"></i> 5 por página
+                                            </p:commandLink>
+                                            
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getSizeFilterActive(10)}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeSize(10)}"
+                                                           update=":tableData :paginationInfo"
+                                                           oncomplete="setPaginationDropdown()">
+                                                <i class="user icon"></i> 10 por página
+                                            </p:commandLink>
+                                            
+                                            <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getSizeFilterActive(20)}"
+                                                           actionListener="#{ticketSupportTableController.supportTable.changeSize(20)}"
+                                                           update=":tableData :paginationInfo"
+                                                           oncomplete="setPaginationDropdown()">
+                                                <i class="user icon"></i> 20 por página
+                                            </p:commandLink>                                                                                       
                                         </div>
                                     </div>
                                     <p:commandLink id="groups-prev-page" styleClass="icon item"
@@ -170,17 +187,17 @@
                     action: 'select'
                 });
             }
-
-            $('#pagination-dropdown').dropdown({
-                action: 'select',
-                direction: 'upward',
-                onChange: function (value, text) {
-                    Session.set('chamados-take', value);
-                }
-            });
+            
+            var setPaginationDropdown = function () {
+            	$('#pagination-dropdown').dropdown({
+                    action: 'select',
+                    direction: 'upward'
+                });
+            }           
 
             setGroupDropdown();
             setIntervalDropdown();
+            setPaginationDropdown();
         </script>
     </ui:define>
 

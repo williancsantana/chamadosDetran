@@ -47,6 +47,10 @@ public class TicketService extends AbstractEntity{
     @ManyToOne
     private PaginaSistema pagina;
     
+    
+    @Column(name = "padrao", nullable = true)
+    private Boolean padrao = false;
+    
     @Transient
     private List<TicketServiceField> fields = new ArrayList<>();
     
@@ -147,8 +151,15 @@ public class TicketService extends AbstractEntity{
         this.solicitantes = solicitantes;
     }        
     
-    public String[] getTips(){
-        return this.solucoes.split("\n");
+    public List<String> getTips(){
+    	List<String> tips = new ArrayList<>();
+    	for(String tp : this.solucoes.split("\n")){
+    		if(!tp.isEmpty()){
+    			tips.add(tp);
+    		}    		
+    	}
+    	
+        return tips;
     }
 
     public PaginaSistema getPagina() {
@@ -166,5 +177,13 @@ public class TicketService extends AbstractEntity{
             return "/abrirchamado.jsf";
         }
     }
+    
+    public Boolean getPadrao() {		
+		return padrao != null ? padrao : false; 
+	}
+
+	public void setPadrao(Boolean padrao) {
+		this.padrao = padrao;
+	}
     
 }

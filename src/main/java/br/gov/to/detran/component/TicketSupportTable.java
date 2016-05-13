@@ -47,7 +47,7 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     private int currentPage;
-    private int pageSize;
+    private int pageSize = 10;
     private int rowCount;
     private String filterValue;
     private String[] filterColumns;
@@ -59,7 +59,7 @@ public class TicketSupportTable implements java.io.Serializable {
 
     public TicketSupportTable() {
         this.currentPage = 0;
-        this.pageSize = 30;
+        this.pageSize = 5;
         this.filterColumns = new String[]{"numero", "assunto", "solicitante.name", "atendente.name"};
     }
 
@@ -83,8 +83,12 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     public void actionFilter() {
-        this.currentPage = 0;
-        this.pageSize = 30;
+        this.currentPage = 0;        
+        this.update();
+    }
+    
+    public void changeSize(Integer size){
+        this.pageSize = size;
         this.update();
     }
     
@@ -104,13 +108,7 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     public List<TicketSupport> load() {
-        HashMap<String, Object> filterHash = new HashMap<>();
-        if (this.filterValue != null && !this.filterValue.isEmpty()) {
-            for (String filterColumn : filterColumns) {
-                filterHash.put(filterColumn, filterValue);
-            }
-        }
-        BooleanBuilder booleanBuilder = new BooleanBuilder();
+    	BooleanBuilder booleanBuilder = new BooleanBuilder();               
         if (null != this.status) {
             switch (this.status) {
                 case ABERTOS:
@@ -155,9 +153,23 @@ public class TicketSupportTable implements java.io.Serializable {
                     List<Long> ids = repository.getUserServices();
                     System.out.println(ids);                    
                     booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids));
-                    break;                
+                    break;             
             }
         }
+        
+        /*HashMap<String, Object> filterHash = new HashMap<>();
+        if (this.filterValue != null && !this.filterValue.isEmpty()) {
+            for (String filterColumn : filterColumns) {
+                filterHash.put(filterColumn, filterValue);
+            }
+        }*/
+        
+        HashMap<String, Object> filterHash = null;
+        if (this.filterValue != null && !this.filterValue.isEmpty()) {
+        	booleanBuilder.andAnyOf(QTicketSupport.ticketSupport.assunto.containsIgnoreCase(filterValue),
+            		QTicketSupport.ticketSupport.numero.containsIgnoreCase(filterValue),
+            		QTicketSupport.ticketSupport.atendente.name.containsIgnoreCase(filterValue));
+        }        
         
         LazyResult<TicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
                 "desc", filterHash, booleanBuilder, true);
@@ -286,6 +298,14 @@ public class TicketSupportTable implements java.io.Serializable {
     public String getGrupoFilterActive(String status) {
         TicketSupportTableGrupo statusTemp = TicketSupportTableGrupo.valueOf(status);
         if (this.grupos == statusTemp) {
+            return "selected active";
+        }
+        return "";
+    }
+    
+    public String getSizeFilterActive(String valor) {
+        Integer size = Integer.parseInt(valor);
+        if (this.pageSize == size) {
             return "selected active";
         }
         return "";

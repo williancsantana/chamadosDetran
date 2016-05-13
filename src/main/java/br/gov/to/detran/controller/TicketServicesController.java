@@ -86,7 +86,7 @@ public class TicketServicesController extends BaseController<TicketService> impl
     }
     
     public void removeAndRedirect(TicketService instance, String link){        
-        try {
+        try {        	
             this.remove(instance);
             this.redirect(link);
         } catch (IOException ex) {
@@ -97,7 +97,7 @@ public class TicketServicesController extends BaseController<TicketService> impl
 
     public void remove(TicketService instance) {
         try {
-            this.repository.remove(instance);
+            this.repository.remove(instance, true);
             this.addMenssage(FacesMessage.SEVERITY_INFO, "Registro Excluído", "Exclusão");
         } catch (Exception ex) {
             ex.printStackTrace();

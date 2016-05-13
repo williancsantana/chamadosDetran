@@ -41,13 +41,15 @@
                     #{ticketSupportTableController.supportTable.updateCount.todos}
                 </div>
             </a>        
-            <a class="item #{menu == 'admin' ? 'active' : ''}" title="Painel de Administração"
-               href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
-                <i class="settings no margin icon"></i>
-            </a>        
-            <a class="item" title="Painel do Desenvolvedor">
-                <i class="code no margin icon"></i>
-            </a>        
+            <shiro:hasRole name="Admin"></shiro:hasRole>
+	            <a class="item #{menu == 'admin' ? 'active' : ''}" title="Painel de Administração"
+	               href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
+	                <i class="settings no margin icon"></i>
+	            </a>        
+	            <a class="item" title="Painel do Desenvolvedor">
+	                <i class="code no margin icon"></i>
+	            </a>        
+            
             <a class="item" title="Opções do Usuário">
                 <i class="options no margin icon"></i>
             </a>

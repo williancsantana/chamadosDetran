@@ -56,7 +56,7 @@
                         </ui:remove>
                         <tr>
                             <td></td>
-                            <td class="user-form-status-col"><b>Visto por último em:</b></td>
+                            <td class="user-form-status-col"><b>Visto por último em: </b></td>
                             <td><h:outputText value="#{userController.instance.lastLogin.created}" >
                                     <f:convertDateTime pattern="dd/MM/yyy HH:mm" locale="pt-BR" />
                                 </h:outputText>
@@ -64,15 +64,17 @@
                         </tr>
                         <tr>
                             <td></td>
-                            <td><b>Cadastrado nesse sistema em:</b></td>
-                            <td>#{userController.instance.created}</td>
+                            <td><b>Cadastrado nesse sistema em: </b></td>
+                            <td><h:outputText value="#{userController.instance.created}" >
+                                    <f:convertDateTime pattern="dd/MM/yyy HH:mm" locale="pt-BR" />
+                                </h:outputText></td>
                         </tr>
                     </table>
                 </div>
                 <div class="ui divider"></div>
                 <div class="field">
-                    <div id="user-form-away" class="ui checkbox">
-                        <input type="checkbox" name="away" checked="{{user.options.away}}" />
+                    <div id="user-form-away" class="ui checkbox">                        
+                        <h:selectBooleanCheckbox value="#{userController.instance.ausente}"/>
                         <label><strong>Estado ausente</strong></label>
                     </div>
                 </div>

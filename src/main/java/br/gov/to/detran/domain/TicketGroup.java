@@ -24,7 +24,7 @@ public class TicketGroup extends AbstractEntity{
     private String descricao;
     
     @Column(name = "permissoes", nullable = false, length = 4000)
-    private String permissoes;  
+    private String permissoes;   
     
     @Transient
     private List<String> permissions;
@@ -59,6 +59,6 @@ public class TicketGroup extends AbstractEntity{
         System.out.println(permission);
         System.out.println(Arrays.deepToString(this.permissions().toArray()));
         return this.permissions().contains(permission);
-    }       
-    
+    }
+
 }

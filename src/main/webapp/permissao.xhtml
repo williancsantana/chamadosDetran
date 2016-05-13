@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:param name="menu" value="abrir" />    
+
+    <ui:define name="page-title">
+        Detran - TO | Não Autorizado
+    </ui:define>
+
+    <ui:define name="content">
+                              
+    			<h4 class="ui top attached header">
+	    			<div class="ui top attached centered page grid">	    			
+	                    <div class="row">
+	                    <h2 class="ui icon header">
+				                    <i class="protect icon"></i>
+				                    Não autorizado
+				                    <div class="sub header">Seu perfil não permite o acesso dessa página</div>
+				                </h2>
+				                <br/>
+				                <br/>			                	                       
+	                    </div>                    
+	                </div>
+    			</h4> 
+                       
+                              
+    </ui:define>  
+
+</ui:composition>

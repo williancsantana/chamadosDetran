@@ -41,12 +41,14 @@
                 <ui:repeat var="field" value="#{ticketSupportController.service.fields}">
                     <div class="field ticket-field" jsf:rendered="#{field.tipo == 'input'}">
                         <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
-                        <h:inputText value="#{field.value}" required="#{field.obrigatorio}"/>
+                        <h:inputText value="#{field.value}" required="#{field.obrigatorio}"
+                        	requiredMessage="Campo #{field.descricao} é obrigatório!" />
                     </div>
 
                     <div class="field ticket-field" jsf:rendered="#{field.tipo == 'select'}">
                         <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
                         <h:selectOneMenu value="#{field.value}" rendered="#{field.obrigatorio}"
+                        					requiredMessage="Campo #{field.descricao} é obrigatório!"
                                          styleClass="ui dropdown">
                             <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" />                        
                         </h:selectOneMenu>
@@ -55,6 +57,7 @@
                     <div class="field ticket-field" jsf:rendered="#{field.tipo == 'checkbox'}">
                         <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>                       
                         <h:selectManyCheckbox value="#{field.selectedOptions}" required="#{field.obrigatorio}"
+                        						requiredMessage="Campo #{field.descricao} é obrigatório!"
                                               styleClass="ui checkbox" layout="pageDirection">
                             <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" itemValue="#{item}"/>
                         </h:selectManyCheckbox>                                                                        
@@ -62,7 +65,8 @@
 
                     <div class="field ticket-field" jsf:rendered="#{field.tipo == 'radio'}">
                         <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
-                        <h:selectOneRadio value="#{field.value}" required="#{field.obrigatorio}" layout="pageDirection" >
+                        <h:selectOneRadio value="#{field.value}" required="#{field.obrigatorio}" layout="pageDirection" 
+                        					requiredMessage="Campo #{field.descricao} é obrigatório!">
                             <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" 
                                            itemValue="#{item}"/>
                         </h:selectOneRadio>                        
@@ -143,7 +147,7 @@
             </h:form>
         </div>
 
-        <div id="tips-dimmer" class="ui page dimmer" jsf:rendered="#{not empty ticketSupportController.service.tips}">
+        <div id="tips-dimmer" class="ui page dimmer" jsf:rendered="#{ticketSupportController.service.getTips().size() > 0}">
             <div class="content">
                 <div class="center">
                     <h2 class="ui inverted blue icon header">

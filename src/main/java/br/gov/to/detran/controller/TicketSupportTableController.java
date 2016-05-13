@@ -21,8 +21,12 @@ public class TicketSupportTableController implements java.io.Serializable {
     private @Inject TicketSupportTable supportTable;
 
     @PostConstruct
-    public void postConstruct() {     
-        this.supportTable.update();
+    public void postConstruct() {
+    	try{
+    		this.supportTable.update();
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    	}        
     }
 
     public TicketSupportTable getSupportTable() {

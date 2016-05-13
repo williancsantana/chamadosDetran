@@ -214,6 +214,12 @@
                     <label>Possíveis soluções <small class="light gray"><i>(opcional)</i></small></label>
                     <p:inputTextarea id="service-tips" ph:placeholder="Uma solução por linha" value="#{ticketServicesController.instance.solucoes}"></p:inputTextarea>
                 </div>
+                <div class="field">                    
+                    <div id="user-form-away" class="ui checkbox">                        
+                        <h:selectBooleanCheckbox value="#{ticketServicesController.instance.padrao}"/>
+                        <label><strong>Serviço é padrão para novos usuários? </strong><small class="light gray"><i>(opcional)</i></small></label>
+                    </div>
+                </div>
                 <div class="ui divider"></div>
                 <div class="ui buttons" jsf:id="insertButton">
                     <p:commandLink actionListener="#{ticketServicesController.insert()}"
@@ -253,6 +259,7 @@
             
             servicePathMarkup($('#serviceName'));
             pathMarkup($('#service-path'));
+            $('.ui.checkbox').checkbox();
         </script>
     </ui:define>
 

@@ -44,11 +44,19 @@ public abstract class AbstractRepository<T extends AbstractEntity> implements Re
             throw new Exception("Campos Obrigatorios não foram preenchidos!");
         }
     }
-
+    
     public void remove(T entity) throws Exception {
+        this.remove(entity, false);
+    }
+
+    public void remove(T entity, boolean softDelete) throws Exception {
         try {
             if (entity.getId() > 0) {
-                this.persistenceDao.delete(this.persistenceDao.findById(entity.getId()));
+            	if(!softDelete){
+            		this.persistenceDao.delete(this.persistenceDao.findById(entity.getId()));
+            	}else{
+            		this.persistenceDao.softDelete(entity);
+            	}            	            	
             }
         } catch (NullPointerException e) {
             throw new Exception("Campos Obrigatorios não foram preenchidos!");

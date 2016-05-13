@@ -84,7 +84,7 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
 
     public void remove(TicketGroup instance) {
         try {
-            this.repository.remove(instance);
+            this.repository.remove(instance, true);
             this.addMenssage(FacesMessage.SEVERITY_INFO, "Registro Excluído", "Exclusão");
         } catch (Exception ex) {
             ex.printStackTrace();
