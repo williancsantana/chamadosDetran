@@ -39,7 +39,7 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     public enum TicketSupportTableFilter {
-        TODOS, ABERTOS, PENDENTES, FECHADOS;
+        TODOS, ABERTOS, PENDENTES, FECHADOS, NAO_DEFINIDO;
     }
 
     public enum TicketSupportTableGrupo {
@@ -55,7 +55,7 @@ public class TicketSupportTable implements java.io.Serializable {
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.HOJE;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
-    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L);
+    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
 
     public TicketSupportTable() {
         this.currentPage = 0;
@@ -121,6 +121,9 @@ public class TicketSupportTable implements java.io.Serializable {
                 case PENDENTES:
                     booleanBuilder.and(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.PENDENTE_USUARIO).or(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.PENDENTE_TERCEIROS)));
                     break;
+                case NAO_DEFINIDO:
+                    booleanBuilder.and(QTicketSupport.ticketSupport.atendente.isNull());
+                    break;
                 default:
             }
         }
@@ -144,15 +147,23 @@ public class TicketSupportTable implements java.io.Serializable {
             }
         }
         UserSecurity user = FacesUtil.loggedUser();
+        
         if (null != this.grupos) {
             switch (this.grupos) {
-                case MEUS:
-                    booleanBuilder.and(QTicketSupport.ticketSupport.solicitante.id.eq(user.getId()).or(QTicketSupport.ticketSupport.atendente.id.eq(user.getId())));
+                case MEUS:        
+                	if(this.status == TicketSupportTableFilter.NAO_DEFINIDO){
+                		booleanBuilder.and(QTicketSupport.ticketSupport.solicitante.id.eq(user.getId()).and(QTicketSupport.ticketSupport.atendente.isNull()));
+                	}else{
+                		booleanBuilder.and(QTicketSupport.ticketSupport.solicitante.id.eq(user.getId()).or(QTicketSupport.ticketSupport.atendente.id.eq(user.getId())));
+                	}
                     break;                
-                case TODOS:                                        
-                    List<Long> ids = repository.getUserServices();
-                    System.out.println(ids);                    
-                    booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids));
+                case TODOS:
+                	List<Long> ids = repository.getUserServices();                          
+                	if(this.status == TicketSupportTableFilter.NAO_DEFINIDO){
+                		booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids).and(QTicketSupport.ticketSupport.atendente.isNull()));
+                	}else{
+                		booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids));
+                	}                                 
                     break;             
             }
         }
@@ -184,6 +195,7 @@ public class TicketSupportTable implements java.io.Serializable {
         this.updateCount.setAbertos(this.repository.countAbertos(onlineUser));
         this.updateCount.setFechados(this.repository.countFechados(onlineUser));
         this.updateCount.setPendentes(this.repository.countPendentes(onlineUser));
+        this.updateCount.setNaoDefinido(this.repository.countNaoDefinido(onlineUser));
     }
 
     public boolean isNextPage(Integer next) {
@@ -328,6 +340,8 @@ public class TicketSupportTable implements java.io.Serializable {
                     return "Chamados fechados";
                 case PENDENTES:
                     return "Chamados pendentes";
+                case NAO_DEFINIDO:
+                    return "Chamados Aguardando Atendimento";
                 default:
                     return "Todos os chamados";
             }

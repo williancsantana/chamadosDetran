@@ -151,6 +151,14 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
         return (Long) query.fetchFirst();
     }
     
+    public Long countNaoDefinido(UserSecurity onlineUser) {     
+        BooleanBuilder where = this.getDefaultWhere();
+        JPAQueryBase query = this.getPersistenceDao().query();        
+        where.and(QTicketSupport.ticketSupport.atendente.isNull());
+        query.select(QTicketSupport.ticketSupport.id.count()).from(QTicketSupport.ticketSupport).where(where);
+        return (Long) query.fetchFirst();
+    }
+    
     public List<Long> getUserServices(){
         UserSecurity onlineUser = FacesUtil.loggedUser();                
         BooleanBuilder where = new BooleanBuilder();

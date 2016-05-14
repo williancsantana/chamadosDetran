@@ -5,18 +5,26 @@
  */
 package br.gov.to.detran.repository;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPAQueryBase;
+
+import br.gov.to.detran.domain.QEscalaTrabalho;
 import br.gov.to.detran.domain.QTicketGroupService;
 import br.gov.to.detran.domain.QUserSecurity;
 import br.gov.to.detran.domain.QUserSecurityGroup;
 import br.gov.to.detran.domain.TicketGroupServiceType;
 import br.gov.to.detran.domain.TicketService;
 import br.gov.to.detran.domain.UserSecurity;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPAQueryBase;
-import java.util.List;
-import javax.transaction.Transactional;
+import br.gov.to.detran.enumeration.DiaSemana;
 
 /**
  *
@@ -35,12 +43,13 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
         where.and(QUserSecurity.userSecurity.cpf.eq(cpf));
         JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
         query = (JPAQueryBase) query.from(QUserSecurity.userSecurity).where(where);
-        Long count = query.fetchCount();
+        Long count = query.fetchCount();        
         return count != 0;
         
     }
     
-    public List<Long> solicitanteIds(UserSecurity solicitante, TicketService service){        
+    public List<Long> solicitanteIds(UserSecurity solicitante, TicketService service, DiaSemana diaSemana, Date hora){
+    	QEscalaTrabalho qEscala = QEscalaTrabalho.escalaTrabalho;
         BooleanBuilder where = new BooleanBuilder();
         where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.id.ne(solicitante.getId()));
         where.and(QUserSecurityGroup.userSecurityGroup
@@ -51,13 +60,31 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
                                 .where(new BooleanBuilder().and(QTicketGroupService.ticketGroupService
                                         .tipo.eq(TicketGroupServiceType.ATENDENTE))
                                         .and(QTicketGroupService.ticketGroupService.servico.id.eq(service.getId())))));
-        where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.ausente.eq(false));                                      
+        where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.ausente.eq(false));
+        
+        /*BooleanBuilder expressaoHora = new BooleanBuilder(qEscala.diaSemana.eq(diaSemana).and(
+        		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())));
+        
+        BooleanBuilder expressaoHora2 = new BooleanBuilder(qEscala.escalaTrabalho.isNull());
+        expressaoHora2.orAllOf(com.mysema.query.types.expr.BooleanExpression.allOf());*/
+                
+        where.andAnyOf(qEscala.escalaTrabalho.isNull().or(new BooleanBuilder().orAllOf(qEscala.diaSemana.eq(diaSemana).and(
+        		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())))));
+       /* where.andAnyOf(qEscala.escalaTrabalho.isNull(), new BooleanBuilder().orAllOf(qEscala.diaSemana.eq(diaSemana),
+        		qEscala.horaInicial.hour().goe(hora.getHours()), qEscala.horaFinal.hour().loe(hora.getHours()))).getValue();*/
+        		/*.orAllOf(qEscala.diaSemana.eq(diaSemana),
+                		qEscala.horaInicial.hour().goe(hora.getHours()), qEscala.horaFinal.hour().loe(hora.getHours()));*/
+/*        where.andAnyOf(
+    	.or(qEscala.diaSemana.eq(diaSemana).andAnyOf((qEscala.diaSemana.eq(diaSemana))
+    	    	.and(qEscala.horaInicial.goe(hora)).and(qEscala.horaFinal.loe(hora)))));*/        
         JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
         query.from(QUserSecurityGroup.userSecurityGroup)
-                .select(QUserSecurityGroup.userSecurityGroup.userSecurity.id)
+                .select(QUserSecurityGroup.userSecurityGroup.userSecurity.id)                
                 .leftJoin(QUserSecurityGroup.userSecurityGroup.userSecurity)
                 .leftJoin(QUserSecurityGroup.userSecurityGroup.ticketGroup)
-                .where(where);        
+                .leftJoin(QUserSecurityGroup.userSecurityGroup.userSecurity.escalaDeTrabalho, qEscala)
+                .where(where);     
+        query.distinct();
         System.out.println(query.toString());
         return query.fetch();
     }       

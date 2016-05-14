@@ -147,6 +147,60 @@
                     </table>
                 </div>
                 <div class="ui divider"></div>
+                <div class="field">
+                    <label>Escala de Trabalho</label>
+                    <div class="ui segment no padding">
+                        <div class="ui divided list" jsf:id="escalaTrabalhoList">
+                            <ui:repeat var="escalaTrabalho" value="#{userController.instance.escalaDeTrabalho}">
+                                <div class="user item small padding" >
+                                    <i class="wait icon"></i>
+                                    <div class="content">
+                                        <div class="header">#{escalaTrabalho.diaSemana.label} | <h:outputText value="#{escalaTrabalho.horaInicial}">
+                                        	 <f:convertDateTime pattern="HH:mm" locale="pt-BR" />
+                                        </h:outputText> as <h:outputText value="#{escalaTrabalho.horaFinal}">
+                                        	 <f:convertDateTime pattern="HH:mm" locale="pt-BR" />
+                                        </h:outputText></div>
+                                        <div class="description">
+                                            <p:commandLink actionListener="#{userController.removerEscalaTrabalho(escalaTrabalho)}"
+                                                           value="Remover" update="escalaTrabalhoList"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                            <div id="empty-escalaTrabalho" class="item small padding"
+                                 jsf:rendered="#{userController.instance.escalaDeTrabalho.size() == 0}">
+                                <i class="blue info icon"></i>
+                                <div class="content">
+                                    <div class="header">Nenhum registro adicionado</div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <table class="ui very basic table" jsf:id="formEscalaTrabalho">
+                        <tbody>
+                            <tr>
+                                <td class="collapsing center aligned"><strong>Adicionar</strong></td>
+                                <td class="center aligned">
+                                     <h:selectOneMenu value="#{userController.escalaTrabalho.diaSemana}" >
+							            <f:selectItems var="diaSemana" value="#{userController.listaDiaSemana}"
+							            	itemValue="#{diaSemana}" itemLabel="#{diaSemana.label}" />
+							        </h:selectOneMenu>
+                                </td>                                
+                                <td class="center aligned">                                    
+                                    <p:calendar value="#{userController.escalaTrabalho.horaInicial}" pattern="HH:mm" timeOnly="true" placeholder="Hora Inicial"/>
+                                </td>
+                                <td class="center aligned">                                    
+                                    <p:calendar value="#{userController.escalaTrabalho.horaFinal}" pattern="HH:mm" timeOnly="true" placeholder="Hora Final"/>
+                                </td>
+                                <td class="collapsing center aligned">                                    
+                                    <p:commandLink id="add-escala-btn" value="Adicionar" styleClass="ui green button" 
+                                                   actionListener="#{userController.adicionarEscalaTrabalho()}" update="escalaTrabalhoList formEscalaTrabalho"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                 </div>
+                <div class="ui divider"></div>
                 <div class="ui buttons">
                     <p:commandLink value="Salvar alterações" styleClass="ui submit blue button" 
                                    actionListener="#{userController.update()}"/>

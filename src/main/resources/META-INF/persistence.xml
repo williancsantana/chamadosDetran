@@ -15,6 +15,7 @@
         <class>br.gov.to.detran.domain.UserSecurityLogins</class>    
         <class>br.gov.to.detran.domain.PaginaSistema</class>
         <class>br.gov.to.detran.domain.RequisicaoAcesso</class>
+        <class>br.gov.to.detran.domain.EscalaTrabalho</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>

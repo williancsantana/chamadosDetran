@@ -21,13 +21,11 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.jpa.criteria.expression.function.FunctionExpression;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 import org.jsoup.Jsoup;
@@ -47,6 +45,7 @@ import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.ViewServidorChamado;
+import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.push.NotifyMessage;
 import br.gov.to.detran.push.NotifySessions;
 import br.gov.to.detran.repository.DetranERPRepository;
@@ -204,7 +203,11 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         instance.setServico(service);
         instance.setSolicitante(FacesUtil.loggedUser());
         instance.setStatus(TicketSupportStatus.ABERTO);
-        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service);
+        /* - Definindo o atendente do chamado de acordo com seu grupo e a quantidade de chamados
+         * - Onde está solicitanteId era pra ser atendenteId
+         */
+        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, DiaSemana.SEG, new Date());
+        
         System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
         Collections.shuffle(solicitanteIds);
         Map<Integer, Group> contarChamados = this.repository.contarChamados(solicitanteIds);        
@@ -231,8 +234,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         String theSequence = StringUtils.leftPad(sequence, 7 - sequence.length(), "0");
         instance.setNumero(format.format(new Date()) + theSequence);
         instance.setUltimaResposta(new Date());
-        Type ticketServiceField = new TypeToken<ArrayList<TicketServiceField>>() {
-        }.getType();
+        Type ticketServiceField = new TypeToken<ArrayList<TicketServiceField>>() {}.getType();
         Gson gson = new Gson();
         try {
             instance.setCamposJsonValues(gson.toJson(this.service.getFields(), ticketServiceField));

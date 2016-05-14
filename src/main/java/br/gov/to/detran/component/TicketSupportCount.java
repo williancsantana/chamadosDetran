@@ -14,15 +14,17 @@ public class TicketSupportCount {
     private Long pendentes;
     private Long fechados;
     private Long abertos;
+    private Long naoDefinido;
 
     public TicketSupportCount() {
     }
 
-    public TicketSupportCount(Long todos, Long pendentes, Long fechados, Long abertos) {
+    public TicketSupportCount(Long todos, Long pendentes, Long fechados, Long abertos, Long naoDefinido) {
         this.todos = todos;
         this.pendentes = pendentes;
         this.fechados = fechados;
         this.abertos = abertos;
+        this.naoDefinido = naoDefinido;
     }
         
 
@@ -57,5 +59,13 @@ public class TicketSupportCount {
     public void setAbertos(Long abertos) {
         this.abertos = abertos;
     }
+
+	public Long getNaoDefinido() {
+		return naoDefinido;
+	}
+
+	public void setNaoDefinido(Long naoDefinido) {
+		this.naoDefinido = naoDefinido;
+	}       
         
 }

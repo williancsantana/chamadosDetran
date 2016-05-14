@@ -48,6 +48,9 @@ public class UserSecurity extends AbstractEntity implements Security{
     @OneToMany(mappedBy = "userSecurity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSecurityGroup> grupos;
     
+    @OneToMany(mappedBy = "userSecurity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EscalaTrabalho> escalaDeTrabalho = new ArrayList<>();
+    
     @Transient
     UserSecurityLogins lastLogin;
 
@@ -154,5 +157,13 @@ public class UserSecurity extends AbstractEntity implements Security{
         }        
         return tempGrupos;
     }
+
+	public List<EscalaTrabalho> getEscalaDeTrabalho() {
+		return escalaDeTrabalho;
+	}
+
+	public void setEscalaDeTrabalho(List<EscalaTrabalho> escalaDeTrabalho) {
+		this.escalaDeTrabalho = escalaDeTrabalho;
+	}       
 
 }

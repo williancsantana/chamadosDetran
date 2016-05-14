@@ -5,10 +5,12 @@
  */
 package br.gov.to.detran.controller;
 
+import br.gov.to.detran.domain.EscalaTrabalho;
 import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.UserSecurityGroup;
 import br.gov.to.detran.domain.UserStatus;
+import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.TicketGroupRepository;
 import br.gov.to.detran.repository.UserSecurityLoginsRepository;
@@ -46,6 +48,7 @@ public class UserController extends BaseController<UserSecurity> implements java
     private TicketGroup ticketGroup;
     private String ldapCpf;
     private LdapRepository.LDAPResult ldapUserResult;
+    private EscalaTrabalho escalaTrabalho;
 
     @PostConstruct
     public void postConstruct() {
@@ -55,6 +58,7 @@ public class UserController extends BaseController<UserSecurity> implements java
             this.instance = user;
             user.setLastLogin(userLoginsrepository.findLastLogin(user));
         }
+        this.escalaTrabalho = new EscalaTrabalho();
     }
 
     public void insert() {
@@ -117,6 +121,39 @@ public class UserController extends BaseController<UserSecurity> implements java
         } catch (Exception ex) {            
         }
     }
+    
+    public void adicionarEscalaTrabalho(){
+    	try{
+    		if(escalaTrabalho != null){
+    			if(escalaTrabalho.getDiaSemana() == null){
+    				throw new Exception("Informe o dia da semana.");
+    			}
+    			if(escalaTrabalho.getHoraInicial() == null || escalaTrabalho.getHoraFinal() == null){
+    				throw new Exception("Informe a definição do horario da escala de trabalho.");
+    			}    			
+    			if(escalaTrabalho.getHoraFinal().before(escalaTrabalho.getHoraInicial())){
+    				throw new Exception("A hora inicial não pode ser maior que a hora final.");
+    			}
+    			if(this.instance.getEscalaDeTrabalho().contains(escalaTrabalho)){
+    				throw new Exception("Já foi definido essa escala de trabalho.");
+    			}
+    			escalaTrabalho.setUserSecurity(this.instance);
+    			this.instance.getEscalaDeTrabalho().add(escalaTrabalho);
+    			this.escalaTrabalho = new EscalaTrabalho();
+        	}else{
+        		throw new Exception("Não foi possivel adicionar a escala de trabalho.");
+        	}
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+            this.addMenssage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), "Error");
+    	}    	
+    }
+    
+    public void removerEscalaTrabalho(EscalaTrabalho registro){
+    	if(this.instance != null && this.instance.getEscalaDeTrabalho().contains(registro)){
+    		this.instance.getEscalaDeTrabalho().remove(registro);
+    	}
+    }
 
     public void removeGrupo(UserSecurityGroup grupo) {
         this.instance.getGrupos().remove(grupo);
@@ -176,5 +213,17 @@ public class UserController extends BaseController<UserSecurity> implements java
         }
         return ldapUserResult.getStatus() != 1;
     }
+
+	public EscalaTrabalho getEscalaTrabalho() {
+		return escalaTrabalho;
+	}
+
+	public void setEscalaTrabalho(EscalaTrabalho escalaTrabalho) {
+		this.escalaTrabalho = escalaTrabalho;
+	}
+	
+	public DiaSemana[] getListaDiaSemana(){
+		return DiaSemana.values();
+	}
 
 }
