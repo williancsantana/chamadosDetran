@@ -3,6 +3,7 @@
     <persistence-unit name="application" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/jboss/chamadosDS</jta-data-source>
+        <class>br.gov.to.detran.domain.AbstractEntity</class>
         <class>br.gov.to.detran.domain.TicketGroup</class>
         <class>br.gov.to.detran.domain.TicketGroupService</class>
         <class>br.gov.to.detran.domain.TicketReply</class>
@@ -24,6 +25,8 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
             <property name="hibernate.default_schema" value="chamados"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
         </properties>        
     </persistence-unit>
     

@@ -78,19 +78,19 @@
                             <tr>
                                 <td class="collapsing"><strong>Aberto em:</strong></td>
                                 <td><h:outputText value="#{ticketSupportController.instance.created}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
+                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" />
                                     </h:outputText></td>
                             </tr>                            
                             <tr jsf:rendered="#{ticketSupportController.instance.reabertoEm != null}">
                                 <td class="collapsing"><strong>Reaberto em:</strong></td>
                                 <td><h:outputText value="#{ticketSupportController.instance.reabertoEm}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
+                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"/>
                                     </h:outputText></td>
                             </tr>                            
                             <tr>
                                 <td class="collapsing"><strong>Última resposta:</strong></td>
                                 <td><h:outputText value="#{ticketSupportController.instance.ultimaResposta}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
+                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"/>
                                     </h:outputText></td>
                             </tr>
                         </tbody>
@@ -105,7 +105,7 @@
 								<i class="font-icon attach icon"></i>
 								<p class="name">#{anexo.name}</p>
 								<p class="date"><h:outputText value="#{anexo.created}">
-                                        <f:convertDateTime pattern="dd MMMM yyyy',' HH:MM" locale="pt-BR"/>
+                                        <f:convertDateTime pattern="dd MMMM yyyy',' HH:mm" locale="pt-BR"/>
                                     </h:outputText></p>
 								<p>									
 									<p:commandLink ajax="false">Baixar
@@ -123,7 +123,7 @@
                            title="Solicitante"></i>
                         #{ticketSupportController.instance.solicitante.name} <small class="light gray">em
                             <h:outputText value="#{ticketSupportController.instance.created}">
-                                <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
+                                <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
                             </h:outputText>                
                         </small>
                     </div>
@@ -155,7 +155,7 @@
                             <i class="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'red' : 'blue'} user icon"
                                title="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'Solicitante' : 'Atendente'}"></i>
                             #{resposta.autor.name} <small class="light gray">em <h:outputText value="#{resposta.created}">
-                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
+                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
                                 </h:outputText>      </small>
                         </div>
                         <div class="content">                        
@@ -169,8 +169,9 @@
                         <div class="text align left content">
                             #{resposta.titleMensagem()}
                             <div class="sub header">por #{resposta.autor.name} em <h:outputText value="#{resposta.created}">
-                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:MM" locale="pt-BR"/>
-                                </h:outputText></div>
+                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
+                                </h:outputText>
+                             </div>
                         </div>
                     </h3>
 
@@ -219,25 +220,25 @@
                         <div class="ui bottom attached menu">     
                             
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitante()}">
-                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
                                     <i class="refresh icon"></i> Reabrir e responder
                                 </p:commandLink>                                 
                             </div>                            
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitanteNotFechado()}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
                                     <i class="comment icon"></i> Responder
                                 </p:commandLink>                                 
                             </div>                                                                                    
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
                                     <i class="comment icon"></i> Responder
                                 </p:commandLink>                                    
                             </div>
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('FECHAR')}" update="@form">
                                     <i class="ban icon"></i> Responder e fechar
                                 </p:commandLink>                                   
@@ -248,14 +249,14 @@
                                     <div class="menu">
                                         <div class="item">                                        
                                             <p:commandLink styleClass="ui orange action fluid button" 
-                                                           onclick="setResponse()" oncomplete="setEditor()"
+                                                           onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
                                                            update="@form">
                                                 <i class="warning sign icon"></i> Com o solicitante
                                             </p:commandLink>
                                         </div>
                                         <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor()"
+                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}" 
                                                            update="@form">
                                                 <i class="warning sign icon"></i> Com terceiros
@@ -265,14 +266,14 @@
                                 </div>
                             </div>                            
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
                                                update="@form">
                                     <i class="comment icon"></i> Responder
                                 </p:commandLink>                                        
                             </div>
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
                                                update="@form">
                                     <i class="ban icon"></i> Responder e fechar
@@ -283,14 +284,14 @@
                                     <i class="warning sign icon"></i> Responder e deixar pendente
                                     <div class="menu">                                    
                                         <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor()"
+                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
                                                            update="@form">
                                                 <i class="warning sign icon"></i> Com o solicitante
                                             </p:commandLink>                                        
                                         </div>
                                         <div class="item">
-                                            <p:commandLink styleClass="ui red action fluid button" onclick="setResponse()" oncomplete="setEditor()"
+                                            <p:commandLink styleClass="ui red action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}" 
                                                            update="@form">
                                                 <i class="warning sign icon"></i> Com terceiros
@@ -304,7 +305,7 @@
                                     <i class="comment icon"></i> Responder
                                     <div class="menu">
                                         <div class="item">
-                                            <p:commandLink styleClass="ui green action fluid button" onclick="setResponse()" oncomplete="setEditor()"
+                                            <p:commandLink styleClass="ui green action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('RETIRAR_PENDENCIA')}" 
                                                            update="@form">
                                                 <i class="thumbs up icon"></i> Retirar pendência com terceiros
@@ -312,7 +313,7 @@
 
                                         </div>
                                         <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor()"
+                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                            actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
                                                            update="@form">
                                                 <i class="warning sign icon"></i> Manter pendência com terceiros
@@ -325,7 +326,7 @@
                             <ui:remove>
                             	<!-- Trecho Não deveria estar assim -->
                             	<div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
-	                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor()"
+	                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
 	                                               actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
 	                                               update="@form">
 	                                    <i class="ban icon"></i> Responder e fechar
@@ -333,21 +334,21 @@
                             	</div>
                             </ui:remove>
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
-                                <p:commandLink styleClass="ui orange action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui orange action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
                                                update="@form">
                                     <i class="warning sign icon"></i> Responder e deixar pendente com solicitante
                                 </p:commandLink>                                                                                                        
                             </div>                            
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('FECHADO')}">
-                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
                                                update="@form">
                                     <i class="refresh icon"></i> Reabrir e responder
                                 </p:commandLink>                                                         
                             </div>                            
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_USUARIO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor()"
+                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
                                                update="@form">
                                     <i class="ban icon"></i> Responder e fechar
@@ -369,10 +370,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="pull right item">
-			                        <div id="apropriar-se" class="ui vk button">
-			                            <i class="level down icon"></i> Apropriar-se desse chamado
-			                        </div>
+                                <div class="pull right item" jsf:rendered="#{ticketSupportController.permissaoApropirar()}">                                
+                                	 <p:commandLink styleClass="ui vk button" oncomplete="setEditor(); setReply(); setDetails();"
+                                               actionListener="#{ticketSupportController.apropiarChamado()}" 
+                                               update="@form">
+                                    	<i class="level down icon"></i> Apropriar-se desse chamado
+                                	</p:commandLink>			                        
 			                    </div>
                             </div>                                                        
                         </div>
@@ -408,30 +411,36 @@
                 $('#reply-response').val(editor.getHTML());
             }
 
-            $('#details-btn').on('click', function (event, template) {
-                if ($('#details-tbl').hasClass('hidden')) {
-                    $('#details-tbl').transition('slide down');
-                    $('#details-btn').html('<i class="chevron up icon"></i> Ocultar detalhes');
-                } else {
-                    $('#details-tbl').transition('slide down');
-                    $('#details-btn').html('<i class="chevron down icon"></i> Ver detalhes');
-                }
-            });
-            
-            $('#reply-btn').on('click', function (event, template) {
-                event.preventDefault();
-                if ($('#reply-form').length) {
-                    $('html, body').animate({scrollTop: $('#reply-form').offset().top}, 500);
-                    $('#ql-editor').focus();
-                    return false;
-                }
-            });                        
+            var setDetails = function () {
+            	$('#details-btn').on('click', function (event, template) {
+                    if ($('#details-tbl').hasClass('hidden')) {
+                        $('#details-tbl').transition('slide down');
+                        $('#details-btn').html('<i class="chevron up icon"></i> Ocultar detalhes');
+                    } else {
+                        $('#details-tbl').transition('slide down');
+                        $('#details-btn').html('<i class="chevron down icon"></i> Ver detalhes');
+                    }
+                });
+            }
+
+            var setReply = function () {
+            	$('#reply-btn').on('click', function (event, template) {
+                    event.preventDefault();
+                    if ($('#reply-form').length) {
+                        $('html, body').animate({scrollTop: $('#reply-form').offset().top}, 500);
+                        $('#ql-editor').focus();
+                        return false;
+                    }
+                });
+            }                                              
             
             var updateView = function () {
                 updateTicketForm();               
             };  
 
             setEditor();
+            setDetails();
+            setReply();
 
         </script>
     </ui:define>

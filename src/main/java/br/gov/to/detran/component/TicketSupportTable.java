@@ -259,15 +259,23 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     public Integer getFirst() {
+    	System.out.println("Quantidade Inicial: " + (currentPage * pageSize + 1));
         return (this.rowCount == 0 ? 0 : currentPage * pageSize + 1);
     }
 
     public Integer getLast() {
         Integer value = this.getFirst() + pageSize;
+        System.out.println("Quantidade Final: " + (this.getFirst() + pageSize));
         if (this.rowCount < value) {
             return this.rowCount;
         }
         return value - 1;
+    }
+    //- #{ticketSupportTableController.supportTable.getLast()} de #{ticketSupportTableController.supportTable.rowCount}
+    public String getPaginationInfor(){
+    	String info =  getFirst() + " - " + getLast() + " de " + rowCount;
+    	System.out.println(info);
+    	return info;
     }
 
     public TicketSupportRepository getRepository() {

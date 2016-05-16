@@ -37,6 +37,8 @@ import com.google.gson.reflect.TypeToken;
 import com.querydsl.core.group.Group;
 
 import br.gov.to.detran.domain.TicketAttachment;
+import br.gov.to.detran.domain.TicketGroup;
+import br.gov.to.detran.domain.TicketGroupService;
 import br.gov.to.detran.domain.TicketReply;
 import br.gov.to.detran.domain.TicketReplyType;
 import br.gov.to.detran.domain.TicketService;
@@ -214,6 +216,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         Long id = Long.MAX_VALUE;
         Long count = Long.MAX_VALUE;
         for (Long atendente : solicitanteIds) {
+        	UserSecurity user = userSecurityRepository.getInstancePorId(id);
             Long tempCount = 0L;
             if (contarChamados.containsKey(atendente.intValue())) {
                 tempCount = (Long) contarChamados.get(atendente.intValue()).toArray()[0];                
@@ -291,6 +294,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setChamado(this.instance);
                     notification.setTipo(TicketReplyType.NOTIFICATION);
                     notification.setMensagem(novoStatus.name());
+                    notification.setCreated(new Date());
                     this.instance.setReabertoEm(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
@@ -303,6 +307,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                 } else if (this.instance.getAtendente().getId().equals(user.getId())) {
                     this.instance.setAtViewat(new Date());
                 }
+                this.reply.setCreated(new Date());
                 this.instance.setUltimaResposta(new Date());
                 this.instance.getRespostas().add(reply);
                 TicketSupportStatus ticketSupportStatus = this.instance.getStatus();
@@ -314,6 +319,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setChamado(this.instance);
                     notification.setTipo(TicketReplyType.NOTIFICATION);
                     notification.setMensagem("PENDENCIA USUARIO REMOVIDA");
+                    notification.setCreated(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
                 } else if (ticketSupportStatus == TicketSupportStatus.PENDENTE_TERCEIROS
@@ -323,6 +329,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setChamado(this.instance);
                     notification.setTipo(TicketReplyType.NOTIFICATION);
                     notification.setMensagem("PENDENCIA TERCEIROS RESOLVIDA");
+                    notification.setCreated(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
                 } else if (novoStatus != TicketSupportStatus.REABERTO
@@ -332,6 +339,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setChamado(this.instance);
                     notification.setTipo(TicketReplyType.NOTIFICATION);
                     notification.setMensagem(novoStatus.name());
+                    notification.setCreated(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
                 }
@@ -353,6 +361,64 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
         }
+    }
+    
+    public void apropiarChamado() {
+        try {               
+        	 UserSecurity user = FacesUtil.loggedUser();
+            if(!this.permissaoApropirar()){
+            	throw new Exception("Você não tem permissão pra executar essa ação!");
+            }
+            
+            TicketReply notification = new TicketReply();
+            notification.setAutor(user);
+            notification.setChamado(this.instance);
+            notification.setTipo(TicketReplyType.NOTIFICATION);
+            notification.setMensagem("APROPRIACAO");
+            notification.setCreated(new Date());
+                                    
+            this.instance.getRespostas().add(notification);
+            this.instance.setAtendente(user);
+            this.instance.setAtViewat(new Date());
+            this.instance.setUltimaResposta(new Date());
+            
+            this.update();                
+            if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
+                notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
+                        NotifyMessage.builderReply(instance, this.instance.getAtendente(), notification));
+            }
+            if (!Objects.equals(user.getId(), this.instance.getSolicitante().getId())) {
+                notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
+                        NotifyMessage.builderReply(instance, this.instance.getSolicitante(), notification));
+            }
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
+        }
+    }
+    
+    public boolean permissaoApropirar() throws Exception{    	
+        UserSecurity user = FacesUtil.loggedUser();
+        if(instance.getAtendente() != null){
+        	if (Objects.equals(user.getId(), this.instance.getAtendente().getId())
+                    || Objects.equals(user.getId(), this.instance.getSolicitante().getId())) {
+                return false;
+            }
+        }
+        else if(Objects.equals(user.getId(), this.instance.getSolicitante().getId())){
+        	return false;
+        }
+        boolean permissao = false;
+        user = userSecurityRepository.getInstancePorId(FacesUtil.loggedUser().getId());
+        for(TicketGroupService service : this.instance.getServico().getAtendentes()){        	
+        	TicketGroup g = service.getGrupo();
+        	if(user.getAllGrupos().contains(g)){
+        		permissao = true;
+        		break;
+        	}
+        }
+        return permissao;                    
     }
 
     public void validar() {

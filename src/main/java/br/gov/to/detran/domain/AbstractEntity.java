@@ -16,6 +16,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 /**
  *
@@ -42,7 +43,7 @@ public class AbstractEntity implements java.io.Serializable {
     
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_at", nullable = true)
-    private Date deletedAt;
+    private Date deletedAt;      
 
     public Long getId() {
         return id;

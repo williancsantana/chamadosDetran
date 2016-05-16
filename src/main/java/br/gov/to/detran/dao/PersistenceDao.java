@@ -37,6 +37,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.SimplePath;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.JPAQueryBase;
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 
@@ -187,7 +188,7 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
      *
      * @return
      */
-    public JPAQuery query() {
+    public JPAQuery query() {    	
         JPAQuery query = new JPAQuery(this.em);
         return query;
     }

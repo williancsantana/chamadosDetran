@@ -126,8 +126,9 @@
                         <tr>
                             <th class="right aligned" colspan="6">
                                 <div class="ui small pagination menu">
-                                    <div id="pagination-dropdown" class="ui dropdown link item" jsf:id="paginationInfo">
-                                        <span class="text">#{ticketSupportTableController.supportTable.first} - #{ticketSupportTableController.supportTable.last} de #{ticketSupportTableController.supportTable.rowCount}</span>
+                                    <div id="pagination-dropdown" class="ui dropdown link item">
+                                        <span class="text"><h:outputText value="#{ticketSupportTableController.supportTable.getPaginationInfor()}" 
+                                        	id="paginationInfo"/></span>
                                         <div class="menu">
                                             <p:commandLink styleClass="item #{ticketSupportTableController.supportTable.getSizeFilterActive(5)}"
                                                            actionListener="#{ticketSupportTableController.supportTable.changeSize(5)}"

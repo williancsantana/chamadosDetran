@@ -62,14 +62,17 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
                                         .and(QTicketGroupService.ticketGroupService.servico.id.eq(service.getId())))));
         where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.ausente.eq(false));
         
-        /*BooleanBuilder expressaoHora = new BooleanBuilder(qEscala.diaSemana.eq(diaSemana).and(
-        		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())));
-        
+        BooleanBuilder expressaoHora = new BooleanBuilder(qEscala.diaSemana.eq(diaSemana).and(
+        		qEscala.horaInicial.hour().loe(hora.getHours())).and(qEscala.horaFinal.hour().goe(hora.getHours())));
+        /*
         BooleanBuilder expressaoHora2 = new BooleanBuilder(qEscala.escalaTrabalho.isNull());
         expressaoHora2.orAllOf(com.mysema.query.types.expr.BooleanExpression.allOf());*/
                 
-        where.andAnyOf(qEscala.escalaTrabalho.isNull().or(new BooleanBuilder().orAllOf(qEscala.diaSemana.eq(diaSemana).and(
-        		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())))));
+        where.andAnyOf(qEscala.escalaTrabalho.isNull(), expressaoHora);
+        /*qEscala.diaSemana.eq(diaSemana)).andAnyOf(qEscala.diaSemana.eq(diaSemana).and(
+                		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())));
+        //new BooleanBuilder().orAllOf(qEscala.diaSemana.eq(diaSemana).and(
+        //		qEscala.horaInicial.hour().goe(hora.getHours())).and(qEscala.horaFinal.hour().loe(hora.getHours())))));
        /* where.andAnyOf(qEscala.escalaTrabalho.isNull(), new BooleanBuilder().orAllOf(qEscala.diaSemana.eq(diaSemana),
         		qEscala.horaInicial.hour().goe(hora.getHours()), qEscala.horaFinal.hour().loe(hora.getHours()))).getValue();*/
         		/*.orAllOf(qEscala.diaSemana.eq(diaSemana),
