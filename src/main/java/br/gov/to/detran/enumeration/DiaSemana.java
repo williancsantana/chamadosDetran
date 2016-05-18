@@ -20,4 +20,20 @@ public enum DiaSemana {
     public void setLabel(String label) {
         this.label = label;
     }
+    
+    public static DiaSemana getDiaSemana(int valor){
+    	switch (valor) {
+			case 1:
+				return DiaSemana.SEG;	
+			case 2:
+				return DiaSemana.TER;	
+			case 3:
+				return DiaSemana.QUA;			
+			case 4:
+				return DiaSemana.QUI;			
+			case 5:
+				return DiaSemana.SEX;
+		}
+    	return DiaSemana.SEG;
+    }
 }

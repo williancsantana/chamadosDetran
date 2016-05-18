@@ -16,11 +16,20 @@
     <ui:define name="content">
         <h:form prependId="false">
             <h:inputHidden id="categoryPath" value="#{ticketSupportController.categoriePath}" />
-            <p:remoteCommand name="filterCategories" actionListener="#{ticketSupportController.filter()}" update="tableServices" />
+            <p:remoteCommand name="filterCategories" actionListener="#{ticketSupportController.filter()}" update="tableServices buttonVoltar" />
+            <p:remoteCommand name="filterCategoriesVoltar" actionListener="#{ticketSupportController.filterVoltar()}" update="tableServices buttonVoltar" />
             <h4 class="ui top attached header">Abrir chamado</h4>
             <div id="services-tree-bottom" class="ui bottom attached segment">
                 <div class="ui centered page grid">
-                    <div class="row">
+                	<div class="row">
+                	<h:outputLink value="#" disabled="#{ticketSupportController.oldCategoriePath == ''}"
+                		 styleClass="ui left labeled icon button" id="buttonVoltar" 
+                				onclick="setCategoryPath('#{ticketSupportController.categorieVoltar}');" >
+                        	<i class="left arrow icon"></i>
+                            VOLTAR FILTRO
+                        </h:outputLink> 	
+					</div>
+                    <div class="row">                    	
                         <div class="column">
                             <div class="ui centered segment">
                                 <div class="ui huge breadcrumb">                                    
@@ -58,6 +67,7 @@
 
     <ui:define name="page-js">
         <script>
+        	var setCategoryPath;
             $(document).ready(function () {
                 var categoryPath = "";
                 var allCategories = JSON.parse('#{ticketSupportController.allcategoriesJson}');
@@ -66,7 +76,15 @@
                     return obj.match(new RegExp('^' + categoryPath));
                 });
 
-                filter(t, categoryPath);
+                filter(t, categoryPath, false);
+                
+                setCategoryPath = function (category){
+                	categoryPath = category;
+                	 var t = _.filter(allCategories, function (obj) {
+                         return obj.match(new RegExp('^' + categoryPath));
+                     });
+                	filter(t, categoryPath, true);
+                };
 
 
                 function resetClickButton() {
@@ -78,7 +96,7 @@
                             var t = _.filter(allCategories, function (obj) {
                                 return obj.match(new RegExp('^' + categoryPath));
                             });
-                            filter(t, categoryPath);
+                            filter(t, categoryPath, false);
                         }
                     });
                 }
@@ -129,11 +147,15 @@
                 }
 
 
-                function filter(services, _filter) {
-
+                function filter(services, _filter, voltar) {
+					
+                	console.log(services);
+                	
                     var filtered = _.compact(_.uniq(_.map(services, function (e) {
                         return e.replace(new RegExp('^' + _filter + '(:|$)'), '').split(':').shift();
                     }), true));
+                    
+                    console.log(filtered);
 
                     var cats = '';
 
@@ -154,7 +176,11 @@
                     navBreadcrumb();
                     resetClickButton();
                     $('#categoryPath').val(_filter);
-                    filterCategories();            
+                    if(voltar == false){
+                    	filterCategories();
+                    }else if(voltar == true){
+                    	filterCategoriesVoltar();
+                    }                           
                 }                                
             });
         </script>

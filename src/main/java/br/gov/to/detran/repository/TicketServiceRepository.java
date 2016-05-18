@@ -39,7 +39,8 @@ public class TicketServiceRepository extends AbstractRepository<TicketService> i
                         .from(QUserSecurityGroup.userSecurityGroup)
                         .where(QUserSecurityGroup.userSecurityGroup.userSecurity.id.eq(userId))
                 )).or(QTicketGroupService.ticketGroupService.servico.padrao.isTrue());
-        where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.SOLICITANTE));                
+        where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.SOLICITANTE));
+        where.and(QTicketGroupService.ticketGroupService.servico.removed.isFalse());
         JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
         query.from(QTicketGroupService.ticketGroupService)
         		.where(where);
@@ -58,12 +59,14 @@ public class TicketServiceRepository extends AbstractRepository<TicketService> i
                 JPAExpressions.select(QUserSecurityGroup.userSecurityGroup.ticketGroup.id)
                         .from(QUserSecurityGroup.userSecurityGroup)
                         .where(QUserSecurityGroup.userSecurityGroup.userSecurity.id.eq(userId))
-                )).or(QTicketGroupService.ticketGroupService.servico.padrao.isTrue());
-        where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.SOLICITANTE));                
+                ).or(QTicketGroupService.ticketGroupService.servico.padrao.isTrue()));
+        where.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.SOLICITANTE));
+        where.and(QTicketGroupService.ticketGroupService.servico.removed.isFalse());
         JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
         query.from(QTicketGroupService.ticketGroupService)
         		.where(where).orderBy(QTicketGroupService.ticketGroupService.servico.descricao.asc());
-        query.select(QTicketGroupService.ticketGroupService.servico);                       
+        query.select(QTicketGroupService.ticketGroupService.servico);   
+        query.distinct();
         return (List<TicketService>) query.fetch();
     	
     	
@@ -76,5 +79,23 @@ public class TicketServiceRepository extends AbstractRepository<TicketService> i
                 .where(where).orderBy(QTicketService.ticketService.descricao.asc());
         return (List<TicketService>) query.fetch();*/
     }
+
+	public List<UserSecurity> getPossibleAttendants(TicketService servico) {
+		BooleanBuilder where = new BooleanBuilder();        
+        where.and(QUserSecurityGroup.userSecurityGroup.ticketGroup.id.in(        		
+                JPAExpressions.select(QTicketGroupService.ticketGroupService.grupo.id)
+                        .from(QTicketGroupService.ticketGroupService)
+                        .where(QTicketGroupService.ticketGroupService.servico.id.eq(servico.getId())
+                        		.and(QTicketGroupService.ticketGroupService.tipo.eq(TicketGroupServiceType.ATENDENTE)))
+                ));                               
+        where.and(QUserSecurityGroup.userSecurityGroup.ticketGroup.removed.isFalse());        
+        where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.removed.isFalse());
+        JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();        
+        query.from(QUserSecurityGroup.userSecurityGroup)
+        		.where(where).orderBy(QUserSecurityGroup.userSecurityGroup.userSecurity.name.asc());
+        query.select(QUserSecurityGroup.userSecurityGroup.userSecurity);   
+        query.distinct();
+        return (List<UserSecurity>) query.fetch();
+	}
 
 }

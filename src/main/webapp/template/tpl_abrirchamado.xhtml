@@ -33,7 +33,7 @@
                 <div class="ui divider"></div>
                 <div class="field">
                     <label>Assunto</label>                    
-                    <h:inputText value="#{ticketSupportController.instance.assunto}" />
+                    <h:inputText value="#{ticketSupportController.instance.assunto}" required="true" requiredMessage = "É obrigatório informar o assunto"/>
                 </div>
                 <ui:insert name="formDefinicao" />                
                 <div class="ui divider"></div>

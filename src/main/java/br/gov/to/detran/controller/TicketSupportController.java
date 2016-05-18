@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -76,12 +77,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private @Inject
     DetranERPRepository detranERPRepository;
     private String cpfServidor;
+    private String categorieVoltar;
     private String categoriePath;
     private String oldCategoriePath;
     private List<TicketService> services;
     private TicketService service;
     private TicketReply reply;
     private ViewServidorChamado servidor = new ViewServidorChamado();
+    private List<UserSecurity> possibleAttendants;    
 
     @PostConstruct
     public void postConstruct() {
@@ -98,8 +101,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     }
 
     public void checkChamado() throws IOException {
-        try {
-            System.out.println("id = " + id);
+        try {            
             if (this.instance == null || this.instance.getId() == 0) {
                 this.instance = this.repository.getTicketSupport(Long.parseLong(id));
                 if (this.instance == null) {
@@ -158,6 +160,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.addMenssage(FacesMessage.SEVERITY_INFO, "Registro Adicionado", "Cadastro");
         } catch (Exception ex) {
             ex.printStackTrace();
+            this.addMenssage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), "Validação");
         }
     }
 
@@ -191,8 +194,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     
     public void buscarServidor(){
         try{
-            servidor = detranERPRepository.findServidor(this.instance.getRequisaoAcesso().getCpf());
-            System.out.println(servidor.getNomeMae());
+            servidor = detranERPRepository.findServidor(this.instance.getRequisaoAcesso().getCpf());            
         }catch(Exception e){
             servidor = new ViewServidorChamado();
             e.printStackTrace();
@@ -200,6 +202,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     }
 
     public void criarChamado(TicketSupport instance, TicketService service) throws Exception {
+    	
+    	if(instance.getDescricao().trim().isEmpty() || instance.getDescricao().trim().length() < 30){
+    		throw new Exception("É necessário informar uma descrição do chamado de no minimo 30 caracteres!");
+    	}
         instance.setCreated(new Date());
         instance.setUpdated(new Date());
         instance.setServico(service);
@@ -208,7 +214,11 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         /* - Definindo o atendente do chamado de acordo com seu grupo e a quantidade de chamados
          * - Onde está solicitanteId era pra ser atendenteId
          */
-        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, DiaSemana.SEG, new Date());
+        /**
+         * 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
+         */        
+        DiaSemana diaSemana = DiaSemana.getDiaSemana(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, diaSemana, new Date());
         
         System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
         Collections.shuffle(solicitanteIds);
@@ -398,6 +408,36 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     }
     
+    public void escalonarChamado(UserSecurity user) {
+        try {                       	                        
+            TicketReply notification = new TicketReply();
+            notification.setAutor(user);
+            notification.setChamado(this.instance);
+            notification.setTipo(TicketReplyType.NOTIFICATION);
+            notification.setMensagem("ESCALONAMENTO");
+            notification.setCreated(new Date());
+                                    
+            this.instance.getRespostas().add(notification);
+            this.instance.setAtendente(user);
+            this.instance.setAtViewat(new Date());
+            this.instance.setUltimaResposta(new Date());
+            
+            this.update();
+            if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
+                notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
+                        NotifyMessage.builderReply(instance, this.instance.getAtendente(), notification));
+            }
+            if (!Objects.equals(user.getId(), this.instance.getSolicitante().getId())) {
+                notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
+                        NotifyMessage.builderReply(instance, this.instance.getSolicitante(), notification));
+            }
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
+        }
+    }
+    
     public boolean permissaoApropirar() throws Exception{    	
         UserSecurity user = FacesUtil.loggedUser();
         if(instance.getAtendente() != null){
@@ -449,12 +489,29 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     public void setServices(List<TicketService> services) {
         this.services = services;
     }
+    
+    public void filterVoltar() {    		
+    		String[] back = categorieVoltar.split(":");
+    		Integer index = back.length - 2;
+    		String voltar = "";
+    		for(int i = 0; i<= index; i++){
+    			voltar += back[i];
+    			if(i + 1 <= index){
+    				voltar += ":";
+    			}
+    		}
+    		oldCategoriePath = categorieVoltar;
+    		categorieVoltar = voltar;    		
+            this.services = ticketServiceRepository.getServicesFilter(oldCategoriePath, FacesUtil.loggedUser().getId());
+        
+    }
 
-    public void filter() {
+    public void filter() {    	
         if (oldCategoriePath == null ? categoriePath != null : !oldCategoriePath.equals(categoriePath)) {
+        	categorieVoltar = oldCategoriePath;
             oldCategoriePath = categoriePath;
             this.services = ticketServiceRepository.getServicesFilter(oldCategoriePath, FacesUtil.loggedUser().getId());
-        }
+        }        
     }
     
     public void enviarAnexo(FileUploadEvent event) {
@@ -512,5 +569,30 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
     public void setServidor(ViewServidorChamado servidor) {
         this.servidor = servidor;
-    }            
+    }
+
+	public String getCategorieVoltar() {
+		return categorieVoltar;
+	}
+
+	public void setCategorieVoltar(String categorieVoltar) {
+		this.categorieVoltar = categorieVoltar;
+	}
+
+	public String getOldCategoriePath() {
+		return oldCategoriePath;
+	}
+
+	public void setOldCategoriePath(String oldCategoriePath) {
+		this.oldCategoriePath = oldCategoriePath;
+	}            
+	
+	public List<UserSecurity> possibleAttendants(){
+		if(possibleAttendants == null){
+			possibleAttendants = ticketServiceRepository.getPossibleAttendants(this.instance.getServico());
+			possibleAttendants.remove(instance.getAtendente());
+		}
+		return possibleAttendants;
+	}
+        	
 }

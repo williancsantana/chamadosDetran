@@ -17,6 +17,13 @@
         <class>br.gov.to.detran.domain.PaginaSistema</class>
         <class>br.gov.to.detran.domain.RequisicaoAcesso</class>
         <class>br.gov.to.detran.domain.EscalaTrabalho</class>
+        
+        <class>br.gov.to.detran.project.domain.Project</class>
+        <class>br.gov.to.detran.project.domain.ProjectComment</class>
+        <class>br.gov.to.detran.project.domain.ProjectDocument</class>
+        <class>br.gov.to.detran.project.domain.ProjectTask</class>
+        <class>br.gov.to.detran.project.domain.ProjectUser</class>
+        <class>br.gov.to.detran.project.domain.ProjectActivities</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
@@ -24,7 +31,7 @@
             <property name="hibernate.archive.autodetection" value="class, hbm"/>                                
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
-            <property name="hibernate.default_schema" value="chamados"/>
+            <property name="hibernate.default_schema" value="chamadoshm"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
         </properties>        

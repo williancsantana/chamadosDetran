@@ -41,7 +41,7 @@
                     #{ticketSupportTableController.supportTable.updateCount.todos}
                 </div>
             </a>        
-            <shiro:hasRole name="Admin"></shiro:hasRole>
+            <shiro:hasRole name="Admin">
 	            <a class="item #{menu == 'admin' ? 'active' : ''}" title="Painel de Administração"
 	               href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">
 	                <i class="settings no margin icon"></i>
@@ -49,7 +49,7 @@
 	            <a class="item" title="Painel do Desenvolvedor">
 	                <i class="code no margin icon"></i>
 	            </a>        
-            
+            </shiro:hasRole>
             <a class="item" title="Opções do Usuário">
                 <i class="options no margin icon"></i>
             </a>
@@ -93,7 +93,7 @@
             }
 
             var wsocket;
-            var serviceLocation = "ws://localhost:8080/chamados/support/#{userLogged.user.id}";
+            var serviceLocation = "ws://10.86.99.30:8080/chamados/support/#{userLogged.user.id}";
 
             function onMessageReceived(evt) {
                 try {

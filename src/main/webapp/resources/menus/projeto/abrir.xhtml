@@ -1,0 +1,83 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <div class="ui left fixed computer only side block flex column menu leftMenu" style="margin-top: 60px; background: none" >                               
+        <div id="cancel-btn" class="ui vertical labeled google plus colored inverted icon menu"
+             jsf:rendered="#{cancelar == null || !cancelar}">
+            <a class="item" href="#{facesContext.externalContext.applicationContextPath}">
+                <i class="remove icon"></i>
+                <strong>Cancelar</strong>
+            </a>
+        </div>        
+         <div class="ui vertical labeled blue inverted icon menu"
+             jsf:rendered="#{cancelar != null and cancelar}">
+            <a class="item" href="#{facesContext.externalContext.applicationContextPath}/servicos.jsf">
+                <i class="plus icon"></i>
+                <strong>Abrir Chamado</strong>
+            </a>
+        </div> 
+        <h:form prependId="false">
+            <p:remoteCommand name="updateTicketSupportTableCount" actionListener="#{ticketSupportTableController.supportTable.countUpdates()}"
+                             update=":menu-principal :navbar-todos-badge" />
+            <div jsf:id="menu-principal" class="ui vertical labeled grey inverted icon menu" >
+                <div class="header item">
+                    Chamados
+                </div>
+                <h:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('TODOS') ? 'active' : ''} item filterable"
+                               actionListener="#{ticketSupportTableController.supportTable.changeStatus('TODOS')}"                               
+                               action="index?faces-redirect=true" >
+                    <i class="inbox icon"></i>
+                    Todos
+                    <div class="badge1 ui bottom right attached blue label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.todos > 0}">#{ticketSupportTableController.supportTable.updateCount.todos}</div>
+                </h:commandLink>
+                <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('ABERTOS') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('ABERTOS')}"
+                               ajax="false" 
+                               action="index?faces-redirect=true">
+                    <i class="comments outline icon"></i>
+                    Abertos
+                    <div class="badge2 ui bottom right attached green label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.abertos > 0}">
+                        #{ticketSupportTableController.supportTable.updateCount.abertos}
+                    </div>
+                </p:commandLink>
+                <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('PENDENTES') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('PENDENTES')}"
+                               ajax="false"
+                               action="index?faces-redirect=true">
+                    <i class="warning icon"></i>
+                    Pendentes
+                    <div class="badge3 ui bottom right attached orange label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.pendentes > 0}">
+                        #{ticketSupportTableController.supportTable.updateCount.pendentes}
+                    </div>
+                </p:commandLink>
+                <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('FECHADOS') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('FECHADOS')}"
+                               ajax="false"
+                               action="index?faces-redirect=true">
+                    <i class="ban icon"></i>
+                    Fechados
+                    <div class="badge4 ui bottom right attached red label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.fechados > 0}">
+                        #{ticketSupportTableController.supportTable.updateCount.fechados}
+                    </div>
+                </p:commandLink>
+                <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('NAO_DEFINIDO') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('NAO_DEFINIDO')}"
+                               ajax="false"
+                               action="index?faces-redirect=true">
+                    <i class="remove user icon"></i>
+                    Sem Atendimento
+                    <div class="badge4 ui bottom right attached red label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.naoDefinido > 0}">
+                        #{ticketSupportTableController.supportTable.updateCount.naoDefinido}
+                    </div>
+                </p:commandLink>
+            </div>
+        </h:form>
+    </div>
+
+</ui:composition>

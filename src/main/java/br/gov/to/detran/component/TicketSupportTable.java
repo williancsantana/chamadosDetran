@@ -53,7 +53,7 @@ public class TicketSupportTable implements java.io.Serializable {
     private String[] filterColumns;
     private List<TicketSupport> data;
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
-    private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.HOJE;
+    private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
     private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
 
@@ -355,7 +355,7 @@ public class TicketSupportTable implements java.io.Serializable {
             }
         }
         return "";
-    }
+    }       
 
     public String icon(TicketSupport suporte) {
         if (null != suporte.getStatus()) {
