@@ -1,0 +1,220 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:param name="menu" value="abrir" />
+
+    <ui:define name="head-include">
+        <h:outputStylesheet library="css" name="quill.base.css" />
+        <h:outputStylesheet library="css" name="quill.snow.css" />
+        <h:outputStylesheet library="css" name="ql-snow-override.css" />
+    </ui:define>
+
+    <ui:define name="page-title">
+        Detran - TO | Projetos
+    </ui:define>    
+
+    <ui:define name="content">
+        <h4 class="ui top attached header">Criar um Projeto</h4>
+        <div class="ui bottom attached segment">
+            <h:form id="novo-chamado-form" class="ui form" prependId="false">
+                <h:inputHidden id="ticket-content" value="#{projectController.instance.descricao}" />
+                <p:remoteCommand name="createProject" actionListener="#{projectController.insert()}" />                
+                <div class="field">
+                    <label>Titulo do Projeto</label>                    
+                    <h:inputText value="#{projectController.instance.titulo}" required="true" requiredMessage = "É obrigatório informar o titulo"/>
+                </div>                             
+                <div class="ui divider"></div>                
+                <div class="field">
+                    <label>Descrição do Projeto</label>
+                    <div class="ui top attached no padding tertiary segment">
+                        <div class="ql-toolbar-container wysiwyg toolbar">
+                            <select class="ql-font">
+                                <option value="sans-serif" selected="selected">Sans Serif</option>
+                                <option value="serif">Serif</option>
+                                <option value="monospace">Monospace</option>
+                            </select>
+                            <select class="ql-size">
+                                <option value="10px">Pequeno</option>
+                                <option value="13px" selected="selected">Normal</option>
+                                <option value="18px">Grande</option>
+                            </select>
+                            <span class="ql-format-separator"></span>
+                            <div class="ql-format-group">
+                                <span class="ql-bold ql-format-button"></span>
+                                <span class="ql-italic ql-format-button"></span>
+                                <span class="ql-strike ql-format-button"></span>
+                                <span class="ql-underline ql-format-button"></span>
+                                <span class="ql-link ql-format-button"></span>
+                                <span class="ql-format-separator"></span>
+                                <select title="Alignment" class="ql-align">
+                                    <option value="left" label="Esquerda" selected=""></option>
+                                    <option value="center" label="Centralizado"></option>
+                                    <option value="right" label="Direita"></option>
+                                    <option value="justify" label="Justificado"></option>
+                                </select>
+                                <span title="List" class="ql-format-button ql-list"></span>
+                                <span title="Bullet" class="ql-format-button ql-bullet"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui attached no padding segment">
+                        <div id="new-ticket-message" class="wysiwyg editor"></div>
+                    </div>                                       
+                </div>
+                
+                <div class="ui divider"></div>                
+                <div class="field">
+                    <label>Coordenador do Projeto</label>                    
+					 <div id="add-group-dropdown" class="ui fluid selection dropdown">
+                                        <i class="dropdown icon"></i>
+                                        <input id="add-group-input" name="group-input" type="hidden" value="default" />
+                                        <div class="default text"><i class="users icon"></i> Selecionar Coordenador</div>
+                                        <div class="menu">
+                                            <ui:repeat var="user" value="#{projectController.users()}" >
+                                                <div class="item" data-value="#{user.id}" data-text="#{user.name}"
+                                                     jsf:onclick="rc_#{user.id}();">
+                                                    <p:remoteCommand name="rc_#{user.id}" 
+                                                    	immediate="true"
+                                                    	actionListener="#{projectController.instance.setCoordinator(user)}" />
+                                                    <i class="users icon"></i> #{user.name}                                                    
+                                                </div>
+                                            </ui:repeat>
+
+                                        </div>
+                                    </div>
+                </div>
+                
+                <div class="ui divider"></div>                
+                <div class="field">
+                    <label>Integrantes do Projeto</label>
+                    <div class="ui segment no padding">
+                        <div class="ui divided list" jsf:id="integrantesList">
+                            <ui:repeat var="user" value="#{projectController.instance.peoples}">
+                                <div class="user item small padding" >
+                                    <i class="user icon"></i>
+                                    <div class="content">
+                                        <div class="header">
+                                        	<h:outputText value="#{user.userSecurity.name}" />                                        	 
+                                       	</div>
+                                        <div class="description">
+                                            <p:commandLink actionListener="#{projectController.removerIntegrante(user)}"
+                                                           value="Remover" update="integrantesList"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ui:repeat>
+                            <div id="empty-userTrabalho" class="item small padding"
+                                 jsf:rendered="#{projectController.instance.peoples.size() == 0}">
+                                <i class="blue info icon"></i>
+                                <div class="content">
+                                    <div class="header">Nenhum integrante adicionado</div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                    <table class="ui very basic table" jsf:id="formUser">
+                        <tbody>
+                            <tr>
+                                <td class="collapsing center aligned"><strong>Adicionar</strong></td>
+                                <td class="center aligned">
+                                     <h:selectOneMenu value="#{projectController.people.userSecurity}" 
+                                     			converter="baseEntityConverter">
+							            <f:selectItems var="user" value="#{projectController.users()}"
+							            	itemValue="#{user}" itemLabel="#{user.name}" />							            
+							        </h:selectOneMenu>
+                                </td>                      
+                                <td class="collapsing center aligned">                                    
+                                    <p:commandLink id="add-escala-btn" value="Adicionar" styleClass="ui green button"                                    			   
+                                                   actionListener="#{projectController.adicionarIntegrante()}"
+                                                   update="integrantesList formUser"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ui divider"></div>
+                <div class="two fields">
+			    	<div class="field">
+			      		<label>Previsão de Termino</label>
+			      		<p:calendar pattern="dd-MM-yyyy" mask="true" value="#{projectController.instance.timeEstimated}"></p:calendar>
+			      	</div>			      	
+			    </div>                                
+                
+                
+                <div class="field" jsf:id="anexoList">
+                    <label jsf:rendered="#{projectController.instance.documents.size() > 0}">Anexos</label>
+                    <section class="proj-page-section" jsf:rendered="#{projectController.instance.documents.size() > 0}">							
+						<ui:repeat var="anexo" value="#{projectController.instance.documents}">
+							<div class="proj-page-attach">
+								<i class="font-icon attach icon"></i>
+								<p class="name">#{anexo.name}</p>
+								<p class="date"><h:outputText value="#{anexo.created}">
+                                        <f:convertDateTime pattern="dd MMMM yyyy',' HH:MM" locale="pt-BR"/>
+                                    </h:outputText></p>
+								<p>
+									<a href="#">Visualizar</a>
+									<p:commandLink actionListener="#{projectController.removeDocument(anexo)}"
+										immediate="true"
+										update="anexoList">Remover</p:commandLink>
+								</p>
+							</div>		
+						</ui:repeat>										
+					</section>						                   
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui buttons">                                        
+                    <a href="#" class="ui submit blue button" onclick="insertProject();">Iniciar Projeto</a>
+                    <div class="or" data-text="ou"></div>
+                    <a href="#{facesContext.externalContext.applicationContextPath}/projetos" class="ui button">Cancelar</a>
+                </div>
+
+                <div class="pull right">
+                	 <p:commandLink styleClass="ui blue action button" onclick="PF('dlg1').show();"
+                	 	immediate="true">
+                     		<i class="upload icon"></i> Enviar Anexo
+                     </p:commandLink>                    
+                </div>
+            </h:form>
+        </div>
+        
+        <h:form>
+	        <p:dialog widgetVar="dlg1" minHeight="40">
+			    <p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo" label="Escolher Arquivo"
+			    		fileUploadListener="#{projectController.sendDocument}" update="anexoList"
+			    		 oncomplete="PF('dlg1').hide()" 
+	                     auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|doc|pdf|xls|xlsx|ppt|pptx|txt)$/" />
+			</p:dialog>
+		</h:form>
+
+    </ui:define>
+
+    <ui:define name="page-js">
+        <h:outputScript library="js" name="quill.min.js" />                
+        <script>
+            this.editor = new Quill('.wysiwyg.editor', {
+                modules: {
+                    'toolbar': {container: '.wysiwyg.toolbar'},
+                    'link-tooltip': true
+                },
+                theme: 'snow'
+            });
+
+            function insertProject() {                
+                $('#ticket-content').val(editor.getHTML());
+                createProject();
+            }            
+            
+            $('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();
+            
+        </script>
+    </ui:define>
+
+</ui:composition>

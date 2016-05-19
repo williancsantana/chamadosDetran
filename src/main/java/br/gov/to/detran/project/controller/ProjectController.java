@@ -7,6 +7,7 @@ package br.gov.to.detran.project.controller;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,15 +22,18 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 
 import br.gov.to.detran.controller.BaseController;
+import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.project.domain.Project;
 import br.gov.to.detran.project.domain.ProjectComment;
 import br.gov.to.detran.project.domain.ProjectDocument;
 import br.gov.to.detran.project.domain.ProjectTask;
+import br.gov.to.detran.project.domain.ProjectUser;
 import br.gov.to.detran.project.enumeration.ProjectStatus;
 import br.gov.to.detran.project.repository.ProjectCommentRepository;
 import br.gov.to.detran.project.repository.ProjectDocumentRepository;
 import br.gov.to.detran.project.repository.ProjectRepository;
 import br.gov.to.detran.project.repository.ProjectTaskRepository;
+import br.gov.to.detran.project.repository.ProjectUserRepository;
 import br.gov.to.detran.push.NotifySessions;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.UserSecurityRepository;
@@ -55,10 +59,14 @@ public class ProjectController extends BaseController<Project> implements java.i
     UserSecurityRepository userSecurityRepository;
     private @Inject
     NotifySessions notifySessions;
+    private @Inject
+    ProjectUserRepository projectUserRepository;
               
     private ProjectComment projectComment;
     private ProjectDocument projectDocument;
     private ProjectTask projectTask;
+    private ProjectUser people;
+    private List<UserSecurity> users;
 
     @PostConstruct
     public void postConstruct() {
@@ -67,6 +75,9 @@ public class ProjectController extends BaseController<Project> implements java.i
         if (Project != null) {
             this.instance = Project;
         }        
+        people = new ProjectUser();
+        projectComment = new ProjectComment();
+        projectDocument = new ProjectDocument();        
     }
 
     public void checkProject() throws IOException {
@@ -79,7 +90,8 @@ public class ProjectController extends BaseController<Project> implements java.i
             }                        
             this.instance.setComments(this.projectCommentRepository.getAllComments(this.instance.getId()));
             this.instance.setDocuments(this.projectDocumentRepository.getAllDocuments(this.instance.getId()));
-            this.instance.setTasks(this.projectTaskRepository.getAllTasks(this.instance.getId()));            
+            this.instance.setTasks(this.projectTaskRepository.getAllTasks(this.instance.getId()));
+            this.instance.setPeoples(this.projectUserRepository.getAllUsers(this.instance.getId()));
             this.projectComment = new ProjectComment();
             this.projectDocument = new ProjectDocument();
         } catch (NumberFormatException | IOException e) {
@@ -157,7 +169,13 @@ public class ProjectController extends BaseController<Project> implements java.i
         instance.setUpdated(new Date());        
         instance.setAutor(FacesUtil.loggedUser());
         instance.setStatus(ProjectStatus.ABERTO);        
-        this.repository.insert(instance);               
+        this.repository.insert(instance);
+        for(ProjectUser user : instance.getPeoples()){
+        	projectUserRepository.insert(user);
+        }
+        for(ProjectDocument doc : instance.getDocuments()){
+        	projectDocumentRepository.insert(doc);
+        }
         this.redirectWithMensagem("projeto", "O Projeto foi aberto com sucesso!", FacesUtil.INFO);
     }
     
@@ -267,6 +285,48 @@ public class ProjectController extends BaseController<Project> implements java.i
          addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
      }
     }
+    
+    public List<UserSecurity> users() {
+    	if(users == null){
+    		users = userSecurityRepository.getAll(); 
+    	}
+        return users;
+    }
+    
+    public void adicionarIntegrante(){
+    	try{    	
+    		if(people == null){
+    			throw new Exception("Não foi possivel realizar a adição de um novo integrante.");
+    		}
+    		people.setCreated(new Date());
+        	people.setUpdated(new Date());
+        	people.setProject(instance);
+        	System.out.println(people.getUserSecurity().getName());
+            if(instance.getId() > 0){
+            	projectUserRepository.insert(people);
+            }else{            	
+            	instance.getPeoples().add(people);            	
+            }
+            people = new ProjectUser();
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Integrante", ex.getMessage());
+    	}
+    }
+    
+    public void removerIntegrante(ProjectUser user){
+    	try{    		
+            if(instance.getId() > 0){ 	
+            	projectUserRepository.remove(user);
+            }else{            	
+            	instance.getPeoples().remove(user);            	
+            }
+            people = new ProjectUser();
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Integrante", ex.getMessage());
+    	}
+    }
 
     public void validar() {
 
@@ -286,25 +346,39 @@ public class ProjectController extends BaseController<Project> implements java.i
             	projectDocument.setMimeType(file.getContentType());
             	projectDocument.setName(file.getFileName());
             	projectDocument.setSize(file.getSize());
-            	projectDocument.setDataByte(file.getContents());            	
-            	projectDocumentRepository.insert(projectDocument);
+            	projectDocument.setDataByte(file.getContents());
+            	if(this.instance.getId() > 0){            		
+            		projectDocumentRepository.insert(projectDocument);
+            	}else{
+            		instance.getDocuments().add(projectDocument);
+            	}
             	projectDocument = new ProjectDocument();
             }
     	}catch(Exception ex){
     		ex.printStackTrace();
-    		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
+    		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
     	}            	   
     }
     
     public void removeDocument(ProjectDocument document){
     	try{    		
-            if(document != null){            	
+            if(document != null && instance.getId() > 0){ 	
             	projectDocumentRepository.remove(document, true);            	
+            }else{
+            	instance.getDocuments().remove(document);
             }
     	}catch(Exception ex){
     		ex.printStackTrace();
-    		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
+    		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
     	}
-    }    
-        	
+    }
+
+	public ProjectUser getPeople() {
+		return people;
+	}
+
+	public void setPeople(ProjectUser people) {
+		this.people = people;
+	}    
+        	    
 }

@@ -13,7 +13,8 @@
         <class>br.gov.to.detran.domain.TokenReset</class>    
         <class>br.gov.to.detran.domain.UserSecurity</class>    
         <class>br.gov.to.detran.domain.UserSecurityGroup</class>    
-        <class>br.gov.to.detran.domain.UserSecurityLogins</class>    
+        <class>br.gov.to.detran.domain.UserSecurityLogins</class>
+        <class>br.gov.to.detran.domain.UserAvatar</class>       
         <class>br.gov.to.detran.domain.PaginaSistema</class>
         <class>br.gov.to.detran.domain.RequisicaoAcesso</class>
         <class>br.gov.to.detran.domain.EscalaTrabalho</class>
@@ -32,8 +33,9 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
             <property name="hibernate.default_schema" value="chamadoshm"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <!--<property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
+            -->
         </properties>        
     </persistence-unit>
     

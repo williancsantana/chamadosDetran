@@ -13,57 +13,7 @@
                 <i class="plus icon"></i>
                 <strong>Iniciar Projeto</strong>
             </a>
-        </div>                                       
-        <h:form prependId="false">
-            <p:remoteCommand name="projectTableCount" actionListener="#{projectTableController.projectTable.countUpdates()}"
-                             update=":menu-principal :navbar-todos-badge" />
-            <div jsf:id="menu-principal" class="ui vertical labeled grey inverted icon menu">
-                <div class="header item">
-                    Chamados
-                </div>
-                <p:commandLink styleClass="#{projectTableController.projectTable.isStatus('TODOS') ? 'active' : ''} item filterable"
-                				actionListener="#{projectTableController.projectTable.changeStatus('TODOS')}"
-                               update=":tableData :menu-principal :activeTitle :paginationInfo">
-                    <i class="inbox icon"></i>
-                    Todos
-                    <div class="badge1 ui bottom right attached blue label" style="margin-bottom: 0px;"
-                         jsf:rendered="#{projectTableController.projectTable.updateCount.todos > 0}">#{projectTableController.projectTable.updateCount.todos}
-                    </div>
-                </p:commandLink>
-                <p:commandLink styleClass="#{projectTableController.projectTable.isStatus('ABERTO') ? 'active' : ''} item filterable" actionListener="#{projectTableController.projectTable.changeStatus('ABERTO')}"
-                               update=":tableData :menu-principal :activeTitle :paginationInfo">
-                    <i class="comments outline icon"></i>
-                    Abertos
-                    <div class="badge2 ui bottom right attached green label" style="margin-bottom: 0px;" jsf:rendered="#{projectTableController.projectTable.updateCount.abertos > 0}">
-                        #{projectTableController.projectTable.updateCount.abertos}
-                    </div>
-                </p:commandLink>
-                <p:commandLink styleClass="#{projectTableController.projectTable.isStatus('PROGRESSO') ? 'active' : ''} item filterable" actionListener="#{projectTableController.projectTable.changeStatus('PROGRESSO')}"
-                               update=":tableData :menu-principal :activeTitle :paginationInfo">
-                    <i class="warning icon"></i>
-                    Progresso
-                    <div class="badge3 ui bottom right attached orange label" style="margin-bottom: 0px;" jsf:rendered="#{projectTableController.projectTable.updateCount.progresso > 0}">
-                        #{projectTableController.projectTable.updateCount.progresso}
-                    </div>
-                </p:commandLink>
-                <p:commandLink styleClass="#{projectTableController.projectTable.isStatus('HOMOLOGACAO') ? 'active' : ''} item filterable" actionListener="#{projectTableController.projectTable.changeStatus('HOMOLOGACAO')}"
-                               update=":tableData :menu-principal :activeTitle :paginationInfo">
-                    <i class="ban icon"></i>
-                    Homologação
-                    <div class="badge4 ui bottom right attached red label" style="margin-bottom: 0px;" jsf:rendered="#{projectTableController.projectTable.updateCount.homologacao > 0}">
-                        #{projectTableController.projectTable.updateCount.homologacao}
-                    </div>
-                </p:commandLink>
-                <p:commandLink styleClass="#{projectTableController.projectTable.isStatus('PRODUCAO') ? 'active' : ''} item filterable" actionListener="#{projectTableController.projectTable.changeStatus('PRODUCAO')}"
-                               update=":tableData :menu-principal :activeTitle :paginationInfo">
-                     <i class="remove user icon"></i>
-                    Produção
-                    <div class="badge4 ui bottom right attached red label" style="margin-bottom: 0px;" jsf:rendered="#{projectTableController.projectTable.updateCount.producao > 0}">
-                        #{projectTableController.projectTable.updateCount.producao}
-                    </div>
-                </p:commandLink>                
-            </div>
-        </h:form>
+        </div>                                               
     </div>
 
 </ui:composition>

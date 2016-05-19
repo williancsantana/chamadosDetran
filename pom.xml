@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>5.2</version>
+            <version>5.3</version>
         </dependency>        
         <dependency>
             <groupId>javax</groupId>
@@ -119,6 +119,13 @@
             <artifactId>jsoup</artifactId>
             <version>1.8.3</version>
         </dependency>
+        
+        	<dependency>
+			<groupId>org.primefaces.themes</groupId>
+			<artifactId>venture</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+				
 
         
         <!--<dependency>

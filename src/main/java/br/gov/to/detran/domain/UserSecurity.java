@@ -5,10 +5,9 @@
  */
 package br.gov.to.detran.domain;
 
-import br.gov.to.detran.security.AuthenticationType;
-import br.gov.to.detran.security.Security;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,9 +15,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.hibernate.annotations.SQLDelete;
+
+import br.gov.to.detran.security.AuthenticationType;
+import br.gov.to.detran.security.Security;
 
 /**
  *
@@ -50,6 +52,10 @@ public class UserSecurity extends AbstractEntity implements Security{
     
     @OneToMany(mappedBy = "userSecurity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EscalaTrabalho> escalaDeTrabalho = new ArrayList<>();
+    
+    //@OneToOne(optional=true, mappedBy="user")
+    @Transient
+    private UserAvatar userAvatar;
     
     @Transient
     UserSecurityLogins lastLogin;
@@ -164,6 +170,14 @@ public class UserSecurity extends AbstractEntity implements Security{
 
 	public void setEscalaDeTrabalho(List<EscalaTrabalho> escalaDeTrabalho) {
 		this.escalaDeTrabalho = escalaDeTrabalho;
-	}       
+	}
 
+	public UserAvatar getUserAvatar() {
+		return userAvatar;
+	}
+
+	public void setUserAvatar(UserAvatar userAvatar) {
+		this.userAvatar = userAvatar;
+	}       
+	
 }

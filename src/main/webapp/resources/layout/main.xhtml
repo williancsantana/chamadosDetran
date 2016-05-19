@@ -33,7 +33,7 @@
                 <img src="#{facesContext.externalContext.applicationContextPath}/resources/images/detran_logo.png" />
             </div>
             <div class="computer only header item">Sistema de Chamados</div>
-            <a class="item #{menu == 'chamados' ||  menu == 'abrir' ? 'active' : ''}" title="Service Desk"
+            <a class="item #{menu == 'chamados' ||  menu == 'abrir' and menuOption == '' ? 'active' : ''}" title="Service Desk"
                href="#{facesContext.externalContext.applicationContextPath}">
                 <i class="comments outline no margin icon"></i>
                 <div jsf:id="navbar-todos-badge" class="bottom floating ui red label"
@@ -50,7 +50,8 @@
 	                <i class="code no margin icon"></i>
 	            </a>        
             </shiro:hasRole>
-            <a class="item" title="Opções do Usuário">
+            <a class="item #{menuOption == 'opcoes' ? 'active' : ''}" title="Opções do Usuário"
+            	href="#{facesContext.externalContext.applicationContextPath}/opcoes.jsf">
                 <i class="options no margin icon"></i>
             </a>
             <div class="item no margin padding"></div>
@@ -82,8 +83,7 @@
 
 
         <ui:insert name="page-js" />
-        <script>
-            //https://wmarkito.wordpress.com/2012/04/05/adding-global-exception-handling-using-jsf-2-x-exceptionhandler/
+        <script>            
             function handleDialogSubmit(xhr, status, args, dialog) {
                 if (args.validationFailed) {
                     dialog.show();
@@ -93,7 +93,7 @@
             }
 
             var wsocket;
-            var serviceLocation = "ws://10.86.99.30:8080/chamados/support/#{userLogged.user.id}";
+            var serviceLocation = "ws://localhost:8080/chamados/support/#{userLogged.user.id}";
 
             function onMessageReceived(evt) {
                 try {

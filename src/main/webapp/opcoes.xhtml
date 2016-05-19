@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:param name="menu" value="abrir" />    
+    <ui:param name="menuOption" value="opcoes" />
+
+    <ui:define name="page-title">
+        Detran - TO | Opções do Usuário
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form prependId="false" id="form">            
+            <h4 class="ui top attached header">Opções de Chamado</h4>                           
+            <div id="services-tree-bottom" class="ui bottom attached segment">                
+                <div class="field">
+                    <div class="ui checkbox">                        
+                        <h:selectBooleanCheckbox value="#{userController.instance.ausente}"/>
+                        <label><strong>Estado ausente</strong></label>
+                    </div>
+                    <p>Ao ativar o estado ausente, novos chamados não serão automaticamente escalonados para você!<br/>
+                    <strong>O estado ausente só faz efeito em usuários que possam atender chamados
+                    <br/>Obs: Esse estado deve ser usado quando se vai estar de férias ao vai estar ausente durante seu horário de trabalho.</strong></p>
+                </div>
+                <div id="categories-divider" class="ui divider small top margin"></div>
+                <h4 class="ui header">Opções de Avatar</h4>                                                          
+                
+                <div class="field">
+                	 
+                    <img class="ui avatar image" src="#{resource['images/square-image.png']}" />
+					<span>#{userLogged.user.name}</span>
+					<h:commandLink onclick="alert('editar')"
+					style="color: black">
+						<i class="edit icon"></i>
+					</h:commandLink>                    
+                </div>
+                                
+                                               
+            </div>
+            
+        </h:form>
+         <h:form>
+	        <p:dialog widgetVar="dlgImagem" minHeight="40">
+			    <p:fileUpload mode="advanced" uploadLabel="Escolher Imagem" label="Escolher Imagem"
+			    		fileUploadListener="#{userLoggedController.enviarFoto}" update="form"
+			    		 oncomplete="PF('dlg1').hide()" 
+	                     auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+			</p:dialog>
+		</h:form>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>        	
+        	$('.ui.checkbox').checkbox();
+        </script>
+    </ui:define>
+
+</ui:composition>

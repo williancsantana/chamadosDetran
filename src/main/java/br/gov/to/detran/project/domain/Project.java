@@ -167,6 +167,13 @@ public class Project extends AbstractEntity{
 
 	public void setTasks(List<ProjectTask> projectTask) {
 		this.tasks = projectTask;
-	}	
-    
+	}
+
+	public UserSecurity getCoordinator() {
+		return coordinator;
+	}
+
+	public void setCoordinator(UserSecurity coordinator) {
+		this.coordinator = coordinator;
+	}	   	
 }
