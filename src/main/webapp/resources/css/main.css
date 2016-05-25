@@ -419,6 +419,10 @@ body {
     border-top: solid 1px #d8e2e7;
 }
 
+.proj-page-section2 {
+    padding: 15px 15px 20px;    
+}
+
 .proj-page-attach {
     display: inline-block;
     max-width: 100%;
@@ -455,4 +459,176 @@ body {
     margin: 0 15px 0 0;
 }
 
+.comment-row-item {
+    position: relative;
+    padding: 12px 15px 12px 61px;
+    min-height: 32px;
+}
+.comment-row-item p {
+    margin: 0;
+}
+.comment-row-item .avatar-preview {
+    position: absolute;
+    left: 15px;
+    top: 12px;
+}
+.comment-row-item .comment-row-item-header {
+    line-height: 18px;
+    margin: 0 0 6px;
+}
+.comment-row-item .comment-row-item-header .tbl-cell {
+    vertical-align: top;
+}
+.comment-row-item .comment-row-item-header .tbl-cell-name {
+    font-weight: 600;
+}
+.comment-row-item .comment-row-item-header .tbl-cell-date {
+    text-align: right;
+    width: 30px;
+    padding-left: 10px;
+    white-space: nowrap;
+    font-size: .875rem;
+    color: #919fa9;
+}
+.comment-row-item .comment-row-item-content {
+    padding: 0 45px 6px 0;
+    position: relative;
+}
+.comment-row-item .comment-row-item-action {
+    border: none;
+    background: 0 0;
+    color: #919fa9;
+    position: absolute;
+    top: 2px;
+}
+.comment-row-item.selected, .hover-action .comment-row-item:hover {
+    background-color: #ecf2f5;
+}
+.comment-row-item .comment-row-item-action:hover {
+    color: #00a8ff;
+}
+.comment-row-item .comment-row-item-action.edit {
+    right: 25px;
+}
+.comment-row-item .comment-row-item-action.del {
+    right: 0;
+}
+.comment-row-item .comment-row-item-action.del:hover {
+    color: #fa424a;
+}
+.comment-row-item .comment-row-item-reply {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 20px 0 0;
+    font-size: 1rem;
+    text-decoration: none;
+    color: #919fa9;
+    border: none;
+}
+.comment-row-item .comment-row-item-reply:hover {
+    color: #00a8ff;
+}
+.comment-row-item .comment-row-item-rating {
+    display: inline-block;
+    vertical-align: top;
+    color: #919fa9;
+    font-size: .875rem;
+    position: relative;
+    top: 2px;
+}
+.comment-row-item .comment-row-item-rating .number {
+    font-weight: 700;
+    margin: 0 6px;
+}
+.comment-row-item .comment-row-item-rating .font-icon, .comment-row-item .comment-row-item-rating .glyphicon {
+    cursor: pointer;
+    position: relative;
+    top: 2px;
+}
+.comment-row-item .comment-row-item-rating .font-icon:hover, .comment-row-item .comment-row-item-rating .glyphicon:hover {
+    color: #00a8ff;
+}
+.comment-row-item .comment-row-item-rating .font-icon.glyphicon-menu-down, .comment-row-item .comment-row-item-rating .glyphicon.glyphicon-menu-down {
+    top: 1px;
+}
+.hover-action .comment-row-item .comment-row-item-action {
+    display: none;
+}
+.hover-action .comment-row-item:hover .comment-row-item-action {
+    display: block;
+}
+.comment-row-item.quote {
+    border-left: solid 4px #d8e2e7;
+    min-height: 24px;
+    margin: 12px -45px 0 0;
+    padding: 0 0 0 44px;
+}
+.comment-row-item.quote .avatar-preview {
+    width: 24px;
+    height: 24px;
+    left: 10px;
+    top: 0;
+}
+.comment-row-item.quote .comment-row-item-header {
+    margin-bottom: 2px;
+}
+.comment-row-item.quote .comment-row-item-content {
+    padding-bottom: 0;
+}
 
+.tbl {
+    display: table;
+    width: 100%}
+.tbl-row {
+    display: table-row;
+}
+.tbl-cell {
+    display: table-cell;
+}
+
+.proj-page-section .comment-rows-container, .proj-page-section .leave-comment-block {
+    margin: 0 -15px;
+}
+.proj-page-section .leave-comment-block {
+    padding-bottom: 0;
+}
+
+.leave-comment-block {
+    position: relative;
+    padding: 15px 15px 15px 61px;
+}
+.leave-comment-block .avatar-preview {
+    position: absolute;
+    left: 15px;
+    top: 15px;
+}
+.leave-comment-block .chat-area-bottom {
+    padding-top: 20px;
+    border: none;
+}
+.leave-comment-block .viewable-access {
+    color: #919fa9;
+    margin: 0 0 12px;
+}
+.leave-comment-block .viewable-access .choose, .leave-comment-block .viewable-access .lbl {
+    display: inline-block;
+    vertical-align: top;
+}
+.leave-comment-block .viewable-access .choose {
+    position: relative;
+    top: 2px;
+}
+.leave-comment-block .viewable-access .choose>button {
+    border: none;
+    background: 0 0;
+    color: #919fa9;
+    font-size: .875rem;
+}
+.leave-comment-block .viewable-access .choose>button:after {
+    position: relative;
+    top: -3px;
+    margin-left: 0;
+}
+.leave-comment-block .viewable-access .choose .dropdown-menu {
+    margin-top: 2px;
+}

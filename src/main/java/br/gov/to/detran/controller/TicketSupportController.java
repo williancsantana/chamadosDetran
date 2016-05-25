@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +36,6 @@ import org.primefaces.model.UploadedFile;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.querydsl.core.group.Group;
 
 import br.gov.to.detran.domain.TicketAttachment;
 import br.gov.to.detran.domain.TicketGroup;
@@ -158,6 +158,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         try {            
             this.criarChamado(instance, service);
             this.addMenssage(FacesMessage.SEVERITY_INFO, "Registro Adicionado", "Cadastro");
+        }catch(java.io.IOException ex){
+        	ex.printStackTrace();            
         } catch (Exception ex) {
             ex.printStackTrace();
             this.addMenssage(FacesMessage.SEVERITY_ERROR, ex.getMessage(), "Validação");
@@ -222,14 +224,19 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         
         System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
         Collections.shuffle(solicitanteIds);
-        Map<Integer, Group> contarChamados = this.repository.contarChamados(solicitanteIds);        
+        Map<Long, Object> contarChamados = this.repository.contarChamados(solicitanteIds);        
         Long id = Long.MAX_VALUE;
         Long count = Long.MAX_VALUE;
-        for (Long atendente : solicitanteIds) {
-        	UserSecurity user = userSecurityRepository.getInstancePorId(id);
+        for (Long atendente : solicitanteIds) {        	
             Long tempCount = 0L;
-            if (contarChamados.containsKey(atendente.intValue())) {
-                tempCount = (Long) contarChamados.get(atendente.intValue()).toArray()[0];                
+            Integer key = atendente.intValue();            
+            if (contarChamados.containsKey(atendente)) {
+            //if(lista.contains(atEscalonamento)){
+            	/*Group g = contarChamados.get(atendente);*/
+            	//.toArray()[2];
+            	LinkedHashSet obj = (LinkedHashSet) contarChamados.get(atendente);
+            	Long value = (Long) obj.toArray()[0];
+                tempCount = value;                 
             }
             if (tempCount < count) {
                 id = atendente;
@@ -240,6 +247,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             UserSecurity user = userSecurityRepository.getInstancePorId(id);
             this.instance.setAtendente(user);
         } catch (Exception e) {
+        	e.printStackTrace();
             this.instance.setAtendente(null);
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyy");
@@ -367,7 +375,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             } else {
                 throw new Exception("Sua requisição foi inválida");
             }
-        } catch (Exception ex) {
+        }catch(java.io.IOException ex){
+        	ex.printStackTrace();            
+        }  catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
         }
@@ -393,15 +403,16 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.instance.setUltimaResposta(new Date());
             
             this.update();                
-            if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
+           /* if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
                 notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
                         NotifyMessage.builderReply(instance, this.instance.getAtendente(), notification));
-            }
+            }*/
             if (!Objects.equals(user.getId(), this.instance.getSolicitante().getId())) {
                 notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
                         NotifyMessage.builderReply(instance, this.instance.getSolicitante(), notification));
             }
-            
+        }catch(java.io.IOException ex){
+        	ex.printStackTrace();                       
         } catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
@@ -422,20 +433,40 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.instance.setAtViewat(new Date());
             this.instance.setUltimaResposta(new Date());
             
-            this.update();
-            if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
-                notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
-                        NotifyMessage.builderReply(instance, this.instance.getAtendente(), notification));
-            }
-            if (!Objects.equals(user.getId(), this.instance.getSolicitante().getId())) {
-                notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
-                        NotifyMessage.builderReply(instance, this.instance.getSolicitante(), notification));
-            }
+            UserSecurity userSecurity = FacesUtil.loggedUser();
             
+            this.update();
+            if (!Objects.equals(userSecurity.getId(), user.getId())) {
+                notifySessions.sendMensagem(user.getId().intValue(),
+                        NotifyMessage.builderNew(instance, user));
+            }
+            if (!Objects.equals(userSecurity.getId(), this.instance.getSolicitante().getId())) {
+                notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
+                        NotifyMessage.builderNew(instance, this.instance.getSolicitante()));
+            }
+        }catch(java.io.IOException ex){
+        	ex.printStackTrace();            
         } catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
         }
+    }
+    
+    public boolean permissaoEscalonar() throws Exception{    	
+        UserSecurity user = FacesUtil.loggedUser();
+        if(instance.getAtendente() != null && Objects.equals(user.getId(), this.instance.getSolicitante().getId())){
+        	return false;
+        }
+        boolean permissao = false;
+        user = userSecurityRepository.getInstancePorId(FacesUtil.loggedUser().getId());
+        for(TicketGroupService service : this.instance.getServico().getAtendentes()){        	
+        	TicketGroup g = service.getGrupo();
+        	if(user.getAllGrupos().contains(g)){
+        		permissao = true;
+        		break;
+        	}
+        }
+        return permissao;                    
     }
     
     public boolean permissaoApropirar() throws Exception{    	

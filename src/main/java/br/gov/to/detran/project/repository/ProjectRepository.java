@@ -7,8 +7,12 @@ package br.gov.to.detran.project.repository;
 
 import javax.transaction.Transactional;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.JPAQueryBase;
 
+import br.gov.to.detran.domain.QTicketSupport;
+import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.project.domain.Project;
 import br.gov.to.detran.project.domain.QProject;
 import br.gov.to.detran.repository.AbstractRepository;
@@ -25,9 +29,18 @@ public class ProjectRepository extends AbstractRepository<Project> implements ja
         return QProject.project;
     }
 
-	public Project getProject(long parseLong) {
-		// TODO Auto-generated method stub
-		return null;
+	public Project getProject(Long id) {
+		 System.out.println("id: "  + id);
+	        BooleanBuilder where = new BooleanBuilder();
+	        where.and(QProject.project.id.eq(id));
+	        JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
+	        query.from(QProject.project)
+	        .leftJoin(QProject.project.peoples)
+	        .leftJoin(QProject.project.documents)
+	        .leftJoin(QProject.project.tasks)
+	        .leftJoin(QProject.project.comments)
+	        .where(where);
+	        return (Project) query.fetchFirst();
 	}    
 
 }

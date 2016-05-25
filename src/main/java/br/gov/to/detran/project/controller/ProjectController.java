@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -66,7 +67,7 @@ public class ProjectController extends BaseController<Project> implements java.i
     private ProjectDocument projectDocument;
     private ProjectTask projectTask;
     private ProjectUser people;
-    private List<UserSecurity> users;
+    private List<UserSecurity> users;    
 
     @PostConstruct
     public void postConstruct() {
@@ -165,17 +166,12 @@ public class ProjectController extends BaseController<Project> implements java.i
     	if(instance.getDescricao().trim().isEmpty() || instance.getDescricao().trim().length() < 30){
     		throw new Exception("É necessário informar uma descrição do projeto de no minimo 30 caracteres!");
     	}
+    	instance.setTags("");
         instance.setCreated(new Date());
         instance.setUpdated(new Date());        
         instance.setAutor(FacesUtil.loggedUser());
         instance.setStatus(ProjectStatus.ABERTO);        
-        this.repository.insert(instance);
-        for(ProjectUser user : instance.getPeoples()){
-        	projectUserRepository.insert(user);
-        }
-        for(ProjectDocument doc : instance.getDocuments()){
-        	projectDocumentRepository.insert(doc);
-        }
+        this.repository.update(instance);
         this.redirectWithMensagem("projeto", "O Projeto foi aberto com sucesso!", FacesUtil.INFO);
     }
     
@@ -208,6 +204,7 @@ public class ProjectController extends BaseController<Project> implements java.i
             projectComment.setUserSecurity(FacesUtil.loggedUser());
             projectCommentRepository.insert(projectComment);            
             projectComment = new ProjectComment();            
+            instance.setComments(projectCommentRepository.getAllComments(instance.getId()));
         } catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
@@ -224,7 +221,8 @@ public class ProjectController extends BaseController<Project> implements java.i
              }                         
              projectComment.setUpdated(new Date());             
              projectCommentRepository.update(projectComment);             
-             projectComment = new ProjectComment();            
+             projectComment = new ProjectComment();          
+             instance.setComments(projectCommentRepository.getAllComments(instance.getId()));
          } catch (Exception ex) {
              ex.printStackTrace();
              addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
@@ -234,13 +232,18 @@ public class ProjectController extends BaseController<Project> implements java.i
     public void removeComment(ProjectComment comment){
     	try {
 	   		 if(comment == null){
-	   			 throw new Exception("Não foi possivel realizar a operação de atualização!");
+	   			 throw new Exception("Não foi possivel realizar a operação de remoção!");
 	   		 }                                                            
-            projectCommentRepository.remove(comment, true);                        
+            projectCommentRepository.remove(comment, true);
+            instance.setComments(projectCommentRepository.getAllComments(instance.getId()));
         } catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
         }
+    }
+    
+    public void cancelEdit(){
+    	projectComment = new ProjectComment();
     }
     
     public void insertTask(){
@@ -340,13 +343,25 @@ public class ProjectController extends BaseController<Project> implements java.i
     public void sendDocument(FileUploadEvent event) {
     	try{
     		UploadedFile file = event.getFile();
-            if(file != null){
-            	projectDocument.setProject(instance);
+            if(file != null){            	
             	projectDocument.setCreated(new Date());
             	projectDocument.setMimeType(file.getContentType());
             	projectDocument.setName(file.getFileName());
             	projectDocument.setSize(file.getSize());
-            	projectDocument.setDataByte(file.getContents());
+            	projectDocument.setDataByte(file.getContents());            	            	
+            }
+    	}catch(Exception ex){
+    		FacesContext.getCurrentInstance().isValidationFailed();
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
+    	}            	   
+    }
+    
+    public void saveDocument() {
+    	try{    		
+            if(projectDocument != null && projectDocument.getDataByte() != null){
+            	projectDocument.setProject(instance);
+            	projectDocument.setCreated(new Date());            	
             	if(this.instance.getId() > 0){            		
             		projectDocumentRepository.insert(projectDocument);
             	}else{
@@ -355,6 +370,17 @@ public class ProjectController extends BaseController<Project> implements java.i
             	projectDocument = new ProjectDocument();
             }
     	}catch(Exception ex){
+    		FacesContext.getCurrentInstance().isValidationFailed();
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
+    	}            	   
+    }
+    
+    public void cancelDocument() {
+    	try{    		            
+    		projectDocument = new ProjectDocument();            
+    	}catch(Exception ex){
+    		FacesContext.getCurrentInstance().isValidationFailed();
     		ex.printStackTrace();
     		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
     	}            	   
@@ -379,6 +405,23 @@ public class ProjectController extends BaseController<Project> implements java.i
 
 	public void setPeople(ProjectUser people) {
 		this.people = people;
-	}    
+	}
+
+	public ProjectDocument getProjectDocument() {
+		return projectDocument;
+	}
+
+	public void setProjectDocument(ProjectDocument projectDocument) {
+		this.projectDocument = projectDocument;
+	}
+
+	public ProjectComment getProjectComment() {
+		return projectComment;
+	}
+
+	public void setProjectComment(ProjectComment projectComment) {
+		this.projectComment = projectComment;
+	}    	
+	
         	    
 }

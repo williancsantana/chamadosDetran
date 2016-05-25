@@ -357,7 +357,7 @@
 
                             </div>
                             <div class="right menu" jsf:rendered="#{!ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
-                                <div class="item" jsf:rendered="#{ticketSupportController.permissaoApropirar()}">
+                                <div class="item" jsf:rendered="#{ticketSupportController.permissaoEscalonar()}">
                                     <div class="ui vk floating #{ticketSupportController.possibleAttendants().size() == 0 ? 'disabled' : ''} dropdown button">
                                         <i class="level up icon"></i> Escalonar esse chamado
                                         <div class="menu">

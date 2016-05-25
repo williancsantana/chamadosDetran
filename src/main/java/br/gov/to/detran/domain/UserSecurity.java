@@ -180,4 +180,14 @@ public class UserSecurity extends AbstractEntity implements Security{
 		this.userAvatar = userAvatar;
 	}       
 	
+	public String getSmallName(){
+		String[] nameSplit = name.split(" ");
+		String tempName = nameSplit[0]; 
+		try{
+			tempName += " " + nameSplit[1];
+		}catch(Exception e){			
+		}
+		return tempName;		
+	}
+	
 }

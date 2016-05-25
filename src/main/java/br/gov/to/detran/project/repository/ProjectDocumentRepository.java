@@ -9,9 +9,12 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.JPAQueryBase;
 
 import br.gov.to.detran.project.domain.ProjectDocument;
+import br.gov.to.detran.project.domain.QProjectComment;
 import br.gov.to.detran.project.domain.QProjectDocument;
 import br.gov.to.detran.repository.AbstractRepository;
 
@@ -28,8 +31,12 @@ public class ProjectDocumentRepository extends AbstractRepository<ProjectDocumen
     }
 
 	public List<ProjectDocument> getAllDocuments(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		 JPAQueryBase query = this.getPersistenceDao().query();
+	        BooleanBuilder where = new BooleanBuilder();
+	        where.and(QProjectDocument.projectDocument.project.id.eq(id));
+	        query.from(QProjectDocument.projectDocument).where(where);
+	        query.orderBy(QProjectDocument.projectDocument.created.asc());
+	        return query.fetch();
 	}    
 
 }

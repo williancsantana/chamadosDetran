@@ -5,32 +5,35 @@
  */
 package br.gov.to.detran.repository;
 
+import java.lang.reflect.Type;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.Transactional;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.group.Group;
+import com.querydsl.core.types.dsl.EntityPathBase;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPAQueryBase;
+
+import br.gov.to.detran.domain.AtendenteEscalonamento;
 import br.gov.to.detran.domain.QTicketGroupService;
 import br.gov.to.detran.domain.QTicketReply;
 import br.gov.to.detran.domain.QTicketSupport;
 import br.gov.to.detran.domain.QUserSecurityGroup;
-import br.gov.to.detran.domain.TicketGroupServiceType;
 import br.gov.to.detran.domain.TicketReply;
 import br.gov.to.detran.domain.TicketReplyType;
 import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.util.FacesUtil;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.group.Group;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
-import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPAQueryBase;
-import java.lang.reflect.Type;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.transaction.Transactional;
 
 /**
  *
@@ -77,7 +80,7 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
         return QTicketSupport.ticketSupport;
     }
 
-    public Map<Integer, Group> contarChamados(List<Long> users) {
+    public Map<Long, Object> contarChamados(List<Long> users) {
         BooleanBuilder where = new BooleanBuilder();
         where.and(QTicketSupport.ticketSupport.atendente.id.in(users));
         where.and(QTicketSupport.ticketSupport.status.ne(TicketSupportStatus.FECHADO));
@@ -88,10 +91,15 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
                 .where(where);
         query.groupBy(QTicketSupport.ticketSupport.atendente.id);
 
-        Map<Integer, Group> result = (Map<Integer, Group>) query.transform(groupBy(QTicketSupport.ticketSupport.atendente.id)
-                .as(QTicketSupport.ticketSupport.atendente.id, set(QTicketSupport.ticketSupport.id.count())));
-
-        return result;
+        Map<Long, Object> result = (Map<Long, Object>) query.transform(groupBy(QTicketSupport.ticketSupport.atendente.id)
+                .as(set(QTicketSupport.ticketSupport.id.count())));
+        
+        /*return query.list(Projections.constructor(AtendenteEscalonamento.class,
+        		QTicketSupport.ticketSupport.atendente.id,
+        		QTicketSupport.ticketSupport.id.count()));*/     
+        
+        return result;/*(List<AtendenteEscalonamento>) query.select(Projections.bean(AtendenteEscalonamento.class, QTicketSupport.ticketSupport.atendente.id,
+        		QTicketSupport.ticketSupport.id.count())).fetch();*/
     }        
     
     public List<TicketReply> getAllReplys(Long id){

@@ -5,15 +5,14 @@
  */
 package br.gov.to.detran.repository;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.EntityPathBase;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPAQueryBase;
 
@@ -49,6 +48,11 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
     }
     
     public List<Long> solicitanteIds(UserSecurity solicitante, TicketService service, DiaSemana diaSemana, Date hora){
+    	System.out.println("Parametros\n================================");
+    	System.out.println("Solicitante: " + solicitante.getId());
+    	System.out.println("Service: " + service.getId());
+    	System.out.println("Dia Semana: " + diaSemana.getLabel());
+    	System.out.println("Data: " + new SimpleDateFormat("dd/MM/yyyy").format(hora));
     	QEscalaTrabalho qEscala = QEscalaTrabalho.escalaTrabalho;
         BooleanBuilder where = new BooleanBuilder();
         where.and(QUserSecurityGroup.userSecurityGroup.userSecurity.id.ne(solicitante.getId()));

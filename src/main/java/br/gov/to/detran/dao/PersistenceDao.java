@@ -112,7 +112,7 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
      * @param entity
      */
     public void update(T entity) {
-        em.merge(entity);
+    	em.merge(entity);        
     }
 
     /**
