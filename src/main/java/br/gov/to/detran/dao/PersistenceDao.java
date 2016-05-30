@@ -255,8 +255,7 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
         JPAQueryBase query = (JPAQueryBase) this.query().from(entity).where(where).offset(first).limit(pageSize);
         if (sortField != null && !sortField.isEmpty()) {
             query.orderBy(new OrderSpecifier(order.equalsIgnoreCase("ASCENDING") ? Order.ASC : Order.DESC, Expressions.stringPath(entity, sortField)));
-        }
-        System.out.println(query.toString());
+        }        
         List<T> result = query.fetch();        
         return new LazyResult<>(result, count);
     }

@@ -20,7 +20,7 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 public class SecurityPersistenceRepository implements java.io.Serializable {
 
     private @Inject
-    UserSecurityRepository userPersistenceRepository;        
+    UserSecurityRepository userPersistenceRepository;     
     
     public SecurityPersistenceRepository() {
     }

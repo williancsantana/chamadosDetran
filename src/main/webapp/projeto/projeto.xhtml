@@ -98,11 +98,14 @@
 						</div>
 					</h:form>
 					<h:form prependId="false" id="projectComentario">
-						<h:inputHidden id="project-comment" value="#{projectController.projectComment.descricao}" />
-                		<p:remoteCommand name="insertComment" actionListener="#{projectController.commentProject()}" update="commentList"
-                			oncomplete="setEditor()" />
-                		<p:remoteCommand name="updateComment" actionListener="#{projectController.updateComment()}" update="commentList"
-                			oncomplete="setEditor()" />
+						<h:inputHidden id="project-comment"
+							value="#{projectController.projectComment.descricao}" />
+						<p:remoteCommand name="insertComment"
+							actionListener="#{projectController.commentProject()}"
+							update="commentList" oncomplete="setEditor()" />
+						<p:remoteCommand name="updateComment"
+							actionListener="#{projectController.updateComment()}"
+							update="commentList" oncomplete="setEditor()" />
 						<h4 class="ui dividing header">Comentários</h4>
 						<div class="field" jsf:id="commentList">
 							<ui:repeat var="comentario"
@@ -128,16 +131,18 @@
 											<h:outputText value="#{comentario.descricao}" escape="false" />
 										</p>
 										<p:commandLink styleClass="comment-row-item-action edit"
-											oncomplete="setReply()" update="project-comment commentButtons"
+											oncomplete="setReply()"
+											update="project-comment commentButtons"
 											actionListener="#{projectController.setProjectComment(comentario)}"
 											rendered="#{comentario.userSecurity.id == userLogged.user.id}">
 											<i class="write icon"></i>
-										</p:commandLink>										
-										<p:commandLink styleClass="comment-row-item-action del" update="commentList"
+										</p:commandLink>
+										<p:commandLink styleClass="comment-row-item-action del"
+											update="commentList"
 											actionListener="#{projectController.removeComment(comentario)}"
 											rendered="#{comentario.userSecurity.id == userLogged.user.id}">
 											<i class="trash icon"></i>
-										</p:commandLink>			
+										</p:commandLink>
 									</div>
 								</div>
 							</ui:repeat>
@@ -183,14 +188,19 @@
 									</div>
 								</div>
 								<div class="chat-area-bottom" jsf:id="commentButtons">
-									<button type="button" class="ui blue button" jsf:rendered="#{projectController.projectComment.id == 0}"
+									<button type="button" class="ui blue button"
+										jsf:rendered="#{projectController.projectComment.id == 0}"
 										onclick="preInsertComment()">Enviar Comentário</button>
-									<button type="button" class="ui blue button" jsf:rendered="#{projectController.projectComment.id > 0}"
+									<button type="button" class="ui blue button"
+										jsf:rendered="#{projectController.projectComment.id > 0}"
 										onclick="preUpdateComment()">Atualizar Comentário</button>
-									<button type="button" class="ui basic button" jsf:rendered="#{projectController.projectComment.id == 0}"
+									<button type="button" class="ui basic button"
+										jsf:rendered="#{projectController.projectComment.id == 0}"
 										onclick="clearComment()">Limpar</button>
-									<p:commandLink styleClass="ui basic button" update="project-comment commentButtons"
-										oncomplete="clearComment()" rendered="#{projectController.projectComment.id > 0}"
+									<p:commandLink styleClass="ui basic button"
+										update="project-comment commentButtons"
+										oncomplete="clearComment()"
+										rendered="#{projectController.projectComment.id > 0}"
 										actionListener="#{projectController.cancelEdit()}">Limpar e Cancelar</p:commandLink>
 								</div>
 							</div>
@@ -198,29 +208,81 @@
 					</h:form>
 				</div>
 			</div>
-			<div class="right floated left aligned five wide column" style="position: fixed; width: 34.25% !important;">
-				<h4 class="ui top attached header">Estatística e Demandas</h4>
+			<div class="right floated left aligned five wide column"
+				style="position: fixed; width: 34.25% !important;">
+				<h4 class="ui top attached header">Estatística</h4>
 				<div class="ui bottom attached segment">
-						<section class="proj-page-section proj-page-time-info">
-							<div class="tbl">
-								<div class="tbl-row">
-									<div class="tbl-cell">Time estimated</div>
-									<div class="tbl-cell tbl-cell-time">4h 30m</div>
-								</div>
-								<div class="tbl-row">
-									<div class="tbl-cell">Time working</div>
-									<div class="tbl-cell tbl-cell-time">2h 10m</div>
-								</div>
+
+					<div class="tbl">
+						<div class="tbl-row">
+							<div class="tbl-cell">Data de Inicio</div>
+							<div class="tbl-cell tbl-cell-time">
+								<h:outputText value="#{projectController.instance.startDate}"
+									rendered="#{projectController.instance.startDate != null}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
+								<h:outputText value="Projeto não iniciado"
+									rendered="#{projectController.instance.startDate == null}">
+								</h:outputText>
 							</div>
-							<div class="progress-compact-style">
-								<progress class="progress progress-success" value="65" max="100">65%</progress>
+						</div>
+						<div class="tbl-row">
+							<div class="tbl-cell">Previsão de Termino</div>
+							<div class="tbl-cell tbl-cell-time">
+								<h:outputText
+									value="#{projectController.instance.timeEstimated}"
+									rendered="#{projectController.instance.timeEstimated != null}">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+								</h:outputText>
 							</div>
-						</section>
+						</div>
+					</div>
+					<div class="progress-compact-style" style="margin-top: 10px;">
+						<progress class="progress progress-success" value="65" max="100">65%</progress>
+					</div>
+
+				</div>
+				<h4 class="ui top attached header">Demandas</h4>
+				<div class="ui bottom attached segment" style="overflow-y:auto;white-space:nowrap;">
+
+					<div class="progress-with-amount progress-compact-style">
+						<progress class="progress progress-success" value="25" max="100">25%</progress>
+						<div class="progress-with-amount-number">25%</div>
+					</div>
+
+					
+						<div class="task-row-item">						
+							<div class="tbl comment-row-item-header" jsf:id="taskList">
+								<ui:repeat var="task" value="#{projectController.instance.tasks}">
+									<div class="tbl-row">
+									<div class="tbl-cell tbl-cell-name">
+										<div class="checkbox">
+											<input type="checkbox" id="check-1" />
+											<label for="check-1">
+												#{task.titulo}
+											</label>
+										</div>
+									</div>
+									<div class="tbl-cell tbl-cell-date" style="text-align: right">
+										teste</div>
+								</div>
+								</ui:repeat>								
+							</div>
+						</div>
+					
+
+
+						<p:commandLink styleClass="ui button" actionListener="#{projectController.cancelTask}"
+							style="float:right" oncomplete="PF('dlgDemanda').show();"
+							update=":formDemanda:demandaForm">
+							Adicionar Demanda
+	                     </p:commandLink>				
+
 				</div>
 			</div>
 		</div>
-		
-		
+
+
 
 		<h:form id="formUpload" prependId="false">
 			<p:dialog widgetVar="dlg1" minHeight="40">
@@ -257,8 +319,7 @@
 							<i class="upload icon"></i> Enviar Anexo
 	                     </p:commandLink>
 						<div class="or" data-text="ou"></div>
-						<p:commandLink styleClass="ui button"
-							actionListener="#{projectController.cancelDocument}"
+						<p:commandLink styleClass="ui button"							
 							oncomplete="PF('dlg1').hide()">
 	                     		Cancelar
 	                     </p:commandLink>
@@ -266,6 +327,50 @@
 				</div>
 			</p:dialog>
 		</h:form>
+		
+		<h:form id="formDemanda" prependId="false">
+			<p:dialog widgetVar="dlgDemanda" minHeight="40">
+				<div class="ui form" jsf:id="demandaForm" style="min-width: 400px; max-width: 400px;">
+					<div class="field">
+						<label>Demanda</label>
+						<p:inputText
+							value="#{projectController.projectTask.titulo}" />
+					</div>
+					
+					<div class="ui divider"></div>
+					<div class="field">
+						<label>Tipo da Demanda</label>
+						 <h:selectOneMenu value="#{projectController.projectTask.taskType}" >
+							<f:selectItems var="tipo" value="#{projectController.taskTypes()}"
+							            	itemValue="#{tipo}" itemLabel="#{tipo.label}" />							            
+						 </h:selectOneMenu>
+					</div>
+					
+					<div class="ui divider"></div>
+					<div class="field">
+						<label>Descrição da Demanda</label>
+						<p:editor value="#{projectController.projectTask.descricao}"></p:editor>
+					</div>									
+														
+					<div class="ui divider"></div>
+					<div class="ui buttons" style="float: right">
+						<p:commandLink styleClass="ui submit blue button"
+							actionListener="#{projectController.insertTask}"
+							update=":taskList"
+							oncomplete="handleDialogSubmit(xhr, status, args, PF('dlgDemanda'))">
+							Salvar
+	                     </p:commandLink>
+						<div class="or" data-text="ou"></div>
+						<p:commandLink styleClass="ui button"
+							actionListener="#{projectController.cancelTask}"
+							oncomplete="PF('dlgDemanda').hide()">
+	                     		Cancelar
+	                     </p:commandLink>
+					</div>
+				</div>
+			</p:dialog>
+		</h:form>
+		
 	</ui:define>
 
 	<ui:define name="page-js">
@@ -284,31 +389,33 @@
 					theme : 'snow'
 				});
 			}
-			
-			var setReply = function () {            	                    
-                    if ($('#comment-form').length) {
-                        $('html, body').animate({scrollTop: $('#comment-form').offset().top}, 500);
-                        $('#ql-editor').focus();
-                        editor.setHTML($('#project-comment').val());
-                        return false;
-                    }                
-            }
+
+			var setReply = function() {
+				if ($('#comment-form').length) {
+					$('html, body').animate({
+						scrollTop : $('#comment-form').offset().top
+					}, 500);
+					$('#ql-editor').focus();
+					editor.setHTML($('#project-comment').val());
+					return false;
+				}
+			}
 
 			function preInsertComment() {
-                console.log(editor.getHTML());
-                $('#project-comment').val(editor.getHTML());
-                insertComment();
-            }
-			
-			function preUpdateComment(){
+				console.log(editor.getHTML());
 				$('#project-comment').val(editor.getHTML());
-                updateComment();
+				insertComment();
 			}
-			
+
+			function preUpdateComment() {
+				$('#project-comment').val(editor.getHTML());
+				updateComment();
+			}
+
 			function clearComment() {
 				editor.setText('');
-            }
-			
+			}
+
 			setEditor();
 		</script>
 	</ui:define>

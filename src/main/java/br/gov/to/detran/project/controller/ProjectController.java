@@ -30,6 +30,7 @@ import br.gov.to.detran.project.domain.ProjectDocument;
 import br.gov.to.detran.project.domain.ProjectTask;
 import br.gov.to.detran.project.domain.ProjectUser;
 import br.gov.to.detran.project.enumeration.ProjectStatus;
+import br.gov.to.detran.project.enumeration.TaskType;
 import br.gov.to.detran.project.repository.ProjectCommentRepository;
 import br.gov.to.detran.project.repository.ProjectDocumentRepository;
 import br.gov.to.detran.project.repository.ProjectRepository;
@@ -78,7 +79,8 @@ public class ProjectController extends BaseController<Project> implements java.i
         }        
         people = new ProjectUser();
         projectComment = new ProjectComment();
-        projectDocument = new ProjectDocument();        
+        projectDocument = new ProjectDocument();
+        projectTask = new ProjectTask();
     }
 
     public void checkProject() throws IOException {
@@ -246,6 +248,10 @@ public class ProjectController extends BaseController<Project> implements java.i
     	projectComment = new ProjectComment();
     }
     
+    public void cancelTask(){
+    	projectTask = new ProjectTask();
+    }
+    
     public void insertTask(){
     	try {
 	   		 if(projectTask == null){
@@ -255,6 +261,7 @@ public class ProjectController extends BaseController<Project> implements java.i
            projectTask.setUpdated(new Date());
            projectTask.setProject(instance);
            projectTaskRepository.insert(projectTask);
+           this.instance.setTasks(this.projectTaskRepository.getAllTasks(this.instance.getId()));
        } catch (Exception ex) {
            ex.printStackTrace();
            addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
@@ -265,7 +272,8 @@ public class ProjectController extends BaseController<Project> implements java.i
     	try {
 	   		 if(projectTask == null){
 	   			 throw new Exception("Não foi possivel realizar a operação de atualização!");
-	   		 }                                                            
+	   		 }                     
+	   		 projectTask.setUserFinalized(FacesUtil.loggedUser());
           projectTask.setFinalizado(true);
           projectTask.setUpdated(new Date());          
           projectTaskRepository.update(projectTask);
@@ -281,7 +289,8 @@ public class ProjectController extends BaseController<Project> implements java.i
 	   			 throw new Exception("Não foi possivel realizar a operação de atualização!");
 	   		 }                                                            
 	   		task.setFinalizado(true);
-	   		task.setUpdated(new Date());          
+	   		task.setUpdated(new Date());
+	   		this.instance.setTasks(this.projectTaskRepository.getAllTasks(this.instance.getId()));
 	   		projectTaskRepository.update(task);
      } catch (Exception ex) {
          ex.printStackTrace();
@@ -398,6 +407,10 @@ public class ProjectController extends BaseController<Project> implements java.i
     		addMenssage(FacesUtil.ERROR, "Documento", ex.getMessage());
     	}
     }
+    
+    public TaskType[] taskTypes(){
+    	return TaskType.values();
+    }
 
 	public ProjectUser getPeople() {
 		return people;
@@ -421,7 +434,14 @@ public class ProjectController extends BaseController<Project> implements java.i
 
 	public void setProjectComment(ProjectComment projectComment) {
 		this.projectComment = projectComment;
-	}    	
-	
+	}
+
+	public ProjectTask getProjectTask() {
+		return projectTask;
+	}
+
+	public void setProjectTask(ProjectTask projectTask) {
+		this.projectTask = projectTask;
+	}    		
         	    
 }
