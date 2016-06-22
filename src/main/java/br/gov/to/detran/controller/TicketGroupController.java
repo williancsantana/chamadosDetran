@@ -5,19 +5,22 @@
  */
 package br.gov.to.detran.controller;
 
-import br.gov.to.detran.domain.GroupPermissions;
-import br.gov.to.detran.domain.TicketGroup;
-import br.gov.to.detran.repository.Repository;
-import br.gov.to.detran.repository.TicketGroupRepository;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import br.gov.to.detran.domain.GroupPermissions;
+import br.gov.to.detran.domain.TicketGroup;
+import br.gov.to.detran.repository.Repository;
+import br.gov.to.detran.repository.TicketGroupRepository;
 
 /**
  *
@@ -93,6 +96,10 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
 
     public void validar() {
 
+    }
+    
+    public List<TicketGroup> getAllGroups(){
+    	return this.repository.getAll();
     }
 
     @Override

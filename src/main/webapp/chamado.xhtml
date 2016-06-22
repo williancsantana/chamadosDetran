@@ -236,7 +236,7 @@
                                 <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
                                     <i class="comment icon"></i> Responder
-                                </p:commandLink>                                    
+                                </p:commandLink>                                                          	                                     
                             </div>
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
                                 <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
@@ -334,13 +334,7 @@
 	                                </p:commandLink>                                                                            
                             	</div>
                             </ui:remove>
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
-                                <p:commandLink styleClass="ui orange action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
-                                               update="@form">
-                                    <i class="warning sign icon"></i> Responder e deixar pendente com solicitante
-                                </p:commandLink>                                                                                                        
-                            </div>                            
+                                                        
                             <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('FECHADO')}">
                                 <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
                                                actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
@@ -355,7 +349,17 @@
                                     <i class="ban icon"></i> Responder e fechar
                                 </p:commandLink>  
 
-                            </div>
+                            </div> 
+                            
+
+                            <div class="item">
+                              <p:commandLink styleClass="ui blue action button"  onclick="PF('dlg1').show();">
+									 <i class="level up icon"></i> Escalonar
+                            	</p:commandLink>
+                             </div>   
+                            
+                              
+                                                     
                             <div class="right menu" jsf:rendered="#{!ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
                                 <div class="item" jsf:rendered="#{ticketSupportController.permissaoEscalonar()}">
                                     <div class="ui vk floating #{ticketSupportController.possibleAttendants().size() == 0 ? 'disabled' : ''} dropdown button">
@@ -387,6 +391,38 @@
                 </div>                                               
             </div>
         </h:form>
+        
+       
+	        <p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true" height="300">
+	        <h:form>
+	    						<!-- <h:outputText value="Este é um modal" /> -->
+	    						<label>Grupo Atendente</label><br/>
+	    					 	<h:selectOneMenu value="#{ticketSupportController.tempGroup}" id="ticketGroupList"
+	    					 		converter="baseEntityConverter">
+	    					 		<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo"/>
+	    							<f:selectItems value="#{ticketGroupController.allGroups}" 
+	    								var="ticketGroup" 
+		    							itemLabel="#{ticketGroup.descricao}" itemValue="#{ticketGroup}"/>
+		    						<f:ajax event="change" execute="@form" listener="#{ticketSupportController.groupListener}" render="@form"/>
+		    					</h:selectOneMenu><br/>
+		    					<div jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
+		    						<label>Atendentes:</label><br/>
+		    						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
+		    						id="atendentesList" converter="baseEntityConverter">
+		    						<f:selectItem noSelectOption="true" itemLabel="Selecione um atendente"/>
+		    							<f:selectItems value="#{ticketSupportController.atendentesGrupo}" var="atendente" itemLabel="#{atendente.name}" itemValue="#{atendente}"/>
+		    						</h:selectOneMenu><br/>
+		    						<label>Mensagem</label><br/>
+		    						<h:inputTextarea cols="40" value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
+	    							<!-- <textarea rows="3" cols=""></textarea> --><br/>
+	    							<h:commandLink styleClass="ui vk fluid possibleattendant button"
+	    										actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
+	    										oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink> 
+		    					</div>
+	    						
+	    						</h:form>	
+			</p:dialog>
+					
     </ui:define>
 
     <ui:define name="page-js">
