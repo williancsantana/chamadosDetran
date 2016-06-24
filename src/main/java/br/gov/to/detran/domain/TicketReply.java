@@ -5,13 +5,25 @@
  */
 package br.gov.to.detran.domain;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
+
+import br.gov.to.detran.util.FacesUtil;
 
 /**
  *
@@ -34,7 +46,17 @@ public class TicketReply extends AbstractEntity{
     @JoinColumn(name = "fk_chamado")
     @ManyToOne
     private TicketSupport chamado;
-
+    
+    @OneToMany(mappedBy = "respostaChamado", cascade = CascadeType.ALL,
+            orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<TicketAttachmentReply> anexosRespostas = new ArrayList<>();
+    
+    
+    public List<TicketAttachmentReply> getAnexoRespostas(){
+    	return anexosRespostas;
+    }
+    
+   
     public String getMensagem() {
         return mensagem;
     }
@@ -132,5 +154,8 @@ public class TicketReply extends AbstractEntity{
         }
         return "";
     }
+    
+    
+
     
 }

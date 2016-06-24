@@ -1,433 +1,597 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="./resources/layout/main.xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:jsf="http://xmlns.jcp.org/jsf"
-                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
+	template="./resources/layout/main.xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
 
-    <ui:param name="menu" value="abrir" />    
-    <ui:param name="cancelar" value="true" />
+	<ui:param name="menu" value="abrir" />
+	<ui:param name="cancelar" value="true" />
 
-    <ui:define name="head-include">
-        <h:outputStylesheet library="css" name="quill.base.css" />
-        <h:outputStylesheet library="css" name="quill.snow.css" />
-        <h:outputStylesheet library="css" name="ql-snow-override.css" />    
-        <f:metadata>
-            <f:viewParam id="id" name="id" value="#{ticketSupportController.id}"/>
-            <f:viewAction action="#{ticketSupportController.checkChamado}"/>
-        </f:metadata>
-    </ui:define>
+	<ui:define name="head-include">
+		<h:outputStylesheet library="css" name="quill.base.css" />
+		<h:outputStylesheet library="css" name="quill.snow.css" />
+		<h:outputStylesheet library="css" name="ql-snow-override.css" />
+		<f:metadata>
+			<f:viewParam id="id" name="id" value="#{ticketSupportController.id}" />
+			<f:viewAction action="#{ticketSupportController.checkChamado}" />
+		</f:metadata>
+	</ui:define>
 
-    <ui:define name="page-title">
+	<ui:define name="page-title">
         Detran - TO | Abrir Chamado
     </ui:define>
 
-    <ui:define name="content">
-        <h:form prependId="false" id="chamadoForm">
-            <p:remoteCommand name="updateTicketForm" actionListener="#{ticketSupportController.checkChamadoUpdate}"
-                             update="@form" oncomplete="setEditor(); setReply(); setDetails();" />
-            <h:inputHidden id="reply-response" value="#{ticketSupportController.reply.mensagem}" />
-            <div class="ui segment">
-                <div class="ui tertiary raised segment">
-                    <h3 class="ui pull left header no margin">
-                        <i class="circular #{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon segment" 
-                           title="{{iconTitle ticket.status}}" style="background-color: white; border: none!important"></i>
-                        <div class="content">
-                            #{ticketSupportController.instance.assunto}
-                            <div class="sub header">Chamado n&deg; #{ticketSupportController.instance.numero}</div>
-                        </div>
-                    </h3>
-                    <div class="ui tiny pull right grey buttons">
-                        <a class="ui button" href="#{request.contextPath}/index.jsf">
-                            <i class="reply icon"></i> Voltar
-                        </a>                        
-                        <div id="reply-btn" class="ui button" jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
-                            <i class="comments icon"></i> Responder
-                        </div>                        
-                        <div id="details-btn" class="ui button">
-                            <i class="chevron down icon"></i> Ver detalhes
-                        </div>
-                    </div>
-                    <div class="clearer"></div>
-                    <table id="details-tbl" class="ui compact hidden standard top margin table">
-                        <tbody>
-                            <tr>
-                                <td class="collapsing"><strong>Status:</strong></td>
-                                <td>
-                                    <i class="#{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon"></i>
-                                    #{ticketSupportController.instance.ticketIconTitle()}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="collapsing"><strong>Serviço:</strong></td>
-                                <td>
-                                    <div class="ui breadcrumb"><h:outputText value="#{ticketSupportController.instance.markupService()}" escape="false" /></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="collapsing"><strong>Solicitante:</strong></td>
-                                <td>#{ticketSupportController.instance.solicitante.name}</td>
-                            </tr>
-                            <tr>
-                                <td class="collapsing"><strong>Atendente:</strong></td>
-                                <td>#{ticketSupportController.instance.atendente.name}</td>
-                            </tr>
-                            <tr>
-                                <td class="collapsing"><strong>Aberto em:</strong></td>
-                                <td><h:outputText value="#{ticketSupportController.instance.created}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" />
-                                    </h:outputText></td>
-                            </tr>                            
-                            <tr jsf:rendered="#{ticketSupportController.instance.reabertoEm != null}">
-                                <td class="collapsing"><strong>Reaberto em:</strong></td>
-                                <td><h:outputText value="#{ticketSupportController.instance.reabertoEm}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"/>
-                                    </h:outputText></td>
-                            </tr>                            
-                            <tr>
-                                <td class="collapsing"><strong>Última resposta:</strong></td>
-                                <td><h:outputText value="#{ticketSupportController.instance.ultimaResposta}">
-                                        <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"/>
-                                    </h:outputText></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="field" jsf:id="anexoList">
-                    <label jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">Anexos</label>
-                    <section class="proj-page-section" jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">							
-						<ui:repeat var="anexo" value="#{ticketSupportController.instance.anexos}">
+	<ui:define name="content">
+		<h:form prependId="false" id="chamadoForm">
+			<p:remoteCommand name="updateTicketForm"
+				actionListener="#{ticketSupportController.checkChamadoUpdate}"
+				update="@form" oncomplete="setEditor(); setReply(); setDetails();" />
+			<h:inputHidden id="reply-response"
+				value="#{ticketSupportController.reply.mensagem}" />
+			<div class="ui segment">
+				<div class="ui tertiary raised segment">
+					<h3 class="ui pull left header no margin">
+						<i
+							class="circular #{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon segment"
+							title="{{iconTitle ticket.status}}"
+							style="background-color: white; border: none !important"></i>
+						<div class="content">
+							#{ticketSupportController.instance.assunto}
+							<div class="sub header">Chamado n&deg;
+								#{ticketSupportController.instance.numero}</div>
+						</div>
+					</h3>
+					<div class="ui tiny pull right grey buttons">
+						<a class="ui button" href="#{request.contextPath}/index.jsf">
+							<i class="reply icon"></i> Voltar
+						</a>
+						<div id="reply-btn" class="ui button"
+							jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
+							<i class="comments icon"></i> Responder
+						</div>
+						<div id="details-btn" class="ui button">
+							<i class="chevron down icon"></i> Ver detalhes
+						</div>
+					</div>
+					<div class="clearer"></div>
+					<table id="details-tbl"
+						class="ui compact hidden standard top margin table">
+						<tbody>
+							<tr>
+								<td class="collapsing"><strong>Status:</strong></td>
+								<td><i
+									class="#{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon"></i>
+									#{ticketSupportController.instance.ticketIconTitle()}</td>
+							</tr>
+							<tr>
+								<td class="collapsing"><strong>ServiÃ§o:</strong></td>
+								<td>
+									<div class="ui breadcrumb">
+										<h:outputText
+											value="#{ticketSupportController.instance.markupService()}"
+											escape="false" />
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td class="collapsing"><strong>Solicitante:</strong></td>
+								<td>#{ticketSupportController.instance.solicitante.name}</td>
+							</tr>
+							<tr>
+								<td class="collapsing"><strong>Atendente:</strong></td>
+								<td>#{ticketSupportController.instance.atendente.name}</td>
+							</tr>
+							<tr>
+								<td class="collapsing"><strong>Aberto em:</strong></td>
+								<td><h:outputText
+										value="#{ticketSupportController.instance.created}">
+										<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" />
+									</h:outputText></td>
+							</tr>
+							<tr
+								jsf:rendered="#{ticketSupportController.instance.reabertoEm != null}">
+								<td class="collapsing"><strong>Reaberto em:</strong></td>
+								<td><h:outputText
+										value="#{ticketSupportController.instance.reabertoEm}">
+										<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" />
+									</h:outputText></td>
+							</tr>
+							<tr>
+								<td class="collapsing"><strong>Ãšltima resposta:</strong></td>
+								<td><h:outputText
+										value="#{ticketSupportController.instance.ultimaResposta}">
+										<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" />
+									</h:outputText></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="field" jsf:id="anexoList">
+					<label
+						jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">Anexos</label>
+					<section class="proj-page-section"
+						jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">
+					<ui:repeat var="anexo"
+						value="#{ticketSupportController.instance.anexos}">
+						<div class="proj-page-attach">
+							<i class="font-icon attach icon"></i>
+							<p class="name">#{anexo.name}</p>
+							<p class="date">
+								<h:outputText value="#{anexo.created}">
+									<f:convertDateTime pattern="dd MMMM yyyy',' HH:mm"
+										locale="pt-BR" />
+								</h:outputText>
+							</p>
+							<p>
+								<p:commandLink ajax="false">Baixar
+										<p:fileDownload value="#{anexo.downloadFile}" />
+								</p:commandLink>
+							</p>
+						</div>
+					</ui:repeat> </section>
+				</div>
+
+				<div class="ui secondary red reply segment">
+					<div class="ui bottom right attached label">
+						<i class="red user icon" title="Solicitante"></i>
+						#{ticketSupportController.instance.solicitante.name} <small
+							class="light gray">em <h:outputText
+								value="#{ticketSupportController.instance.created}">
+								<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
+									locale="pt-BR" />
+							</h:outputText>
+						</small>
+					</div>
+					<div class="content">
+						<div class="ui list">
+							<ui:repeat var="field"
+								value="#{ticketSupportController.instance.fields}">
+								<div class="item">
+									<i class="caret right icon"></i>
+									<div class="content">
+										<div class="header">#{field.descricao}</div>
+										<div class="description">#{field.respostas()}</div>
+									</div>
+								</div>
+							</ui:repeat>
+
+							<div class="ui divider small margin"
+								jsf:rendered="#{not empty ticketSupportController.instance.fields}"></div>
+
+							<div class="item">
+								<div class="content">
+									<h:outputText escape="false"
+										value="#{ticketSupportController.instance.descricao}" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<ui:repeat var="resposta"
+					value="#{ticketSupportController.instance.respostas}">
+					<div
+						class="ui secondary #{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'red' : 'blue'} reply segment"
+						jsf:rendered="#{resposta.tipo == 'REPLY'}"
+						id="reply#{resposta.id}">
+						<div class="ui bottom right attached label">
+							<i
+								class="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'red' : 'blue'} user icon"
+								title="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'Solicitante' : 'Atendente'}"></i>
+							#{resposta.autor.name} <small class="light gray">em <h:outputText
+									value="#{resposta.created}">
+									<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
+										locale="pt-BR" />
+								</h:outputText>
+							</small>
+						</div>
+						<div class="content">
+							<h:outputText value="#{resposta.mensagem}" escape="false" />
+						</div>
+						<div class="field" jsf:id="anexoReplyList">
+							<label jsf:rendered="#{resposta.anexoRespostas.size()> 0}">Anexos
+								da Resposta</label>
+							<section class="proj-page-section"
+								jsf:rendered="#{resposta.anexoRespostas.size() > 0}">
+							<ui:repeat var="anexoResposta" value="#{resposta.anexoRespostas}">
+								<div class="proj-page-attach">
+									<i class="font-icon attach icon"></i>
+									<p class="name">#{anexoResposta.name}</p>
+									<p class="date">
+										<h:outputText value="#{anexoResposta.created}">
+											<f:convertDateTime pattern="dd MMMM yyyy',' HH:mm"
+												locale="pt-BR" />
+										</h:outputText>
+									</p>
+									<p>
+										<p:commandLink ajax="false">Baixar
+										<p:fileDownload value="#{anexoResposta.downloadFile}" />
+										</p:commandLink>
+									</p>
+								</div>
+							</ui:repeat> </section>
+						</div>
+					</div>
+
+					<h3
+						class="ui #{resposta.colorMensagem()} horizontal divider no top margin header"
+						jsf:rendered="#{resposta.tipo == 'NOTIFICATION'}"
+						id="reply#{resposta.id}">
+						<i class="#{resposta.iconMensagem()} icon"></i>
+						<div class="text align left content">
+							#{resposta.titleMensagem()}
+							<div class="sub header">
+								por #{resposta.autor.name} em
+								<h:outputText value="#{resposta.created}">
+									<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
+										locale="pt-BR" />
+								</h:outputText>
+							</div>
+						</div>
+					</h3>
+
+				</ui:repeat>
+
+				<div class="ui divider"></div>
+				<div id="reply-form" class="ui form"
+					jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
+					<div class="field">
+						<label>Responder:</label>
+						<div class="ui top attached no padding tertiary segment">
+							<div class="ql-toolbar-container wysiwyg toolbar">
+								<select class="ql-font">
+									<option value="sans-serif" selected="selected">Sans
+										Serif</option>
+									<option value="serif">Serif</option>
+									<option value="monospace">Monospace</option>
+								</select> <select class="ql-size">
+									<option value="10px">Pequeno</option>
+									<option value="13px" selected="selected">Normal</option>
+									<option value="18px">Grande</option>
+								</select> <span class="ql-format-separator"></span>
+								<div class="ql-format-group">
+									<span class="ql-bold ql-format-button"></span> <span
+										class="ql-italic ql-format-button"></span> <span
+										class="ql-strike ql-format-button"></span> <span
+										class="ql-underline ql-format-button"></span> <span
+										class="ql-link ql-format-button"></span> <span
+										class="ql-format-separator"></span> <select title="Alignment"
+										class="ql-align">
+										<option value="left" label="Esquerda" selected=""></option>
+										<option value="center" label="Centralizado"></option>
+										<option value="right" label="Direita"></option>
+										<option value="justify" label="Justificado"></option>
+									</select> <span title="List" class="ql-format-button ql-list"></span> <span
+										title="Bullet" class="ql-format-button ql-bullet"></span>
+								</div>
+							</div>
+						</div>
+
+						<div class="ui attached no padding segment">
+							<div id="new-ticket-message" class="wysiwyg editor"></div>
+						</div>
+
+						<div class="ui bottom attached menu">
+
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitante()}">
+								<p:commandLink styleClass="ui green action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+									update="@form">
+									<i class="refresh icon"></i> Reabrir e responder
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitanteNotFechado()}">
+								<p:commandLink styleClass="ui blue action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+									update="@form">
+									<i class="comment icon"></i> Responder
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
+								<p:commandLink styleClass="ui blue action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+									update="@form">
+									<i class="comment icon"></i> Responder
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
+								<p:commandLink styleClass="ui red action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('FECHAR')}"
+									update="@form">
+									<i class="ban icon"></i> Responder e fechar
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
+								<div class="ui orange floating dropdown button">
+									<i class="warning sign icon"></i> Responder e deixar pendente
+									<div class="menu">
+										<div class="item">
+											<p:commandLink styleClass="ui orange action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}"
+												update="@form">
+												<i class="warning sign icon"></i> Com o solicitante
+                                            </p:commandLink>
+										</div>
+										<div class="item">
+											<p:commandLink styleClass="ui orange action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}"
+												update="@form">
+												<i class="warning sign icon"></i> Com terceiros
+                                            </p:commandLink>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
+								<p:commandLink styleClass="ui blue action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+									update="@form">
+									<i class="comment icon"></i> Responder
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
+								<p:commandLink styleClass="ui red action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('FECHAR')}"
+									update="@form">
+									<i class="ban icon"></i> Responder e fechar
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
+								<div class="ui orange floating dropdown button">
+									<i class="warning sign icon"></i> Responder e deixar pendente
+									<div class="menu">
+										<div class="item">
+											<p:commandLink styleClass="ui orange action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}"
+												update="@form">
+												<i class="warning sign icon"></i> Com o solicitante
+                                            </p:commandLink>
+										</div>
+										<div class="item">
+											<p:commandLink styleClass="ui red action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}"
+												update="@form">
+												<i class="warning sign icon"></i> Com terceiros
+                                            </p:commandLink>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
+								<div class="ui blue floating dropdown button">
+									<i class="comment icon"></i> Responder
+									<div class="menu">
+										<div class="item">
+											<p:commandLink styleClass="ui green action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('RETIRAR_PENDENCIA')}"
+												update="@form">
+												<i class="thumbs up icon"></i> Retirar pendÃªncia com terceiros
+                                            </p:commandLink>
+
+										</div>
+										<div class="item">
+											<p:commandLink styleClass="ui orange action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+												update="@form">
+												<i class="warning sign icon"></i> Manter pendÃªncia com terceiros
+                                            </p:commandLink>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<ui:remove>
+								<!-- Trecho NÃ£o deveria estar assim -->
+								<div class="item"
+									jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
+									<p:commandLink styleClass="ui red action button"
+										onclick="setResponse()"
+										oncomplete="setEditor(); setReply(); setDetails();"
+										actionListener="#{ticketSupportController.responderChamado('FECHAR')}"
+										update="@form">
+										<i class="ban icon"></i> Responder e fechar
+	                                </p:commandLink>
+								</div>
+							</ui:remove>
+
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('FECHADO')}">
+								<p:commandLink styleClass="ui green action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('AUTO')}"
+									update="@form">
+									<i class="refresh icon"></i> Reabrir e responder
+                                </p:commandLink>
+							</div>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_USUARIO')}">
+								<p:commandLink styleClass="ui red action button"
+									onclick="setResponse()"
+									oncomplete="setEditor(); setReply(); setDetails();"
+									actionListener="#{ticketSupportController.responderChamado('FECHAR')}"
+									update="@form">
+									<i class="ban icon"></i> Responder e fechar
+                                </p:commandLink>
+
+							</div>
+
+
+							<div class="item">
+								<p:commandLink styleClass="ui blue action button"
+									onclick="PF('dlg1').show();">
+									<i class="level up icon"></i> Escalonar
+                            	</p:commandLink>
+							</div>
+
+
+							<div class="right menu"
+								jsf:rendered="#{!ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
+								<div class="item"
+									jsf:rendered="#{ticketSupportController.permissaoEscalonar()}">
+									<div
+										class="ui vk floating #{ticketSupportController.possibleAttendants().size() == 0 ? 'disabled' : ''} dropdown button">
+										<i class="level up icon"></i> Escalonar esse chamado
+										<div class="menu">
+											<ui:repeat var="atendente"
+												value="#{ticketSupportController.possibleAttendants()}">
+												<div class="item">
+													<p:commandLink
+														styleClass="ui vk fluid possibleattendant button"
+														oncomplete="setEditor(); setReply(); setDetails();"
+														actionListener="#{ticketSupportController.escalonarChamado(atendente)}"
+														update="@form">
+														<i class="user icon"></i> #{atendente.name}
+				                                	</p:commandLink>
+												</div>
+											</ui:repeat>
+										</div>
+									</div>
+								</div>
+								<div class="pull right item"
+									jsf:rendered="#{ticketSupportController.permissaoApropirar()}">
+									<p:commandLink styleClass="ui vk button"
+										oncomplete="setEditor(); setReply(); setDetails();"
+										actionListener="#{ticketSupportController.apropiarChamado()}"
+										update="@form">
+										<i class="level down icon"></i> Apropriar-se desse chamado
+                                	</p:commandLink>
+								</div>
+							</div>
+							<div class="item">
+								<p:commandLink styleClass="ui blue action button"
+									onclick="PF('dlg2').show();">
+									<i class="upload icon"></i> Enviar Anexo
+                     				</p:commandLink>
+
+							</div>
+						</div>
+
+					</div>
+					<div class="field" jsf:id="anexoListRespostasMensagem">
+						<label
+							jsf:rendered="#{ticketSupportController.reply.anexoRespostas.size() > 0}">Anexos</label>
+						<section class="proj-page-section"
+							jsf:rendered="#{ticketSupportController.reply.anexoRespostas.size() > 0}">
+						<ui:repeat var="anexoRespostasMensagem"
+							value="#{ticketSupportController.reply.anexoRespostas}">
 							<div class="proj-page-attach">
 								<i class="font-icon attach icon"></i>
-								<p class="name">#{anexo.name}</p>
-								<p class="date"><h:outputText value="#{anexo.created}">
-                                        <f:convertDateTime pattern="dd MMMM yyyy',' HH:mm" locale="pt-BR"/>
-                                    </h:outputText></p>
-								<p>									
-									<p:commandLink ajax="false">Baixar
-										<p:fileDownload value="#{anexo.downloadFile}" />
-									</p:commandLink>
+								<p class="name">#{anexoRespostasMensagem.name}</p>
+								<p class="date">
+									<h:outputText value="#{anexoRespostasMensagem.created}">
+										<f:convertDateTime pattern="dd MMMM yyyy',' HH:MM"
+											locale="pt-BR" />
+									</h:outputText>
 								</p>
-							</div>		
-						</ui:repeat>										
-					</section>						                   
-                </div>
+								<p>
+									<a href="#">Visualizar</a>
+									<p:commandLink
+										actionListener="#{ticketSupportController.removerAnexoResposta(anexoRespostasMensagem)}"
+										update="anexoListRespostasMensagem">Remover</p:commandLink>
+								</p>
+							</div>
+						</ui:repeat> </section>
+					</div>
+				</div>
 
-                <div class="ui secondary red reply segment">
-                    <div class="ui bottom right attached label">
-                        <i class="red user icon"
-                           title="Solicitante"></i>
-                        #{ticketSupportController.instance.solicitante.name} <small class="light gray">em
-                            <h:outputText value="#{ticketSupportController.instance.created}">
-                                <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
-                            </h:outputText>                
-                        </small>
-                    </div>
-                    <div class="content">
-                        <div class="ui list">                                                                             
-                            <ui:repeat var="field" value="#{ticketSupportController.instance.fields}">
-                                <div class="item">
-                                    <i class="caret right icon"></i>
-                                    <div class="content">
-                                        <div class="header">#{field.descricao}</div>
-                                        <div class="description">#{field.respostas()}</div>
-                                    </div>
-                                </div>
-                            </ui:repeat>
-                            
-                            <div class="ui divider small margin" jsf:rendered="#{not empty ticketSupportController.instance.fields}"></div>
-                            
-                            <div class="item">
-                                <div class="content"><h:outputText escape="false" value="#{ticketSupportController.instance.descricao}" /></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+			</div>
+		</h:form>
 
 
-                <ui:repeat var="resposta" value="#{ticketSupportController.instance.respostas}">
-                    <div class="ui secondary #{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'red' : 'blue'} reply segment"
-                         jsf:rendered="#{resposta.tipo == 'REPLY'}" id="reply#{resposta.id}">
-                        <div class="ui bottom right attached label">
-                            <i class="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'red' : 'blue'} user icon"
-                               title="#{resposta.autor.id == ticketSupportController.instance.solicitante.id ? 'Solicitante' : 'Atendente'}"></i>
-                            #{resposta.autor.name} <small class="light gray">em <h:outputText value="#{resposta.created}">
-                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
-                                </h:outputText>      </small>
-                        </div>
-                        <div class="content">                        
-                            <h:outputText value="#{resposta.mensagem}" escape="false" />
-                        </div>
-                    </div>
+		<p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true"
+			height="300">
+			<h:form>
+				<!-- <h:outputText value="Este Ã© um modal" /> -->
+				<label>Grupo Atendente</label>
+				<br />
+				<h:selectOneMenu value="#{ticketSupportController.tempGroup}"
+					id="ticketGroupList" converter="baseEntityConverter">
+					<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo" />
+					<f:selectItems value="#{ticketGroupController.allGroups}"
+						var="ticketGroup" itemLabel="#{ticketGroup.descricao}"
+						itemValue="#{ticketGroup}" />
+					<f:ajax event="change" execute="@form"
+						listener="#{ticketSupportController.groupListener}" render="@form" />
+				</h:selectOneMenu>
+				<br />
+				<div
+					jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
+					<label>Atendentes:</label><br />
+					<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
+						id="atendentesList" converter="baseEntityConverter">
+						<f:selectItem noSelectOption="true"
+							itemLabel="Selecione um atendente" />
+						<f:selectItems value="#{ticketSupportController.atendentesGrupo}"
+							var="atendente" itemLabel="#{atendente.name}"
+							itemValue="#{atendente}" />
+					</h:selectOneMenu>
+					<br /> <label>Mensagem</label><br />
+					<h:inputTextarea cols="40"
+						value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
+					<!-- <textarea rows="3" cols=""></textarea> -->
+					<br />
+					<h:commandLink styleClass="ui vk fluid possibleattendant button"
+						actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
+						oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink>
+				</div>
 
-                    <h3 class="ui #{resposta.colorMensagem()} horizontal divider no top margin header"
-                        jsf:rendered="#{resposta.tipo == 'NOTIFICATION'}" id="reply#{resposta.id}">
-                        <i class="#{resposta.iconMensagem()} icon"></i>
-                        <div class="text align left content">
-                            #{resposta.titleMensagem()}
-                            <div class="sub header">por #{resposta.autor.name} em <h:outputText value="#{resposta.created}">
-                                    <f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm" locale="pt-BR"/>
-                                </h:outputText>
-                             </div>
-                        </div>
-                    </h3>
+			</h:form>
+		</p:dialog>
 
-                </ui:repeat>                                    
-
-                <div class="ui divider"></div>                
-                <div id="reply-form" class="ui form" jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
-                    <div class="field">
-                        <label>Responder:</label>
-                        <div class="ui top attached no padding tertiary segment">
-                            <div class="ql-toolbar-container wysiwyg toolbar">
-                                <select class="ql-font">
-                                    <option value="sans-serif" selected="selected">Sans Serif</option>
-                                    <option value="serif">Serif</option>
-                                    <option value="monospace">Monospace</option>
-                                </select>
-                                <select class="ql-size">
-                                    <option value="10px">Pequeno</option>
-                                    <option value="13px" selected="selected">Normal</option>
-                                    <option value="18px">Grande</option>
-                                </select>
-                                <span class="ql-format-separator"></span>
-                                <div class="ql-format-group">
-                                    <span class="ql-bold ql-format-button"></span>
-                                    <span class="ql-italic ql-format-button"></span>
-                                    <span class="ql-strike ql-format-button"></span>
-                                    <span class="ql-underline ql-format-button"></span>
-                                    <span class="ql-link ql-format-button"></span>
-                                    <span class="ql-format-separator"></span>
-                                    <select title="Alignment" class="ql-align">
-                                        <option value="left" label="Esquerda" selected=""></option>
-                                        <option value="center" label="Centralizado"></option>
-                                        <option value="right" label="Direita"></option>
-                                        <option value="justify" label="Justificado"></option>
-                                    </select>
-                                    <span title="List" class="ql-format-button ql-list"></span>
-                                    <span title="Bullet" class="ql-format-button ql-bullet"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="ui attached no padding segment">
-                            <div id="new-ticket-message" class="wysiwyg editor"></div>
-                        </div>
-                        
-                        <div class="ui bottom attached menu">     
-                            
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitante()}">
-                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
-                                    <i class="refresh icon"></i> Reabrir e responder
-                                </p:commandLink>                                 
-                            </div>                            
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.permissaoResponderSolicitanteNotFechado()}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
-                                    <i class="comment icon"></i> Responder
-                                </p:commandLink>                                 
-                            </div>                                                                                    
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('AUTO')}" update="@form">
-                                    <i class="comment icon"></i> Responder
-                                </p:commandLink>                                                          	                                     
-                            </div>
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('FECHAR')}" update="@form">
-                                    <i class="ban icon"></i> Responder e fechar
-                                </p:commandLink>                                   
-                            </div>
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('ABERTO')}">
-                                <div class="ui orange floating dropdown button">
-                                    <i class="warning sign icon"></i> Responder e deixar pendente
-                                    <div class="menu">
-                                        <div class="item">                                        
-                                            <p:commandLink styleClass="ui orange action fluid button" 
-                                                           onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
-                                                           update="@form">
-                                                <i class="warning sign icon"></i> Com o solicitante
-                                            </p:commandLink>
-                                        </div>
-                                        <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}" 
-                                                           update="@form">
-                                                <i class="warning sign icon"></i> Com terceiros
-                                            </p:commandLink>                                        
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                            
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
-                                <p:commandLink styleClass="ui blue action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
-                                               update="@form">
-                                    <i class="comment icon"></i> Responder
-                                </p:commandLink>                                        
-                            </div>
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
-                                               update="@form">
-                                    <i class="ban icon"></i> Responder e fechar
-                                </p:commandLink>                                                                    
-                            </div>
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('REABERTO')}">
-                                <div class="ui orange floating dropdown button">
-                                    <i class="warning sign icon"></i> Responder e deixar pendente
-                                    <div class="menu">                                    
-                                        <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('PENDENTE_USUARIO')}" 
-                                                           update="@form">
-                                                <i class="warning sign icon"></i> Com o solicitante
-                                            </p:commandLink>                                        
-                                        </div>
-                                        <div class="item">
-                                            <p:commandLink styleClass="ui red action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('PENDENTE_TERCEIROS')}" 
-                                                           update="@form">
-                                                <i class="warning sign icon"></i> Com terceiros
-                                            </p:commandLink>                                                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                            
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
-                                <div class="ui blue floating dropdown button">
-                                    <i class="comment icon"></i> Responder
-                                    <div class="menu">
-                                        <div class="item">
-                                            <p:commandLink styleClass="ui green action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('RETIRAR_PENDENCIA')}" 
-                                                           update="@form">
-                                                <i class="thumbs up icon"></i> Retirar pendência com terceiros
-                                            </p:commandLink>                                                                            
-
-                                        </div>
-                                        <div class="item">
-                                            <p:commandLink styleClass="ui orange action fluid button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                                           actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
-                                                           update="@form">
-                                                <i class="warning sign icon"></i> Manter pendência com terceiros
-                                            </p:commandLink>                                                                                                                                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <ui:remove>
-                            	<!-- Trecho Não deveria estar assim -->
-                            	<div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_TERCEIROS')}">
-	                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-	                                               actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
-	                                               update="@form">
-	                                    <i class="ban icon"></i> Responder e fechar
-	                                </p:commandLink>                                                                            
-                            	</div>
-                            </ui:remove>
-                                                        
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('FECHADO')}">
-                                <p:commandLink styleClass="ui green action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('AUTO')}" 
-                                               update="@form">
-                                    <i class="refresh icon"></i> Reabrir e responder
-                                </p:commandLink>                                                         
-                            </div>                            
-                            <div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteStatus('PENDENTE_USUARIO')}">
-                                <p:commandLink styleClass="ui red action button" onclick="setResponse()" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.responderChamado('FECHAR')}" 
-                                               update="@form">
-                                    <i class="ban icon"></i> Responder e fechar
-                                </p:commandLink>  
-
-                            </div> 
-                            
-
-                            <div class="item">
-                              <p:commandLink styleClass="ui blue action button"  onclick="PF('dlg1').show();">
-									 <i class="level up icon"></i> Escalonar
-                            	</p:commandLink>
-                             </div>   
-                            
-                              
-                                                     
-                            <div class="right menu" jsf:rendered="#{!ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
-                                <div class="item" jsf:rendered="#{ticketSupportController.permissaoEscalonar()}">
-                                    <div class="ui vk floating #{ticketSupportController.possibleAttendants().size() == 0 ? 'disabled' : ''} dropdown button">
-                                        <i class="level up icon"></i> Escalonar esse chamado
-                                        <div class="menu">
-                                            <ui:repeat var="atendente" value="#{ticketSupportController.possibleAttendants()}">
-                                            	<div class="item">
-	                                            	<p:commandLink styleClass="ui vk fluid possibleattendant button"
-	                                            			   oncomplete="setEditor(); setReply(); setDetails();"
-				                                               actionListener="#{ticketSupportController.escalonarChamado(atendente)}" 
-				                                               update="@form">
-				                                    	<i class="user icon"></i> #{atendente.name}
-				                                	</p:commandLink>		                                            	                                               
-	                                            </div>
-                                            </ui:repeat>                                            
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="pull right item" jsf:rendered="#{ticketSupportController.permissaoApropirar()}">                                
-                                	 <p:commandLink styleClass="ui vk button" oncomplete="setEditor(); setReply(); setDetails();"
-                                               actionListener="#{ticketSupportController.apropiarChamado()}" 
-                                               update="@form">
-                                    	<i class="level down icon"></i> Apropriar-se desse chamado
-                                	</p:commandLink>			                        
-			                    </div>
-                            </div>                                                        
-                        </div>
-                    </div>
-                </div>                                               
-            </div>
-        </h:form>
-        
-       
-	        <p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true" height="300">
-	        <h:form>
-	    						<!-- <h:outputText value="Este é um modal" /> -->
-	    						<label>Grupo Atendente</label><br/>
-	    					 	<h:selectOneMenu value="#{ticketSupportController.tempGroup}" id="ticketGroupList"
-	    					 		converter="baseEntityConverter">
-	    					 		<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo"/>
-	    							<f:selectItems value="#{ticketGroupController.allGroups}" 
-	    								var="ticketGroup" 
-		    							itemLabel="#{ticketGroup.descricao}" itemValue="#{ticketGroup}"/>
-		    						<f:ajax event="change" execute="@form" listener="#{ticketSupportController.groupListener}" render="@form"/>
-		    					</h:selectOneMenu><br/>
-		    					<div jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
-		    						<label>Atendentes:</label><br/>
-		    						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
-		    						id="atendentesList" converter="baseEntityConverter">
-		    						<f:selectItem noSelectOption="true" itemLabel="Selecione um atendente"/>
-		    							<f:selectItems value="#{ticketSupportController.atendentesGrupo}" var="atendente" itemLabel="#{atendente.name}" itemValue="#{atendente}"/>
-		    						</h:selectOneMenu><br/>
-		    						<label>Mensagem</label><br/>
-		    						<h:inputTextarea cols="40" value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
-	    							<!-- <textarea rows="3" cols=""></textarea> --><br/>
-	    							<h:commandLink styleClass="ui vk fluid possibleattendant button"
-	    										actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
-	    										oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink> 
-		    					</div>
-	    						
-	    						</h:form>	
+		<h:form>
+			<p:dialog widgetVar="dlg2" minHeight="40">
+				<p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo"
+					label="Escolher Arquivo"
+					fileUploadListener="#{ticketSupportController.enviarAnexoResposta}"
+					update="anexoListRespostasMensagem" oncomplete="PF('dlg2').hide()" auto="true"
+					sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
 			</p:dialog>
-					
-    </ui:define>
+		</h:form>
 
-    <ui:define name="page-js">
-        <h:outputScript library="js" name="quill.min.js" />                
-        <script>
+	</ui:define>
+
+	<ui:define name="page-js">
+		<h:outputScript library="js" name="quill.min.js" />
+		<script>
             this.editor;
 
             var setEditor = function () {
@@ -483,6 +647,6 @@
             setReply();
 
         </script>
-    </ui:define>
+	</ui:define>
 
 </ui:composition>
