@@ -89,6 +89,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private List<UserSecurity> atendentesGrupo;
     private UserSecurity tempAtendente;
     private String respostaModal = "";
+    private String cpfConsulta = "";
+    private Boolean resultadoConsultaCpf;
+    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado(); 
 
     @PostConstruct
     public void postConstruct() {
@@ -530,6 +533,26 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
         return permissao;                    
     }
+    
+	public Boolean consultarDadosSolicitante(String cpf){
+    	
+    	Boolean resultado = false;
+    	System.out.println(cpf);
+    	try{
+    		servidorBuscaCpf = detranERPRepository.findServidor(cpf);
+    		System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf());
+    		resultadoConsultaCpf =  resultado = true;
+    	}catch(NullPointerException ex){
+    		resultadoConsultaCpf = false;
+    		ex.printStackTrace();
+    	}finally{
+    		System.out.println(servidorBuscaCpf);
+    		
+    	}
+    	
+    	return resultado;
+    	
+    }
 
     public void validar() {
 
@@ -741,5 +764,32 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.instance.setAtendente(null);
         }
     	
-    }    	
+    }
+
+	public String getCpfConsulta() {
+		return cpfConsulta;
+	}
+
+	public void setCpfConsulta(String cpfConsulta) {
+		this.cpfConsulta = cpfConsulta;
+	}
+
+	public Boolean getResultadoConsultaCpf() {
+		return resultadoConsultaCpf;
+	}
+
+	public void setResultadoConsultaCpf(Boolean resultadoConsultaCpf) {
+		this.resultadoConsultaCpf = resultadoConsultaCpf;
+	}
+
+	public ViewServidorChamado getServidorBuscaCpf() {
+		return servidorBuscaCpf;
+	}
+
+	public void setServidorBuscaCpf(ViewServidorChamado servidorBuscaCpf) {
+		this.servidorBuscaCpf = servidorBuscaCpf;
+	}    	
+    
+    
 }
+

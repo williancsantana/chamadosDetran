@@ -69,7 +69,16 @@
                             </tr>
                             <tr>
                                 <td class="collapsing"><strong>Solicitante:</strong></td>
-                                <td>#{ticketSupportController.instance.solicitante.name}</td>
+                                <td>
+                                	#{ticketSupportController.instance.solicitante.name} &ensp;
+                                	
+			                              <p:commandLink styleClass="ui blue action button"  onclick="PF('dlg2').show();"
+			                              update=":formDialogConsulta">
+												 <i class="search icon"></i> Consultar dados
+												 <f:setPropertyActionListener value="#{ticketSupportController.instance.solicitante.cpf}" target="#{ticketSupportController.cpfConsulta}" />
+			                            	</p:commandLink>
+                             		
+                                </td>
                             </tr>
                             <tr>
                                 <td class="collapsing"><strong>Atendente:</strong></td>
@@ -394,9 +403,9 @@
         
        
 	        <p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true" height="300">
-	        <h:form>
-	    						<!-- <h:outputText value="Este é um modal" /> -->
-	    						<label>Grupo Atendente</label><br/>
+	        <h:form class="ui form">
+	    					 <div class="field">
+                    <label>Grupo Atendente</label>
 	    					 	<h:selectOneMenu value="#{ticketSupportController.tempGroup}" id="ticketGroupList"
 	    					 		converter="baseEntityConverter">
 	    					 		<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo"/>
@@ -404,23 +413,56 @@
 	    								var="ticketGroup" 
 		    							itemLabel="#{ticketGroup.descricao}" itemValue="#{ticketGroup}"/>
 		    						<f:ajax event="change" execute="@form" listener="#{ticketSupportController.groupListener}" render="@form"/>
-		    					</h:selectOneMenu><br/>
-		    					<div jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
-		    						<label>Atendentes:</label><br/>
+		    					</h:selectOneMenu>
+                </div>
+	    					<div class="field" jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">			    					
+		    							 <div class="field">
+		    						<label>Atendentes:</label>
 		    						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
 		    						id="atendentesList" converter="baseEntityConverter">
 		    						<f:selectItem noSelectOption="true" itemLabel="Selecione um atendente"/>
 		    							<f:selectItems value="#{ticketSupportController.atendentesGrupo}" var="atendente" itemLabel="#{atendente.name}" itemValue="#{atendente}"/>
-		    						</h:selectOneMenu><br/>
-		    						<label>Mensagem</label><br/>
+		    						</h:selectOneMenu></div>
+		    							 <div class="field">
+		    						<label>Mensagem</label>
 		    						<h:inputTextarea cols="40" value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
-	    							<!-- <textarea rows="3" cols=""></textarea> --><br/>
+	    							</div>
+	    							<div class="ui divider"></div>
+	    							
+	    							 <div class="ui buttons">
 	    							<h:commandLink styleClass="ui vk fluid possibleattendant button"
 	    										actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
-	    										oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink> 
+	    										oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink>
+	    										</div> 
 		    					</div>
 	    						
 	    						</h:form>	
+			</p:dialog>
+			
+			<p:dialog header="Consultar servidor" widgetVar="dlg2" modal="true" height="300">
+			<h:form prependId="false" id="formDialogConsulta" class="ui form">
+				<div class="field">
+				<label>CPF:</label><br/>
+				<h:inputText value="#{ticketSupportController.cpfConsulta}" id="tbCPFSolicitante"/>
+				
+				<div class="ui divider"></div>
+				<div>
+					<p:commandLink styleClass="ui vk fluid possibleattendant button"
+								actionListener="#{ticketSupportController.consultarDadosSolicitante(ticketSupportController.cpfConsulta)}"
+								update="@form">Consultar</p:commandLink>
+					</div>
+					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == true}">
+						<label>Nome:</label> 
+						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.nome}" disabled="true" style="font-weight: 900;"/><!-- <h3>#{ticketSupportController.servidorBuscaCpf.nome}</h3> -->
+						<label>Matrícula: </label> 
+						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.matricula}" disabled="true" style="font-weight: bold;"/><!-- <h3>#{ticketSupportController.servidorBuscaCpf.matricula}</h3> -->
+					</div>
+					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
+						<h3 style="color:red;">Servidor não encontrado!</h3>
+					</div>
+				</div>			
+							
+			</h:form>			
 			</p:dialog>
 					
     </ui:define>

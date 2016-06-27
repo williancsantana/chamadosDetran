@@ -120,11 +120,7 @@
             <version>1.8.3</version>
         </dependency>
         
-        	<dependency>
-			<groupId>org.primefaces.themes</groupId>
-			<artifactId>venture</artifactId>
-			<version>1.0.1</version>
-		</dependency>
+        	
 				
 
         
