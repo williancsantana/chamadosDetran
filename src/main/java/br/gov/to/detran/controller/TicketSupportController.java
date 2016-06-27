@@ -33,11 +33,13 @@ import org.joda.time.Hours;
 import org.jsoup.Jsoup;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.primefaces.push.EventBus.Reply;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import br.gov.to.detran.domain.TicketAttachment;
+import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.TicketGroupService;
 import br.gov.to.detran.domain.TicketReply;
@@ -215,6 +217,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	if(instance.getDescricao().trim().isEmpty() || instance.getDescricao().trim().length() < 30){
     		throw new Exception("É necessário informar uma descrição do chamado de no minimo 30 caracteres!");
     	}
+    	if(instance.getAssunto().trim().isEmpty()){
+    		throw new Exception("É obrigatório informar o assunto");
+    	}
         instance.setCreated(new Date());
         instance.setUpdated(new Date());
         instance.setServico(service);
@@ -247,6 +252,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
     public void responderChamado(String status) {
         try {
+        	
             if (Jsoup.parse(reply.getMensagem()).text().trim().isEmpty()) {
                 throw new Exception("É necessário informar uma mensagem!");
             }
@@ -625,6 +631,32 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
     	}            	   
     }
+    
+    public void enviarAnexoResposta(FileUploadEvent event) {
+    	try{
+    		UploadedFile file = event.getFile();
+            if(file != null){
+            	TicketAttachmentReply attachReply = new TicketAttachmentReply();
+            	attachReply.setChamadoResposta(reply);
+            	attachReply.setCreated(new Date());
+            	attachReply.setMimeType(file.getContentType());
+            	attachReply.setName(file.getFileName());
+            	attachReply.setSize(file.getSize());
+            	attachReply.setDataByte(file.getContents());
+            	reply.getAnexoRespostas().add(attachReply);
+            }
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
+    	}            	   
+    }
+    
+    public void removerAnexoResposta(TicketAttachmentReply attachReply){
+    	if(reply.getAnexoRespostas()!=null){
+    		reply.getAnexoRespostas().remove(attachReply);
+    	}
+    }
+    
     
     public void removerAnexo(TicketAttachment attach){
     	if(this.instance.getAnexos() != null){

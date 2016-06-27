@@ -44,6 +44,9 @@ public class TicketAttachment extends AbstractEntity{
     @JoinColumn(name = "fk_chamado")
     @ManyToOne
     private TicketSupport chamado;
+    
+    
+    
 
 	public String getName() {
 		return name;

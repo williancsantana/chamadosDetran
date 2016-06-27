@@ -25,6 +25,7 @@
         <class>br.gov.to.detran.project.domain.ProjectTask</class>
         <class>br.gov.to.detran.project.domain.ProjectUser</class>
         <class>br.gov.to.detran.project.domain.ProjectActivities</class>
+        <class>br.gov.to.detran.domain.TicketAttachmentReply</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
