@@ -422,6 +422,15 @@
 												<i class="warning sign icon"></i> Manter pendência com terceiros
                                             </p:commandLink>
 										</div>
+										<div class="item">
+											<p:commandLink styleClass="ui orange action fluid button"
+												onclick="setResponse()"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												actionListener="#{ticketSupportController.responderChamado('RETIRAR_PENDENCIA_TERCEIROS_SOLICITANTE')}"
+												update="@form">
+												<i class="warning sign icon"></i> Pendente com o solicitante
+                                            </p:commandLink>
+										</div>
 									</div>
 								</div>
 							</div>
