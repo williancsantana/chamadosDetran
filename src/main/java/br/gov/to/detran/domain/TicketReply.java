@@ -109,6 +109,8 @@ public class TicketReply extends AbstractEntity{
                 return "Chamado escalonado para outro atendente";
             case "APROPRIACAO":
                 return "Chamado apropriado por outro atendente";
+            case "PENDENCIA TERCEIROS RESOLVIDA PENDENTE USUARIO":
+            	return "Pendência com terceiros removida, pendente com o solicitante";
         }
          return "";
     }
@@ -119,6 +121,7 @@ public class TicketReply extends AbstractEntity{
                 return "comments outline";
             case "REABERTO":
                 return "refresh";
+            case "PENDENCIA TERCEIROS RESOLVIDA PENDENTE USUARIO":
             case "PENDENTE_USUARIO":
             case "PENDENTE_TERCEIROS":
                 return "warning sign";
@@ -143,6 +146,7 @@ public class TicketReply extends AbstractEntity{
             case "PENDENCIA TERCEIROS RESOLVIDA":
             case "PENDENCIA USUARIO REMOVIDA":
                 return "green";
+            case "PENDENCIA TERCEIROS RESOLVIDA PENDENTE USUARIO":
             case "PENDENTE_USUARIO":
             case "PENDENTE_TERCEIROS":
                 return "orange";

@@ -324,6 +324,18 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
                 } else if (ticketSupportStatus == TicketSupportStatus.PENDENTE_TERCEIROS
+                        && novoStatus != TicketSupportStatus.PENDENTE_TERCEIROS
+                        && novoStatus != TicketSupportStatus.FECHADO
+                        && status.equals("RETIRAR_PENDENCIA_TERCEIROS_SOLICITANTE")) {
+                    TicketReply notification = new TicketReply();
+                    notification.setAutor(user);
+                    notification.setChamado(this.instance);
+                    notification.setTipo(TicketReplyType.NOTIFICATION);
+                    notification.setMensagem("PENDENCIA TERCEIROS RESOLVIDA PENDENTE USUARIO");
+                    notification.setCreated(new Date());
+                    this.instance.setStatus(novoStatus);
+                    this.instance.getRespostas().add(notification);
+                } else if (ticketSupportStatus == TicketSupportStatus.PENDENTE_TERCEIROS
                         && novoStatus != TicketSupportStatus.PENDENTE_TERCEIROS) {
                     TicketReply notification = new TicketReply();
                     notification.setAutor(user);
@@ -343,6 +355,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setCreated(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
+                    
                 }
                 this.update();                
                 if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
