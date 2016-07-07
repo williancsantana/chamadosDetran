@@ -5,13 +5,16 @@
  */
 package br.gov.to.detran.repository;
 
-import br.gov.to.detran.domain.QViewServidorChamado;
-import br.gov.to.detran.domain.ViewServidorChamado;
+import javax.transaction.Transactional;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
-import javax.transaction.Transactional;
 
+import br.gov.to.detran.domain.QViewDadosServidor;
+import br.gov.to.detran.domain.QViewServidorChamado;
+import br.gov.to.detran.domain.ViewDadosServidor;
+import br.gov.to.detran.domain.ViewServidorChamado;
 /**
  *
  * @author maycon
@@ -24,8 +27,7 @@ public class DetranERPRepository extends AbstractRepositoryDetranErp<ViewServido
         return QViewServidorChamado.viewServidorChamado;
     }
     
-    public ViewServidorChamado findServidor(String cpf){
-        print();
+    public ViewServidorChamado findServidor(String cpf){      
         JPAQuery query = this.query();
         QViewServidorChamado entity = QViewServidorChamado.viewServidorChamado;
         BooleanBuilder where = new BooleanBuilder();
@@ -34,5 +36,17 @@ public class DetranERPRepository extends AbstractRepositoryDetranErp<ViewServido
         System.out.println(query);
         return (ViewServidorChamado) query.fetchFirst();
     }
+    
+    public ViewDadosServidor findDadosServidor(String cpf){        
+        JPAQuery query = this.query();
+        QViewDadosServidor entity = QViewDadosServidor.viewDadosServidor;
+        BooleanBuilder where = new BooleanBuilder();
+        where.and(entity.cpf.eq(cpf));
+        query.from(entity).where(where);
+        System.out.println(query);
+        return (ViewDadosServidor) query.fetchFirst();
+    }
+    
+    
     
 }

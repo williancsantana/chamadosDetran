@@ -608,10 +608,30 @@
 								update="@form">Consultar</p:commandLink>
 					</div>
 					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == true}">
-						<label>Nome:</label> 
-						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.nome}" disabled="true" style="font-weight: 900;"/><!-- <h3>#{ticketSupportController.servidorBuscaCpf.nome}</h3> -->
+						<table class="ui compact standard table">
+							<tbody>
+								<tr>
+									<td class="collapsing"><strong>Nome: </strong></td>
+									<td>#{ticketSupportController.servidorBuscaCpf.nome}</td>
+								</tr>
+								<tr>
+									<td class="collapsing"><strong>Matrícula: </strong></td>
+									<td>#{ticketSupportController.servidorBuscaCpf.matricula}</td>
+								</tr>
+								<tr>
+									<td class="collapsing"><strong>Setor: </strong></td>
+									<td>#{ticketSupportController.dadosServidor.nomesetor}</td>
+								</tr>
+							
+							</tbody>
+						
+						</table>
+						<!-- <label>Nome:</label> 
+						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.nome}" disabled="true" style="font-weight: 900;"/><h3>#{ticketSupportController.servidorBuscaCpf.nome}</h3>
 						<label>Matrícula: </label> 
-						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.matricula}" disabled="true" style="font-weight: bold;"/><!-- <h3>#{ticketSupportController.servidorBuscaCpf.matricula}</h3> -->
+						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.matricula}" disabled="true" style="font-weight: bold;"/><h3>#{ticketSupportController.servidorBuscaCpf.matricula}</h3>
+						<label>Setor: </label>
+						<h:inputText value="#{ticketSupportController.dadosServidor.nomesetor}" disabled="true" style="font-weight: bold;"/> -->
 					</div>
 					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
 						<h3 style="color:red;">Servidor não encontrado!</h3>

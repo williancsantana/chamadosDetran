@@ -50,6 +50,7 @@ import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.ViewServidorChamado;
+import br.gov.to.detran.domain.ViewDadosServidor;
 import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.push.NotifyMessage;
 import br.gov.to.detran.push.NotifySessions;
@@ -93,7 +94,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private String respostaModal = "";
     private String cpfConsulta = "";
     private Boolean resultadoConsultaCpf;
-    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado(); 
+    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado();
+    ViewDadosServidor dadosServidor = new ViewDadosServidor();
 
     @PostConstruct
     public void postConstruct() {
@@ -546,14 +548,17 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	System.out.println(cpf);
     	try{
     		servidorBuscaCpf = detranERPRepository.findServidor(cpf);
-    		System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf());
+    		String cpfFormatado = cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9);
+    		dadosServidor = detranERPRepository.findDadosServidor(cpfFormatado);
+    		//System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf()+"\nSetor: "+viewDadosServidor.getNomesetor());
     		resultadoConsultaCpf =  resultado = true;
     	}catch(NullPointerException ex){
     		resultadoConsultaCpf = false;
     		ex.printStackTrace();
     	}finally{
-    		System.out.println(servidorBuscaCpf);
-    		
+    		System.out.println(servidorBuscaCpf.getNome());
+    		//System.out.println(dadosServidor);
+    		System.out.println(cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9));
     	}
     	
     	return resultado;
@@ -820,8 +825,19 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
 	public void setServidorBuscaCpf(ViewServidorChamado servidorBuscaCpf) {
 		this.servidorBuscaCpf = servidorBuscaCpf;
-	}    	
+	}
+
+	public ViewDadosServidor getDadosServidor() {
+		return dadosServidor;
+	}
+
+	public void setDadosServidor(ViewDadosServidor dadosServidor) {
+		this.dadosServidor = dadosServidor;
+	}
+
+	
     
+	
     
 }
 

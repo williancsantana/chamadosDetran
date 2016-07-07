@@ -43,6 +43,7 @@
     <persistence-unit name="detran-erp" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/jboss/detranErpDS</jta-data-source>
+        <class>br.gov.to.detran.domain.ViewDadosServidor</class>
         <class>br.gov.to.detran.domain.ViewServidorChamado</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
