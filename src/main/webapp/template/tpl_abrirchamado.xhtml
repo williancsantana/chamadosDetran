@@ -133,7 +133,7 @@
                 </div>
                 <div class="ui divider"></div>
                 <div class="ui buttons">                                        
-                    <a href="#" class="ui submit blue button" onclick="createChamado();">Abrir chamado</a>
+                    <a href="#" class="ui submit blue button" onclick="createChamado();">Enviar chamado</a>
                     <div class="or" data-text="ou"></div>
                     <a href="#{facesContext.externalContext.applicationContextPath}" class="ui button">Cancelar</a>
                 </div>
@@ -179,7 +179,7 @@
 			    <p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo" label="Escolher Arquivo"
 			    		fileUploadListener="#{ticketSupportController.enviarAnexo}" update="anexoList"
 			    		 oncomplete="PF('dlg1').hide()" 
-	                     auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx)$/" />
+	                     auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
 			</p:dialog>
 		</h:form>
 
