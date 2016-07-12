@@ -53,6 +53,8 @@ public class UserSecurity extends AbstractEntity implements Security{
     @OneToMany(mappedBy = "userSecurity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EscalaTrabalho> escalaDeTrabalho = new ArrayList<>();
     
+    @Column(name = "nomesetor")
+    private String nomesetor;
     //@OneToOne(optional=true, mappedBy="user")
     @Transient
     private UserAvatar userAvatar;
@@ -188,6 +190,14 @@ public class UserSecurity extends AbstractEntity implements Security{
 		}catch(Exception e){			
 		}
 		return tempName;		
+	}
+
+	public String getNomesetor() {
+		return nomesetor;
+	}
+
+	public void setNomesetor(String nomesetor) {
+		this.nomesetor = nomesetor;
 	}
 	
 }

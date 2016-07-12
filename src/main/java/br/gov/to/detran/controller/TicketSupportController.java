@@ -96,6 +96,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private Boolean resultadoConsultaCpf;
     ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado();
     ViewDadosServidor dadosServidor = new ViewDadosServidor();
+    private String lotacaoCiretran = "";
 
     @PostConstruct
     public void postConstruct() {
@@ -577,6 +578,30 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	return resultado;
     	
     }
+	
+	public Boolean solicitanteCiretran(){
+		try{
+			UserSecurity solicitante = this.instance.getSolicitante();
+			String cpfFormatado = solicitante.getCpf();
+			cpfFormatado = cpfFormatado.substring(0,3)+"."+cpfFormatado.substring(3,6)+"."+
+								cpfFormatado.substring(6,9)+"-"+cpfFormatado.substring(9);
+			
+			ViewDadosServidor servidor = new ViewDadosServidor();
+			servidor = detranERPRepository.findDadosServidor(cpfFormatado);
+			
+			String lotacao = servidor.getNomesetor().toUpperCase();
+			if(lotacao.startsWith("CIRETRAN")){
+				System.out.println("Servidor: "+servidor.getNome()+"\nLotação: "+servidor.getNomesetor());
+				lotacaoCiretran = servidor.getNomesetor();
+				return true;
+			}
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
+		return false;
+	}
 
     public void validar() {
 
@@ -848,9 +873,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 		this.dadosServidor = dadosServidor;
 	}
 
+	public String getLotacaoCiretran() {
+		return lotacaoCiretran;
+	}
+
+	public void setLotacaoCiretran(String lotacaoCiretran) {
+		this.lotacaoCiretran = lotacaoCiretran;
+	}
 	
-    
 	
-    
 }
 

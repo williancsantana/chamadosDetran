@@ -146,7 +146,7 @@
 				<div class="ui secondary red reply segment">
 					<div class="ui bottom right attached label">
 						<i class="red user icon" title="Solicitante"></i>
-						#{ticketSupportController.instance.solicitante.name} <small
+						#{ticketSupportController.instance.solicitante.name} <b jsf:rendered="#{ticketSupportController.solicitanteCiretran() == true}">(#{ticketSupportController.lotacaoCiretran})</b> <small
 							class="light gray">em <h:outputText
 								value="#{ticketSupportController.instance.created}">
 								<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
@@ -472,7 +472,7 @@
 							</div>
 
 
-							<div class="item">
+							<div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
 								<p:commandLink styleClass="ui blue action button"
 									onclick="PF('dlg1').show();">
 									<i class="level up icon"></i> Escalonar
@@ -634,13 +634,7 @@
 							
 							</tbody>
 						
-						</table>
-						<!-- <label>Nome:</label> 
-						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.nome}" disabled="true" style="font-weight: 900;"/><h3>#{ticketSupportController.servidorBuscaCpf.nome}</h3>
-						<label>Matrícula: </label> 
-						<h:inputText value="#{ticketSupportController.servidorBuscaCpf.matricula}" disabled="true" style="font-weight: bold;"/><h3>#{ticketSupportController.servidorBuscaCpf.matricula}</h3>
-						<label>Setor: </label>
-						<h:inputText value="#{ticketSupportController.dadosServidor.nomesetor}" disabled="true" style="font-weight: bold;"/> -->
+						</table>						
 					</div>
 					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
 						<h3 style="color:red;">Servidor não encontrado!</h3>
