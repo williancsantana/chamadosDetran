@@ -87,7 +87,8 @@ public class Authorization extends AuthorizingRealm {
         SecurityPersistenceRepository userRepository = userToken.getSecurityPersistenceRepository();        
         UserSecurity user = null;
         try {
-            user = userRepository.findUser("email", userToken.getUsername());            
+            user = userRepository.findUser("email", userToken.getUsername());
+            userRepository.updateSetor(user);            
         } catch (Exception ex) {            
             throw new AuthenticationException("Usuário ou senhas inválidos");
         }        
@@ -109,8 +110,6 @@ public class Authorization extends AuthorizingRealm {
                 if (!userRepository.insertUser(user)) {
                     throw new LockedAccountException("Não possivel realizar o login.");
                 }
-            }else{
-            	
             }
         } else if (userToken.getAuthenticationType() == AuthenticationType.LOCAL && user != null) {
             if (user.getUserStatus() == UserStatus.BLOCKED) {
@@ -118,7 +117,7 @@ public class Authorization extends AuthorizingRealm {
             }
         } else if(user == null){
             throw new AuthenticationException("Usuário ou senhas inválidos");
-        }    
+        }
         SimplePrincipalCollection principal = new SimplePrincipalCollection();
         principal.add(user.getName(), this.getName());
         principal.add(user, this.getName());

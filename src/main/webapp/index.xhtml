@@ -101,18 +101,20 @@
                                 <td class="collapsing">
                                     <i class="#{ticketSupportTableController.supportTable.icon(chamado)} icon" title="#{chamado.ticketIconTitle()}"></i>
                                 </td>
-                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado)}">
+                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                             #{chamado.numero}</h:commandLink></td>
-                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado)}">
+                                <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                         <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
                                         <i class="warning sign orange icon" jsf:rendered="#{chamado.status == 'PENDENTE_USUARIO'}"
                                            title="Esse chamado está pendente com o solicitante"></i>                                    
                                         #{chamado.assunto}
-                                    </h:commandLink></td>
-                                <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante.name}</td>
+                                    </h:commandLink>      
+                                    <i class="attach icon" jsf:rendered="#{chamado.existeAnexo}"> </i>                              
+                                   </td>
+                                <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante}</td>
                                 <td class="collapsing" title="{{ifNeedsTitle attendant.name}}">
-                                    <h:outputText value="#{chamado.atendente.name}" rendered="#{chamado.atendente != null}"/>
-                                    <h:outputText value="Não Definido" rendered="#{chamado.atendente == null}"/>
+                                    <h:outputText value="#{chamado.atendente}" rendered="#{chamado.idAtendente != null}"/>
+                                    <h:outputText value="Não Definido" rendered="#{chamado.idAtendente == null}"/>
                                 </td>
                                 <td class="collapsing">
                                     <h:outputText value="#{chamado.ultimaResposta}">

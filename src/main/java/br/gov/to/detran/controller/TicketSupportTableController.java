@@ -5,11 +5,12 @@
  */
 package br.gov.to.detran.controller;
 
-import br.gov.to.detran.component.TicketSupportTable;
 import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import br.gov.to.detran.component.ViewTicketSupportTable;
 
 /**
  *
@@ -18,7 +19,10 @@ import javax.inject.Named;
 @Named
 @ViewScoped
 public class TicketSupportTableController implements java.io.Serializable {
-    private @Inject TicketSupportTable supportTable;
+	
+	private static final long serialVersionUID = 1L;
+	
+	private @Inject ViewTicketSupportTable supportTable;
 
     @PostConstruct
     public void postConstruct() {
@@ -29,11 +33,11 @@ public class TicketSupportTableController implements java.io.Serializable {
     	}        
     }
 
-    public TicketSupportTable getSupportTable() {
+    public ViewTicketSupportTable getSupportTable() {
         return supportTable;
     }
 
-    public void setSupportTable(TicketSupportTable supportTable) {
+    public void setSupportTable(ViewTicketSupportTable supportTable) {
         this.supportTable = supportTable;
     }        
 }

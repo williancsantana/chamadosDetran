@@ -5,14 +5,12 @@
  */
 package br.gov.to.detran.domain;
 
-import br.gov.to.detran.util.FacesUtil;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,11 +20,15 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import br.gov.to.detran.util.FacesUtil;
 
 /**
  *
@@ -85,13 +87,13 @@ public class TicketSupport extends AbstractEntity{
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "at_viewat", nullable = true)
     private Date atViewat;
-    
-    @Column(name = "colunaTeste", nullable = true)
-    private String colunaTeste;
-    
+           
     @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TicketAttachment> anexos = new ArrayList<>();
+    
+    @Column(name = "existe_anexo")
+    private Boolean withAttachment = false;
     
     //@OneToOne(mappedBy = "chamado", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = true)
     @Transient
@@ -330,15 +332,7 @@ public class TicketSupport extends AbstractEntity{
     public void setRequisaoAcesso(RequisicaoAcesso requisaoAcesso) {
         this.requisaoAcesso = requisaoAcesso;
     }        
-
-    public String getColunaTeste() {
-        return colunaTeste;
-    }
-
-    public void setColunaTeste(String colunaTeste) {
-        this.colunaTeste = colunaTeste;
-    }
-
+    
 	public List<TicketAttachment> getAnexos() {
 		return anexos;
 	}
@@ -346,6 +340,14 @@ public class TicketSupport extends AbstractEntity{
 	public void setAnexos(List<TicketAttachment> anexos) {
 		this.anexos = anexos;
 	}
+
+	public Boolean getWithAttachment() {
+		return withAttachment;
+	}
+
+	public void setWithAttachment(Boolean withAttachment) {
+		this.withAttachment = withAttachment;
+	}	
            
     
 }

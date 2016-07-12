@@ -5,22 +5,23 @@
  */
 package br.gov.to.detran.component;
 
-import br.gov.to.detran.dao.LazyResult;
-import br.gov.to.detran.domain.QTicketSupport;
-import br.gov.to.detran.domain.TicketSupport;
-import br.gov.to.detran.domain.TicketSupportStatus;
-import br.gov.to.detran.domain.UserSecurity;
-import br.gov.to.detran.domain.view.ViewTicketSupport;
-import br.gov.to.detran.repository.TicketSupportRepository;
-import br.gov.to.detran.util.FacesUtil;
-import com.querydsl.core.BooleanBuilder;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
+
 import org.joda.time.DateTime;
+
+import com.querydsl.core.BooleanBuilder;
+
+import br.gov.to.detran.dao.LazyResult;
+import br.gov.to.detran.domain.TicketSupportStatus;
+import br.gov.to.detran.domain.UserSecurity;
+import br.gov.to.detran.domain.view.QViewTicketSupport;
+import br.gov.to.detran.domain.view.ViewTicketSupport;
+import br.gov.to.detran.repository.view.ViewTicketSupportRepository;
+import br.gov.to.detran.util.FacesUtil;
 
 /**
  * Classes responsavel para realizar a filtragem e paginação das tabelas do
@@ -30,12 +31,12 @@ import org.joda.time.DateTime;
  *
  */
 @SessionScoped
-public class TicketSupportTable implements java.io.Serializable {
-
-    private @Inject
-    TicketSupportRepository repository;
+public class ViewTicketSupportTable implements java.io.Serializable {
     
-    private ViewTicketSupport estanteChamados;
+	private static final long serialVersionUID = 1L;
+	
+	private @Inject
+    ViewTicketSupportRepository repository;   
 
     public enum TicketSupportTablePeriod {
         HOJE, U7DIAS, U30DIAS, TODOS;
@@ -54,16 +55,16 @@ public class TicketSupportTable implements java.io.Serializable {
     private int rowCount;
     private String filterValue;
     private String[] filterColumns;
-    private List<TicketSupport> data;
+    private List<ViewTicketSupport> data;
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
     private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
 
-    public TicketSupportTable() {
+    public ViewTicketSupportTable() {
         this.currentPage = 0;
         this.pageSize = 5;
-        this.filterColumns = new String[]{"numero", "assunto", "solicitante.name", "atendente.name"};
+        this.filterColumns = new String[]{"numero", "assunto", "solicitante", "atendente"};
     }
 
     public void update() {
@@ -92,6 +93,7 @@ public class TicketSupportTable implements java.io.Serializable {
     
     public void changeSize(Integer size){
         this.pageSize = size;
+        this.currentPage = 0;
         this.update();
     }
     
@@ -111,22 +113,22 @@ public class TicketSupportTable implements java.io.Serializable {
         this.update();
     }
 
-    public List<TicketSupport> load() {
+    public List<ViewTicketSupport> load() {
     	BooleanBuilder booleanBuilder = new BooleanBuilder();               
         if (null != this.status) {
             switch (this.status) {
                 case ABERTOS:
-                    booleanBuilder.and(QTicketSupport.ticketSupport.status
-                            .eq(TicketSupportStatus.ABERTO).or(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.REABERTO)));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.status
+                            .eq(TicketSupportStatus.ABERTO).or(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.REABERTO)));
                     break;
                 case FECHADOS:
-                    booleanBuilder.and(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.FECHADO));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.FECHADO));
                     break;
                 case PENDENTES:
-                    booleanBuilder.and(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.PENDENTE_USUARIO).or(QTicketSupport.ticketSupport.status.eq(TicketSupportStatus.PENDENTE_TERCEIROS)));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.PENDENTE_USUARIO).or(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.PENDENTE_TERCEIROS)));
                     break;
                 case NAO_DEFINIDO:
-                    booleanBuilder.and(QTicketSupport.ticketSupport.atendente.isNull());
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idAtendente.isNull());
                     break;
                 default:
             }
@@ -137,15 +139,15 @@ public class TicketSupportTable implements java.io.Serializable {
         if (null != this.periodo) {
             switch (this.periodo) {
                 case HOJE:                    
-                    booleanBuilder.and(QTicketSupport.ticketSupport.ultimaResposta.goe(time.toDate()));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.ultimaResposta.goe(time.toDate()));
                     break;                
                 case U30DIAS:                    
                     time = time.minusMonths(1);
-                    booleanBuilder.and(QTicketSupport.ticketSupport.ultimaResposta.goe(time.toDate()));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.ultimaResposta.goe(time.toDate()));
                     break;
                 case U7DIAS:
                     time = time.minusWeeks(1);
-                    booleanBuilder.and(QTicketSupport.ticketSupport.ultimaResposta.goe(time.toDate()));
+                    booleanBuilder.and(QViewTicketSupport.viewTicketSupport.ultimaResposta.goe(time.toDate()));
                     break;
                 default:
             }
@@ -156,17 +158,17 @@ public class TicketSupportTable implements java.io.Serializable {
             switch (this.grupos) {
                 case MEUS:        
                 	if(this.status == TicketSupportTableFilter.NAO_DEFINIDO){
-                		booleanBuilder.and(QTicketSupport.ticketSupport.solicitante.id.eq(user.getId()).and(QTicketSupport.ticketSupport.atendente.isNull()));
+                		booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idSolicitante.eq(user.getId()).and(QViewTicketSupport.viewTicketSupport.idAtendente.isNull()));
                 	}else{
-                		booleanBuilder.and(QTicketSupport.ticketSupport.solicitante.id.eq(user.getId()).or(QTicketSupport.ticketSupport.atendente.id.eq(user.getId())));
+                		booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idSolicitante.eq(user.getId()).or(QViewTicketSupport.viewTicketSupport.idAtendente.eq(user.getId())));
                 	}
                     break;                
                 case TODOS:
                 	List<Long> ids = repository.getUserServices();                          
                 	if(this.status == TicketSupportTableFilter.NAO_DEFINIDO){
-                		booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids).and(QTicketSupport.ticketSupport.atendente.isNull()));
+                		booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idServico.in(ids).and(QViewTicketSupport.viewTicketSupport.idAtendente.isNull()));
                 	}else{
-                		booleanBuilder.and(QTicketSupport.ticketSupport.servico.id.in(ids));
+                		booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idServico.in(ids));
                 	}                                 
                     break;             
             }
@@ -181,12 +183,13 @@ public class TicketSupportTable implements java.io.Serializable {
         
         HashMap<String, Object> filterHash = null;
         if (this.filterValue != null && !this.filterValue.isEmpty()) {
-        	booleanBuilder.andAnyOf(QTicketSupport.ticketSupport.assunto.containsIgnoreCase(filterValue),
-            		QTicketSupport.ticketSupport.numero.containsIgnoreCase(filterValue),
-            		QTicketSupport.ticketSupport.atendente.name.containsIgnoreCase(filterValue));
+        	booleanBuilder.andAnyOf(QViewTicketSupport.viewTicketSupport.assunto.containsIgnoreCase(filterValue),
+            		QViewTicketSupport.viewTicketSupport.numero.containsIgnoreCase(filterValue),
+            		QViewTicketSupport.viewTicketSupport.atendente.containsIgnoreCase(filterValue),
+            		QViewTicketSupport.viewTicketSupport.solicitante.containsIgnoreCase(filterValue));
         }        
         
-        LazyResult<TicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
+        LazyResult<ViewTicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
                 "desc", filterHash, booleanBuilder, true);
         
         this.setRowCount(lazyResult.getCount().intValue());
@@ -226,7 +229,7 @@ public class TicketSupportTable implements java.io.Serializable {
         this.rowCount = rowCount;
     }
 
-    public List<TicketSupport> getData() {
+    public List<ViewTicketSupport> getData() {
         if (this.data == null) {
             this.data = this.load();
             this.countUpdates();
@@ -234,7 +237,7 @@ public class TicketSupportTable implements java.io.Serializable {
         return data;
     }
 
-    public void setData(List<TicketSupport> data) {
+    public void setData(List<ViewTicketSupport> data) {
         this.data = data;
     }
 
@@ -282,11 +285,11 @@ public class TicketSupportTable implements java.io.Serializable {
     	return info;
     }
 
-    public TicketSupportRepository getRepository() {
+    public ViewTicketSupportRepository getRepository() {
         return repository;
     }
 
-    public void setRepository(TicketSupportRepository repository) {
+    public void setRepository(ViewTicketSupportRepository repository) {
         this.repository = repository;
     }
 
@@ -361,7 +364,7 @@ public class TicketSupportTable implements java.io.Serializable {
         return "";
     }       
 
-    public String icon(TicketSupport suporte) {
+    public String icon(ViewTicketSupport suporte) {
         if (null != suporte.getStatus()) {
             switch (suporte.getStatus()) {
                 case ABERTO:

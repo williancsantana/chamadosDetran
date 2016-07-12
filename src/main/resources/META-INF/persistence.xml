@@ -28,7 +28,7 @@
         <class>br.gov.to.detran.leilao.domain.ItemLeilao</class>
         <class>br.gov.to.detran.leilao.domain.Categoria</class>        
         <class>br.gov.to.detran.domain.TicketAttachmentReply</class>
-        <class>br.gov.to.detran.domain.view.ViewEstanteChamado</class>
+        <class>br.gov.to.detran.domain.view.ViewTicketSupport</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
@@ -58,7 +58,8 @@
     
     <persistence-unit name="detranNet" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-       	<jta-data-source>java:/jboss/detranNetDS</jta-data-source>          
+       	<jta-data-source>java:/jboss/detranNetDS</jta-data-source>
+       	<class>br.gov.to.detran.domain.view.ViewOperadorDetrannet</class>          
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>

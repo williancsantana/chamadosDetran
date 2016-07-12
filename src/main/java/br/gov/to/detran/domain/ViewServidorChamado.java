@@ -76,6 +76,18 @@ public class ViewServidorChamado implements java.io.Serializable {
     @Column(name = "nascimento", nullable = false, length = 100)
     @Temporal(TemporalType.DATE)
     private Date nascimento;
+    
+    @Column(name = "nomesetor")
+    private String nomeSetor;
+    
+    @Column(name = "descricaosituacaofuncional")
+    private String situacaoFuncional;
+    
+    @Column(name = "ativado")
+    private Boolean ativado;
+    
+    @Column(name = "bloqueado")
+    private Boolean bloqueado;
 
     public String getCpf() {
         return cpf;
@@ -232,4 +244,37 @@ public class ViewServidorChamado implements java.io.Serializable {
         }
         return "INDEFINIDO";
     }
+
+	public Boolean getAtivado() {
+		return ativado;
+	}
+
+	public void setAtivado(Boolean ativado) {
+		this.ativado = ativado;
+	}
+
+	public Boolean getBloqueado() {
+		return bloqueado;
+	}
+
+	public void setBloqueado(Boolean bloqueado) {
+		this.bloqueado = bloqueado;
+	}
+
+	public String getNomeSetor() {
+		return nomeSetor;
+	}
+
+	public void setNomeSetor(String nomeSetor) {
+		this.nomeSetor = nomeSetor;
+	}
+
+	public String getSituacaoFuncional() {
+		return situacaoFuncional;
+	}
+
+	public void setSituacaoFuncional(String situacaoFuncional) {
+		this.situacaoFuncional = situacaoFuncional;
+	}	
+	
 }
