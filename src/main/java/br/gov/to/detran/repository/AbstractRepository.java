@@ -8,8 +8,10 @@ package br.gov.to.detran.repository;
 import br.gov.to.detran.dao.LazyResult;
 import br.gov.to.detran.dao.PersistenceDao;
 import br.gov.to.detran.domain.AbstractEntity;
+import br.gov.to.detran.leilao.domain.ItemLeilao;
 import br.gov.to.detran.util.LanguageResource;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAUpdateClause;
 import java.util.List;
@@ -97,6 +99,12 @@ public abstract class AbstractRepository<T extends AbstractEntity> implements Re
     public LazyResult<T> lazyLoad(int first, int pageSize, String sortField, String order, Map<String, Object> values, BooleanBuilder where, Boolean or) {
         return this.persistenceDao.lazyLoad(this.getEntityPath(), first, pageSize, sortField, order, values, where, or);
     }
+    
+    @Override
+	public LazyResult<T> lazyLoad3(List<Predicate> predicates, int first, int pageSize, String sortField, String order,
+			Map<String, Object> values) {
+    	return this.persistenceDao.lazyLoad3(predicates, this.getEntityPath(), first, pageSize, sortField, order, values);
+	}
 
     @Override
     public Class<T> getPersitenceClass() {

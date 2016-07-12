@@ -27,7 +27,7 @@ public class SimplePagination<T extends AbstractEntity> {
     private int rowCount;  
     private String filterValue;    
     private String[] filterColumns;
-    private List<T> data;
+    private List<T> data;    
 
     public SimplePagination(Repository<T> repository) {
         this.repository = repository;

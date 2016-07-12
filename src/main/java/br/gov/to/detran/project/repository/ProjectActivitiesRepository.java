@@ -29,6 +29,7 @@ public class ProjectActivitiesRepository extends AbstractRepository<ProjectActiv
 
 	public List<ProjectActivities> getAllActivities(Long id) {
 		return null;
-	}    
+	}
+	
 
 }

@@ -12,6 +12,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
+import org.apache.shiro.SecurityUtils;
+
 /**
  *
  * @author maycon
@@ -37,5 +39,7 @@ public class UserLogged implements java.io.Serializable{
     public void setUser(UserSecurity user) {
         this.user = user;
     }        
+    
+   
     
 }

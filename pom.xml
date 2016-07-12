@@ -118,15 +118,35 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.8.3</version>
-        </dependency>
-        
-        	<dependency>
-			<groupId>org.primefaces.themes</groupId>
-			<artifactId>venture</artifactId>
-			<version>1.0.1</version>
-		</dependency>
+       </dependency>                
 				
-
+		<dependency>
+		    <groupId>org.jxls</groupId>
+		    <artifactId>jxls</artifactId>
+		    <version>2.3.0</version>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-poi</artifactId>
+            <version>1.0.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-jexcel</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <dependency>
+    <groupId>net.sf.jxls</groupId>
+    <artifactId>jxls-reader</artifactId>
+    <version>1.0.6</version>
+</dependency>
+		
         
         <!--<dependency>
             <groupId>org.ocpsoft.rewrite</groupId>

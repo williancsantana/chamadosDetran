@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ph="http://java.sun.com/jsf/passthrough"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+   
+    <ui:define name="page-title">
+        Detran - TO | #{categoriaController.instance.id == 0 ? 'Cadastrar' : 'Editar'} Categoria
+    </ui:define>    
+
+    <ui:define name="content">
+        <h4 class="ui top attached header">
+            <h:outputText rendered="#{categoriaController.instance.id > 0}" value="Detalhe da Categoria #{categoriaController.instance.descricao}" />
+            <h:outputText rendered="#{categoriaController.instance.id == 0}" value="Cadastrar Categoria" />
+        </h4>
+        <div class="ui bottom attached segment">
+            <h:form id="service-form" class="ui form" prependId="false">
+                <div class="field">
+                    <label>Placa</label>                    
+                   	
+				      <div class="field">
+				        <p:inputText value="#{categoriaController.instance.descricao}"
+	                    	required="true" requiredMessage="Informe a Descrição!"
+	                    	placeholder="Informe a Descrição"
+	                    	disabled="#{categoriaController.instance.id > 0}"/>
+				      </div>				      				    
+                </div>                
+                <div class="ui divider"></div>
+                <div class="ui buttons" jsf:id="insertButton">
+                    <p:commandLink actionListener="#{categoriaController.insert()}"
+                                   styleClass="ui blue button" rendered="#{categoriaController.instance.id == 0}"
+                                   value="Salvar Registro" update="@form"/>
+                    <p:commandLink actionListener="#{categoriaController.update()}"
+                                   styleClass="ui blue button" rendered="#{categoriaController.instance.id > 0}"
+                                   value="Salvar Alterações" update="insertButton"/>
+                    <div class="or" data-text="ou"></div>
+                    <a href="#{facesContext.externalContext.applicationContextPath}/leilao/categoria/list.jsf" class="ui button">Voltar</a>
+                </div>                                
+            </h:form>
+        </div>        
+    </ui:define>   
+
+</ui:composition>

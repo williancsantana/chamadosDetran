@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+       
+    <ui:define name="page-title">
+        Detran - TO
+    </ui:define>   
+        
+    <ui:define name="content">       
+        <h:form prependId="false" id="formList">            
+            <h4 class="ui top attached header" jsf:id="activeTitle">Categoria</h4>            
+            <div class="ui bottom attached segment">            	
+            	<a href="#{facesContext.externalContext.applicationContextPath}/leilao/categoria/edit.jsf" class="ui blue button"
+            		style="float: right">Cadastrar</a>
+            	<br/><br/>
+            	<p:dataTable var="instance" value="#{categoriaController.lazyModel}" lazy="true"
+            			rowKey="#{instance.id}"
+            			paginator="true" rows="20"  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                 		rowsPerPageTemplate="20, 50, 100" >
+            		<p:column headerText="ID">
+            			<h:outputText value="#{instance.id}" />
+            		</p:column>
+            		<p:column headerText="Descrição">
+            			<h:outputText value="#{instance.descricao}" />
+            		</p:column>            		            	
+            		<p:column headerText="Data de Criação">            			
+            			<h:outputText value="#{instance.created}" >
+            				<f:convertDateTime pattern="dd/MM/yyy HH:mm"/>
+            			</h:outputText>
+            		</p:column>
+            		<p:column headerText="Data de Atulização">
+            			<h:outputText value="#{instance.updated}" >
+            				<f:convertDateTime pattern="dd/MM/yyy HH:mm"/>
+            			</h:outputText>
+            		</p:column>
+            		<p:column headerText="Ação" style="text-align: center;">
+            			<h:commandLink  actionListener="#{categoriaController.viewVeiculos(instance)}">
+            				<i class="list icon"></i>
+            			</h:commandLink>
+            			<h:commandLink  actionListener="#{categoriaController.click(instance, 'categoriaInstance', '/leilao/categoria/edit.jsf')}">
+            				<i class="edit icon"></i>
+            			</h:commandLink>
+            			<p:commandLink actionListener="#{categoriaController.remove(instance)}"
+            				update="formList">
+            				<p:confirm header="Confirmar" message="Realmente desejar remover essa listagem?" icon="ui-icon-alert" />
+            				<i class="trash icon"></i>
+            			</p:commandLink>
+            		</p:column>
+            	</p:dataTable>
+            </div>
+        </h:form>
+    </ui:define>
+   
+</ui:composition>

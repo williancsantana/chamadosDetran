@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ph="http://java.sun.com/jsf/passthrough"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+   
+    <ui:define name="page-title">
+        Detran - TO | #{itemLeilaoController.instance.id == 0 ? 'Cadastrar' : 'Editar'} Item Leilão
+    </ui:define>    
+    
+     <ui:define name="head-include">           
+        <f:metadata>
+            <f:viewParam id="id" name="id" value="#{itemLeilaoController.id}"/>
+            <f:viewAction action="#{itemLeilaoController.checkCategoria}"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="content">
+        <h4 class="ui top attached header" id="titulo">
+            <h:outputText rendered="#{itemLeilaoController.instance.id > 0}" value="Detalhe do Aplicativo #{itemLeilaoController.instance.placa}" />
+            <h:outputText rendered="#{itemLeilaoController.instance.id == 0}" value="Cadastrar Aplicativo" />
+        </h4>
+        <div class="ui bottom attached segment">
+            <h:form id="service-form" class="ui form" prependId="false">
+                <div class="field">
+                    <label>Placa</label>                    
+                   	<div class="two fields">
+				      <div class="field">
+				        <p:inputText value="#{itemLeilaoController.placa}" id="placaInput"
+	                    	required="true" requiredMessage="A placa do Veiculo é obrigatório!"
+	                    	placeholder="Informe a Placa do Veiculo"
+	                    	disabled="#{itemLeilaoController.instance.id > 0}"/>
+				      </div>
+				      <div class="field">
+				        <p:commandLink actionListener="#{itemLeilaoController.pesquisarPlaca()}"
+                                   styleClass="ui blue button" disabled="#{itemLeilaoController.instance.id > 0}"
+                                   value="Consultar Veiculo" update="@form"/>
+				      </div>
+				    </div>
+                </div>
+                <h4 class="ui dividing header">Informações Veiculo</h4>
+                <div class="three fields">
+				    <div class="field">
+				      <label>Chassi</label>
+				      <p:inputText value="#{itemLeilaoController.instance.chassi}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Renavam</label>
+				      <p:inputText value="#{itemLeilaoController.instance.renavam}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>UF</label>
+				      <p:inputText value="#{itemLeilaoController.instance.uf}" readonly="true" />
+				    </div>
+				  </div>  
+				  <div class="four fields">
+				    <div class="field">
+				      <label>Motor</label>
+				      <p:inputText value="#{itemLeilaoController.instance.motor}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Cor</label>
+				      <p:inputText value="#{itemLeilaoController.instance.cor}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Marca</label>
+				      <p:inputText value="#{itemLeilaoController.instance.marcaModelo}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Ano/Modelo</label>
+				      <p:inputText value="#{itemLeilaoController.instance.anoModelo}" readonly="true" />
+				    </div>
+				  </div>       				   
+				    <div class="field">
+				      <label>Restrições</label>
+				      <p:inputText value="#{itemLeilaoController.instance.restricao}" readonly="true" />
+				    </div>				    				    
+				   <div class="two fields">				    				   
+				    <div class="field">
+				      <label>Tipo Alienção</label>
+				      <p:inputText value="#{itemLeilaoController.instance.tiporestricao}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Alienção/Gravame</label>
+				      <p:inputText value="#{itemLeilaoController.instance.alienacao}" readonly="true" />
+				    </div>
+				  </div> 
+				<h4 class="ui dividing header">Informações Debitos</h4>				  
+				  <div class="four fields">
+				    <div class="field">
+				      <label>IPVA</label>
+				      <p:inputText value="#{itemLeilaoController.instance.ipva}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>DPVAT</label>
+				      <p:inputText value="#{itemLeilaoController.instance.dpvat}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Multas</label>
+				      <p:inputText value="#{itemLeilaoController.instance.multa}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>Débitos Detran</label>
+				      <p:inputText value="#{itemLeilaoController.instance.totalDebitosDetran}" readonly="true" />
+				    </div>
+				  </div> 
+                <h4 class="ui dividing header">Informações Proprietário</h4>
+                 <div class="two fields">
+				    <div class="field">
+				      <label>Proprietário</label>
+				      <p:inputText value="#{itemLeilaoController.instance.proprietario}" readonly="true" />
+				    </div>
+				    <div class="field">
+				      <label>CPF/CNPJ</label>
+				      <p:inputText value="#{itemLeilaoController.instance.cnpj}" readonly="true" />
+				    </div>				    
+				  </div>
+				  
+				  <div class="field">
+				      <label>Endereco</label>
+				      <p:inputText value="#{itemLeilaoController.instance.endereco}" readonly="true" />
+				    </div>
+				  
+				  <div class="three fields">
+				  	<div class="field">
+				      <label>CIDADE</label>
+				      <p:inputText value="#{itemLeilaoController.instance.cidade}" readonly="true" />
+				    </div>				    
+				    <div class="field">
+				      <label>CEP</label>
+				      <p:inputText value="#{itemLeilaoController.instance.cep}" readonly="true" />
+				    </div>				    
+				    <div class="field">
+				      <label>UF</label>
+				      <p:inputText value="#{itemLeilaoController.instance.uf2}" readonly="true" />
+				    </div>
+				  </div>
+                 <h4 class="ui dividing header">Informações Leilão</h4>
+                 
+				  <div class="four fields">
+				  	<div class="field">
+				      <label>Processo</label>
+				      <p:inputText value="#{itemLeilaoController.instance.processo}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Região</label>
+				      <p:inputText value="#{itemLeilaoController.instance.regiao}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Data Apreensão</label>				      
+				      <p:calendar value="#{itemLeilaoController.instance.dataApreensao}" 
+				      pattern="dd/MM/yyy"/>
+				    </div>
+				    <div class="field">
+				      <label>N° Auto</label>
+				      <p:inputText value="#{itemLeilaoController.instance.nAuto}" />
+				    </div>
+				  </div>    
+				  <div class="four fields">
+				  	<div class="field">
+				      <label>Situação</label>				      
+				      <h:selectOneMenu value="#{itemLeilaoController.instance.situacao}" >
+			            <f:selectItems var="situacao" value="#{itemLeilaoController.situacoes}"
+			            	itemValue="#{situacao}" itemLabel="#{situacao}" />
+			        </h:selectOneMenu>
+				    </div>				    
+				    <div class="field">
+				      <label>AR</label>
+				      <p:inputText value="#{itemLeilaoController.instance.ar}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Comentário</label>
+				      <p:inputText value="#{itemLeilaoController.instance.comentario}" />
+				    </div>
+				    <div class="field">
+				      <label>Vistoria</label>
+				      <p:inputText value="#{itemLeilaoController.instance.vistoria}" />
+				    </div>
+				  </div>    
+				  <div class="four fields">
+				  	<div class="field">
+				      <label>BOX</label>
+				      <p:inputText value="#{itemLeilaoController.instance.box}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Etiqueta</label>
+				      <p:inputText value="#{itemLeilaoController.instance.etiqueta}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Digitador</label>
+				      <p:inputText value="#{itemLeilaoController.instance.digitador}" readonly="true"/>
+				    </div>
+				    <div class="field">
+				      <label>N° Leilão</label>
+				      <p:inputText value="#{itemLeilaoController.instance.nLeilao}" />
+				    </div>
+				  </div>   
+				  <div class="four fields">
+				  	<div class="field">
+				      <label>Avaliação</label>
+				      <p:inputText value="#{itemLeilaoController.instance.avalicao}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Guincho</label>
+				      <p:inputText value="#{itemLeilaoController.instance.guincho}" />
+				    </div>				    
+				    <div class="field">
+				      <label>Diárias do Patio</label>
+				      <p:inputText value="#{itemLeilaoController.instance.diarias}" />
+				    </div>				    
+				  </div>   
+                <div class="ui divider"></div>
+                <div class="ui buttons" jsf:id="insertButton">
+                    <p:commandLink actionListener="#{itemLeilaoController.insert()}"
+                                   styleClass="ui blue button" rendered="#{itemLeilaoController.instance.id == 0}"
+                                   oncomplete="irParaTopo();"
+                                   value="Salvar Registro" update="@form"/>
+                    <p:commandLink actionListener="#{itemLeilaoController.update()}"
+                                   styleClass="ui blue button" rendered="#{itemLeilaoController.instance.id > 0}"
+                                   value="Salvar Alterações" update="insertButton"/>
+                    <div class="or" data-text="ou"></div>
+                    <p:commandLink actionListener="#{itemLeilaoController.voltarLista()}"
+                    		styleClass="ui button" value="Voltar" immediate="true">
+                    </p:commandLink>                    
+                </div>                                
+            </h:form>
+        </div>        
+    </ui:define>
+    
+    <ui:define name="page-js">                       
+        <script>                                                               
+            var irParaTopo = function () {
+            	$('html, body').animate({scrollTop: $('#titulo').offset().top}, 500);
+            	$('#placaInput').focus();
+            };  
+        </script>
+    </ui:define>   
+
+</ui:composition>
