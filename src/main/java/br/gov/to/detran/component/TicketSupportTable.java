@@ -103,6 +103,7 @@ public class TicketSupportTable implements java.io.Serializable {
     }
 
     public void changeStatus(String status) {
+    	this.currentPage = 0;
         this.status = TicketSupportTableFilter.valueOf(status);
         this.update();
     }

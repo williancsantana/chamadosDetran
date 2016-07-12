@@ -4,6 +4,8 @@
 	<classpath>
 		<dir name="/home/maycon/Cloud/NovoChamados/chamados/target/classes">
 		</dir>
+		<dir name="/home/maycon/Cloud/NovoChamados/chamados/target/test-classes">
+		</dir>
 	</classpath>
 
 	<web>

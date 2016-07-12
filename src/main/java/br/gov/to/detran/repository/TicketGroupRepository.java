@@ -36,5 +36,15 @@ public class TicketGroupRepository extends AbstractRepository<TicketGroup> imple
                 .where(where).orderBy(QTicketGroup.ticketGroup.descricao.asc());
         return (List<TicketGroup>) query.fetch();
     }       
-
+    
+    public List<TicketGroup> getGroupsAtendentes(){
+    	BooleanBuilder where = new BooleanBuilder();
+    	//montar uma query para retornar todos os grupos de atendentes
+    	
+    	JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
+    	query.from(QTicketGroup.ticketGroup)
+    			.where(where).orderBy(QTicketGroup.ticketGroup.descricao.asc());
+    	return (List<TicketGroup>) query.fetch();
+    }
+    
 }

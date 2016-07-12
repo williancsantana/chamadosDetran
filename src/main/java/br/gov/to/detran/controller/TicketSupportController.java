@@ -84,7 +84,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private TicketService service;
     private TicketReply reply;
     private ViewServidorChamado servidor = new ViewServidorChamado();
-    private List<UserSecurity> possibleAttendants;    
+    private List<UserSecurity> possibleAttendants;
+    private TicketGroup tempGroup = null;
+    private List<UserSecurity> atendentesGrupo;
+    private UserSecurity tempAtendente;
+    private String respostaModal = "";
+    private String cpfConsulta = "";
+    private Boolean resultadoConsultaCpf;
+    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado(); 
 
     @PostConstruct
     public void postConstruct() {
@@ -216,40 +223,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         /* - Definindo o atendente do chamado de acordo com seu grupo e a quantidade de chamados
          * - Onde está solicitanteId era pra ser atendenteId
          */
-        /**
-         * 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
-         */        
-        DiaSemana diaSemana = DiaSemana.getDiaSemana(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, diaSemana, new Date());
+        atribuiChamadoAAtendenteDisponivel(FacesUtil.loggedUser(), service);
         
-        System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
-        Collections.shuffle(solicitanteIds);
-        Map<Long, Object> contarChamados = this.repository.contarChamados(solicitanteIds);        
-        Long id = Long.MAX_VALUE;
-        Long count = Long.MAX_VALUE;
-        for (Long atendente : solicitanteIds) {        	
-            Long tempCount = 0L;
-            Integer key = atendente.intValue();            
-            if (contarChamados.containsKey(atendente)) {
-            //if(lista.contains(atEscalonamento)){
-            	/*Group g = contarChamados.get(atendente);*/
-            	//.toArray()[2];
-            	LinkedHashSet obj = (LinkedHashSet) contarChamados.get(atendente);
-            	Long value = (Long) obj.toArray()[0];
-                tempCount = value;                 
-            }
-            if (tempCount < count) {
-                id = atendente;
-                count = tempCount;
-            }
-        }
-        try {
-            UserSecurity user = userSecurityRepository.getInstancePorId(id);
-            this.instance.setAtendente(user);
-        } catch (Exception e) {
-        	e.printStackTrace();
-            this.instance.setAtendente(null);
-        }
         SimpleDateFormat format = new SimpleDateFormat("yyyy");
         String sequence = String.valueOf(this.repository.getNextSequence());
         String theSequence = StringUtils.leftPad(sequence, 7 - sequence.length(), "0");
@@ -444,12 +419,79 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                 notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
                         NotifyMessage.builderNew(instance, this.instance.getSolicitante()));
             }
+                                    
         }catch(java.io.IOException ex){
         	ex.printStackTrace();            
         } catch (Exception ex) {
             ex.printStackTrace();
             addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
         }
+    }
+    
+    public void escalonarAtendenteGrupo(UserSecurity user){
+    	try{
+    		
+    		TicketReply notification = new TicketReply();
+    		UserSecurity autor = FacesUtil.loggedUser();
+    		TicketReply mensagem = new TicketReply();
+    		
+    		if(user == null){//Caso não tenha sido escolhido um atendente para o chamado, o escalonamento é automático
+            	System.out.println("Nenhum atendente selecionado");
+            	atribuiChamadoAAtendenteDisponivel(autor,this.instance.getServico());            	
+            }
+            else{//inserir os passos para escalonamento
+            	System.out.println("Atendente escolhido: "+user.getName());
+            	
+	            this.instance.setAtendente(user);
+	        }
+    		
+    		System.out.println("Mensagem: "+respostaModal);
+        	System.out.println("Usuário logado: "+autor.getName());
+        	mensagem.setTipo(TicketReplyType.REPLY);
+        	mensagem.setAutor(autor);
+        	mensagem.setChamado(this.instance);
+        	
+        	mensagem.setCreated(new Date());
+        	
+        	notification.setAutor(autor);
+        	notification.setChamado(this.instance);
+            notification.setTipo(TicketReplyType.NOTIFICATION);
+            notification.setMensagem("ESCALONAMENTO");
+            notification.setChamado(this.instance);
+            notification.setCreated(new Date());
+            this.instance.getRespostas().add(notification);
+            this.instance.getRespostas().add(mensagem);
+            
+            mensagem.setMensagem("Escalonado para: "+this.instance.getAtendente().getName()+". <br/> Motivo do escalonamento: "+respostaModal);
+            
+            this.instance.setAtViewat(new Date());
+            this.instance.setUltimaResposta(new Date());
+            
+            this.update();
+            if (!Objects.equals(autor.getId(), this.instance.getAtendente().getId())) {
+            	
+                notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
+                        NotifyMessage.builderNew(instance, this.instance.getAtendente()));
+                System.out.println("O autor é diferente do atendente");
+            }
+            if (!Objects.equals(autor.getId(), this.instance.getSolicitante().getId())) {
+                notifySessions.sendMensagem(this.instance.getSolicitante().getId().intValue(),
+                        NotifyMessage.builderNew(instance, this.instance.getSolicitante()));
+            }
+            
+    		
+    	}
+    	catch(java.io.IOException ex){
+        	ex.printStackTrace();            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            addMenssage(FacesUtil.ERROR, "Validação", ex.getMessage());
+        }
+    	user = null;
+        tempGroup = null;
+        tempAtendente = null;
+        respostaModal = "";
+    	
     }
     
     public boolean permissaoEscalonar() throws Exception{    	
@@ -490,6 +532,26 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         	}
         }
         return permissao;                    
+    }
+    
+	public Boolean consultarDadosSolicitante(String cpf){
+    	
+    	Boolean resultado = false;
+    	System.out.println(cpf);
+    	try{
+    		servidorBuscaCpf = detranERPRepository.findServidor(cpf);
+    		System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf());
+    		resultadoConsultaCpf =  resultado = true;
+    	}catch(NullPointerException ex){
+    		resultadoConsultaCpf = false;
+    		ex.printStackTrace();
+    	}finally{
+    		System.out.println(servidorBuscaCpf);
+    		
+    	}
+    	
+    	return resultado;
+    	
     }
 
     public void validar() {
@@ -569,6 +631,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     		this.instance.getAnexos().remove(attach);
     	}
     }
+    
+    public void groupListener(){
+    	//System.out.println("Item selecionado: " + tempGroup.getDescricao());
+    	
+    	String grupoAtendentes = tempGroup.getDescricao();
+    	atendentesGrupo = userSecurityRepository.getAtendentesGrupo(tempGroup);
+    	
+    }
 
     public TicketService getService() {
         return service;
@@ -625,5 +695,101 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 		}
 		return possibleAttendants;
 	}
-        	
+
+	public TicketGroup getTempGroup() {
+		return tempGroup;
+	}
+
+	public void setTempGroup(TicketGroup tempGroup) {
+		this.tempGroup = tempGroup;
+	}
+
+	public List<UserSecurity> getAtendentesGrupo() {
+		return atendentesGrupo;
+	}
+
+	public void setAtendentesGrupo(List<UserSecurity> atendentesGrupo) {
+		this.atendentesGrupo = atendentesGrupo;
+	}
+
+	public UserSecurity getTempAtendente() {
+		return tempAtendente;
+	}
+
+	public void setTempAtendente(UserSecurity tempAtendente) {
+		this.tempAtendente = tempAtendente;
+	}
+
+	public String getRespostaModal() {
+		return respostaModal;
+	}
+
+	public void setRespostaModal(String respostaModal) {
+		this.respostaModal = respostaModal;
+	}
+	
+    public void atribuiChamadoAAtendenteDisponivel(UserSecurity User, TicketService service){
+    	/**
+         * 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
+         */        
+        DiaSemana diaSemana = DiaSemana.getDiaSemana(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, diaSemana, new Date());
+        
+        System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
+        Collections.shuffle(solicitanteIds);
+        Map<Long, Object> contarChamados = this.repository.contarChamados(solicitanteIds);        
+        Long id = Long.MAX_VALUE;
+        Long count = Long.MAX_VALUE;
+        for (Long atendente : solicitanteIds) {        	
+            Long tempCount = 0L;
+            Integer key = atendente.intValue();            
+            if (contarChamados.containsKey(atendente)) {
+            //if(lista.contains(atEscalonamento)){
+            	/*Group g = contarChamados.get(atendente);*/
+            	//.toArray()[2];
+            	LinkedHashSet obj = (LinkedHashSet) contarChamados.get(atendente);
+            	Long value = (Long) obj.toArray()[0];
+                tempCount = value;                 
+            }
+            if (tempCount < count) {
+                id = atendente;
+                count = tempCount;
+            }
+        }
+        try {
+            UserSecurity user = userSecurityRepository.getInstancePorId(id);
+            this.instance.setAtendente(user);
+        } catch (Exception e) {
+        	e.printStackTrace();
+            this.instance.setAtendente(null);
+        }
+    	
+    }
+
+	public String getCpfConsulta() {
+		return cpfConsulta;
+	}
+
+	public void setCpfConsulta(String cpfConsulta) {
+		this.cpfConsulta = cpfConsulta;
+	}
+
+	public Boolean getResultadoConsultaCpf() {
+		return resultadoConsultaCpf;
+	}
+
+	public void setResultadoConsultaCpf(Boolean resultadoConsultaCpf) {
+		this.resultadoConsultaCpf = resultadoConsultaCpf;
+	}
+
+	public ViewServidorChamado getServidorBuscaCpf() {
+		return servidorBuscaCpf;
+	}
+
+	public void setServidorBuscaCpf(ViewServidorChamado servidorBuscaCpf) {
+		this.servidorBuscaCpf = servidorBuscaCpf;
+	}    	
+    
+    
 }
+

@@ -17,12 +17,15 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPAQueryBase;
 
 import br.gov.to.detran.domain.QEscalaTrabalho;
+import br.gov.to.detran.domain.QTicketGroup;
 import br.gov.to.detran.domain.QTicketGroupService;
 import br.gov.to.detran.domain.QUserSecurity;
 import br.gov.to.detran.domain.QUserSecurityGroup;
+import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.TicketGroupServiceType;
 import br.gov.to.detran.domain.TicketService;
 import br.gov.to.detran.domain.UserSecurity;
+import br.gov.to.detran.domain.UserSecurityGroup;
 import br.gov.to.detran.enumeration.DiaSemana;
 
 /**
@@ -96,4 +99,16 @@ public class UserSecurityRepository extends AbstractRepository<UserSecurity> imp
         return query.fetch();
     }       
 
+    public List<UserSecurity> getAtendentesGrupo(TicketGroup grupoChamado){
+    	BooleanBuilder where = new BooleanBuilder();
+    
+    	where.and(QUserSecurityGroup.userSecurityGroup.ticketGroup.id.eq(grupoChamado.getId()));
+    	where.and(QUserSecurityGroup.userSecurityGroup.ticketGroup.removed.isFalse());
+    	JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
+    	query.from(QUserSecurityGroup.userSecurityGroup).select(QUserSecurityGroup.userSecurityGroup.userSecurity);
+    	query.where(where).orderBy(QUserSecurityGroup.userSecurityGroup.userSecurity.name.asc());
+    	
+    	return query.fetch();
+    }
+    
 }
