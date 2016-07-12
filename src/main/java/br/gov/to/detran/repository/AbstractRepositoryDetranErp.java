@@ -37,4 +37,14 @@ public abstract class AbstractRepositoryDetranErp<T>{
             System.out.println(className);
         }
     }
+
+	public EntityManager getEm() {
+		return em;
+	}
+
+	public void setEm(EntityManager em) {
+		this.em = em;
+	}
+    
+    
 }

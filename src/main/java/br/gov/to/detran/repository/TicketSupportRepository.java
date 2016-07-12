@@ -62,7 +62,8 @@ public class TicketSupportRepository extends AbstractRepository<TicketSupport> i
 			"            },\n" +
 			"            \"PENDENTE_TERCEIROS\": {\n" +
 			"                \"AUTO\": \"PENDENTE_TERCEIROS\",\n" +
-			"                \"RETIRAR_PENDENCIA\": \"REABERTO\"\n" +
+"                \"RETIRAR_PENDENCIA\": \"REABERTO\",\n" +
+"                \"RETIRAR_PENDENCIA_TERCEIROS_SOLICITANTE\": \"PENDENTE_USUARIO\"\n"+
 			"            },\n" +
 			"            \"PENDENTE_USUARIO\": {\n" +
 			"                \"AUTO\": \"REABERTO\",\n" +

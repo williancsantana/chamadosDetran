@@ -10,6 +10,7 @@ import br.gov.to.detran.domain.QTicketSupport;
 import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
+import br.gov.to.detran.domain.view.ViewEstanteChamado;
 import br.gov.to.detran.repository.TicketSupportRepository;
 import br.gov.to.detran.util.FacesUtil;
 import com.querydsl.core.BooleanBuilder;
@@ -33,6 +34,8 @@ public class TicketSupportTable implements java.io.Serializable {
 
     private @Inject
     TicketSupportRepository repository;
+    
+    private ViewEstanteChamado estanteChamados;
 
     public enum TicketSupportTablePeriod {
         HOJE, U7DIAS, U30DIAS, TODOS;
@@ -415,4 +418,5 @@ public class TicketSupportTable implements java.io.Serializable {
         this.updateCount = updateCount;
     }
 
+    
 }

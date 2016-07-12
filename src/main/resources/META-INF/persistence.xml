@@ -27,6 +27,8 @@
         <class>br.gov.to.detran.project.domain.ProjectActivities</class>
         <class>br.gov.to.detran.leilao.domain.ItemLeilao</class>
         <class>br.gov.to.detran.leilao.domain.Categoria</class>        
+        <class>br.gov.to.detran.domain.TicketAttachmentReply</class>
+        <class>br.gov.to.detran.domain.view.ViewEstanteChamado</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
@@ -43,6 +45,7 @@
     <persistence-unit name="detran-erp" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/jboss/detranErpDS</jta-data-source>
+        <class>br.gov.to.detran.domain.ViewDadosServidor</class>
         <class>br.gov.to.detran.domain.ViewServidorChamado</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>

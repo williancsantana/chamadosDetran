@@ -189,5 +189,5 @@ public class UserSecurity extends AbstractEntity implements Security{
 		}
 		return tempName;		
 	}
-	
+
 }

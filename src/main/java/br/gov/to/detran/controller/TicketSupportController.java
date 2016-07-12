@@ -33,11 +33,13 @@ import org.joda.time.Hours;
 import org.jsoup.Jsoup;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
+import org.primefaces.push.EventBus.Reply;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import br.gov.to.detran.domain.TicketAttachment;
+import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.TicketGroupService;
 import br.gov.to.detran.domain.TicketReply;
@@ -48,6 +50,7 @@ import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.ViewServidorChamado;
+import br.gov.to.detran.domain.ViewDadosServidor;
 import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.push.NotifyMessage;
 import br.gov.to.detran.push.NotifySessions;
@@ -91,7 +94,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private String respostaModal = "";
     private String cpfConsulta = "";
     private Boolean resultadoConsultaCpf;
-    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado(); 
+    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado();
+    ViewDadosServidor dadosServidor = new ViewDadosServidor();
+    private String lotacaoCiretran = "";
 
     @PostConstruct
     public void postConstruct() {
@@ -215,6 +220,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	if(instance.getDescricao().trim().isEmpty() || instance.getDescricao().trim().length() < 30){
     		throw new Exception("É necessário informar uma descrição do chamado de no minimo 30 caracteres!");
     	}
+    	if(instance.getAssunto().trim().isEmpty()){
+    		throw new Exception("É obrigatório informar o assunto");
+    	}
         instance.setCreated(new Date());
         instance.setUpdated(new Date());
         instance.setServico(service);
@@ -247,6 +255,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
     public void responderChamado(String status) {
         try {
+        	
             if (Jsoup.parse(reply.getMensagem()).text().trim().isEmpty()) {
                 throw new Exception("É necessário informar uma mensagem!");
             }
@@ -316,6 +325,18 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
                 } else if (ticketSupportStatus == TicketSupportStatus.PENDENTE_TERCEIROS
+                        && novoStatus != TicketSupportStatus.PENDENTE_TERCEIROS
+                        && novoStatus != TicketSupportStatus.FECHADO
+                        && status.equals("RETIRAR_PENDENCIA_TERCEIROS_SOLICITANTE")) {
+                    TicketReply notification = new TicketReply();
+                    notification.setAutor(user);
+                    notification.setChamado(this.instance);
+                    notification.setTipo(TicketReplyType.NOTIFICATION);
+                    notification.setMensagem("PENDENCIA TERCEIROS RESOLVIDA PENDENTE USUARIO");
+                    notification.setCreated(new Date());
+                    this.instance.setStatus(novoStatus);
+                    this.instance.getRespostas().add(notification);
+                } else if (ticketSupportStatus == TicketSupportStatus.PENDENTE_TERCEIROS
                         && novoStatus != TicketSupportStatus.PENDENTE_TERCEIROS) {
                     TicketReply notification = new TicketReply();
                     notification.setAutor(user);
@@ -335,6 +356,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     notification.setCreated(new Date());
                     this.instance.setStatus(novoStatus);
                     this.instance.getRespostas().add(notification);
+                    
                 }
                 this.update();                
                 if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
@@ -540,19 +562,46 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	System.out.println(cpf);
     	try{
     		servidorBuscaCpf = detranERPRepository.findServidor(cpf);
-    		System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf());
+    		String cpfFormatado = cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9);
+    		dadosServidor = detranERPRepository.findDadosServidor(cpfFormatado);
+    		//System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf()+"\nSetor: "+viewDadosServidor.getNomesetor());
     		resultadoConsultaCpf =  resultado = true;
     	}catch(NullPointerException ex){
     		resultadoConsultaCpf = false;
     		ex.printStackTrace();
     	}finally{
-    		System.out.println(servidorBuscaCpf);
-    		
+    		System.out.println(servidorBuscaCpf.getNome());
+    		//System.out.println(dadosServidor);
+    		System.out.println(cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9));
     	}
     	
     	return resultado;
     	
     }
+	
+	public Boolean solicitanteCiretran(){
+		try{
+			UserSecurity solicitante = this.instance.getSolicitante();
+			String cpfFormatado = solicitante.getCpf();
+			cpfFormatado = cpfFormatado.substring(0,3)+"."+cpfFormatado.substring(3,6)+"."+
+								cpfFormatado.substring(6,9)+"-"+cpfFormatado.substring(9);
+			
+			ViewDadosServidor servidor = new ViewDadosServidor();
+			servidor = detranERPRepository.findDadosServidor(cpfFormatado);
+			
+			String lotacao = servidor.getNomesetor().toUpperCase();
+			if(lotacao.startsWith("CIRETRAN")){
+				System.out.println("Servidor: "+servidor.getNome()+"\nLotação: "+servidor.getNomesetor());
+				lotacaoCiretran = servidor.getNomesetor();
+				return true;
+			}
+		}
+		catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
+		return false;
+	}
 
     public void validar() {
 
@@ -625,6 +674,32 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
     	}            	   
     }
+    
+    public void enviarAnexoResposta(FileUploadEvent event) {
+    	try{
+    		UploadedFile file = event.getFile();
+            if(file != null){
+            	TicketAttachmentReply attachReply = new TicketAttachmentReply();
+            	attachReply.setChamadoResposta(reply);
+            	attachReply.setCreated(new Date());
+            	attachReply.setMimeType(file.getContentType());
+            	attachReply.setName(file.getFileName());
+            	attachReply.setSize(file.getSize());
+            	attachReply.setDataByte(file.getContents());
+            	reply.getAnexoRespostas().add(attachReply);
+            }
+    	}catch(Exception ex){
+    		ex.printStackTrace();
+    		addMenssage(FacesUtil.ERROR, "Anexo", ex.getMessage());
+    	}            	   
+    }
+    
+    public void removerAnexoResposta(TicketAttachmentReply attachReply){
+    	if(reply.getAnexoRespostas()!=null){
+    		reply.getAnexoRespostas().remove(attachReply);
+    	}
+    }
+    
     
     public void removerAnexo(TicketAttachment attach){
     	if(this.instance.getAnexos() != null){
@@ -788,8 +863,24 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
 	public void setServidorBuscaCpf(ViewServidorChamado servidorBuscaCpf) {
 		this.servidorBuscaCpf = servidorBuscaCpf;
-	}    	
-    
-    
+	}
+
+	public ViewDadosServidor getDadosServidor() {
+		return dadosServidor;
+	}
+
+	public void setDadosServidor(ViewDadosServidor dadosServidor) {
+		this.dadosServidor = dadosServidor;
+	}
+
+	public String getLotacaoCiretran() {
+		return lotacaoCiretran;
+	}
+
+	public void setLotacaoCiretran(String lotacaoCiretran) {
+		this.lotacaoCiretran = lotacaoCiretran;
+	}
+	
+	
 }
 
