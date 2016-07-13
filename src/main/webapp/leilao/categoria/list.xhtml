@@ -20,6 +20,9 @@
             	<a href="#{facesContext.externalContext.applicationContextPath}/leilao/categoria/edit.jsf" class="ui blue button"
             		style="float: right">Cadastrar</a>
             	<br/><br/>
+            	<p:commandButton value="Download Excel" ajax="false">
+			        <p:fileDownload value="#{itemLeilaoController.exportar()}" />
+			    </p:commandButton>
             	<p:dataTable var="instance" value="#{categoriaController.lazyModel}" lazy="true"
             			rowKey="#{instance.id}"
             			paginator="true" rows="20"  paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"

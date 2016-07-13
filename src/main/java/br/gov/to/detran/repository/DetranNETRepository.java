@@ -47,6 +47,30 @@ public class DetranNETRepository extends AbstractRepositoryDetranNET implements 
 		return null;
 	}
 	
+	public Object[] pesquisarVeiculoPlacaVistoria(String p) {
+		Session session = this.getEm().unwrap(Session.class);
+		ProcedureCall call = session
+			    .createStoredProcedureCall("stp_Rev_Vist_Ws_ConsultaVeiculo");		    
+		call.registerParameter(1, String.class, 
+			    ParameterMode.IN).bindValue(p);
+		
+		Output output = call.getOutputs().getCurrent();
+		if (output.isResultSet()) {		    
+			List<Object[]> veiculo = ((ResultSetOutput) output).getResultList();
+		    if(!veiculo.isEmpty()){
+		    	if(veiculo.get(0) instanceof Object[]){
+		    		return veiculo.get(0);
+		    	}		    	
+		    	try{
+		    		System.out.println(veiculo.get(0));
+		    	}catch(Exception e){
+		    		e.printStackTrace();
+		    	}		    	
+		    }
+		}
+		return null;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public ViewOperadorDetrannet consultarOperador(String cpf){
 		Session session = this.getEm().unwrap(Session.class);
@@ -63,6 +87,8 @@ public class DetranNETRepository extends AbstractRepositoryDetranNET implements 
 		}		
 		return operador;
 	}
+
+	
 	
     
 }

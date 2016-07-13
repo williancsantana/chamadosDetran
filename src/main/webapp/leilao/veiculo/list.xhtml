@@ -28,7 +28,7 @@
             		styleClass="ui blue button" value="Cadastrar" style="float: right">
             	</p:commandLink>
             	<p:commandButton value="Download Excel" ajax="false">
-			        <p:fileDownload value="#{itemLeilaoController.exportarExcel}" />
+			        <p:fileDownload value="#{itemLeilaoController.exportar()}" />
 			    </p:commandButton>    	            	
             	<br/><br/>
             	<p:dataTable var="instance" value="#{itemLeilaoController.lazyModel}" lazy="true"
