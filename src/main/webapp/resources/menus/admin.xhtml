@@ -12,6 +12,13 @@
                 <i class="home icon"></i>
                 Início
             </a>
+            
+            <shiro:hasPermission name="admin:setor">
+            <a class="#{menuItem == 'setor' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/setor/list.jsf">
+                <i class="fork icon"></i>
+                Setores
+            </a>
+            </shiro:hasPermission>
 
 			<shiro:hasPermission name="admin:usuarios">
 	            <a class="#{menuItem == 'usuarios' ? 'active' : ''} item" href="#{facesContext.externalContext.applicationContextPath}/admin/usuarios/list.jsf">

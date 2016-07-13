@@ -37,6 +37,7 @@ import org.primefaces.model.UploadedFile;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import br.gov.to.detran.component.TicketEscalonador;
 import br.gov.to.detran.domain.TicketAttachment;
 import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
@@ -84,6 +85,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     DetranERPRepository detranERPRepository;
     private @Inject
     DetranNETRepository detranNetReposioty;
+    private @Inject
+    TicketEscalonador ticketEscalonador;       
     private String cpfServidor;
     private String categorieVoltar;
     private String categoriePath;
@@ -246,7 +249,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         /* - Definindo o atendente do chamado de acordo com seu grupo e a quantidade de chamados
          * - Onde está solicitanteId era pra ser atendenteId
          */
-        atribuiChamadoAAtendenteDisponivel(FacesUtil.loggedUser(), service);
+        UserSecurity proximoAtendente = ticketEscalonador.selecionarProximoAtendente(FacesUtil.loggedUser(), service);
+        this.instance.setAtendente(proximoAtendente);
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy");
         String sequence = String.valueOf(this.repository.getNextSequence());
@@ -475,8 +479,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     		TicketReply mensagem = new TicketReply();
     		
     		if(user == null){//Caso não tenha sido escolhido um atendente para o chamado, o escalonamento é automático
-            	System.out.println("Nenhum atendente selecionado");
-            	atribuiChamadoAAtendenteDisponivel(autor,this.instance.getServico());            	
+            	System.out.println("Nenhum atendente selecionado");            	
+            	UserSecurity proximoAtendente = ticketEscalonador.selecionarProximoAtendente(autor, this.instance.getServico());
+                this.instance.setAtendente(proximoAtendente);
             }
             else{//inserir os passos para escalonamento
             	System.out.println("Atendente escolhido: "+user.getName());
@@ -808,45 +813,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
 	public void setRespostaModal(String respostaModal) {
 		this.respostaModal = respostaModal;
-	}
-	
-    public void atribuiChamadoAAtendenteDisponivel(UserSecurity User, TicketService service){
-    	/**
-         * 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
-         */        
-        DiaSemana diaSemana = DiaSemana.getDiaSemana(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, diaSemana, new Date());
-        
-        System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
-        Collections.shuffle(solicitanteIds);
-        Map<Long, Object> contarChamados = this.repository.contarChamados(solicitanteIds);        
-        Long id = Long.MAX_VALUE;
-        Long count = Long.MAX_VALUE;
-        for (Long atendente : solicitanteIds) {        	
-            Long tempCount = 0L;
-            Integer key = atendente.intValue();            
-            if (contarChamados.containsKey(atendente)) {
-            //if(lista.contains(atEscalonamento)){
-            	/*Group g = contarChamados.get(atendente);*/
-            	//.toArray()[2];
-            	LinkedHashSet obj = (LinkedHashSet) contarChamados.get(atendente);
-            	Long value = (Long) obj.toArray()[0];
-                tempCount = value;                 
-            }
-            if (tempCount < count) {
-                id = atendente;
-                count = tempCount;
-            }
-        }
-        try {
-            UserSecurity user = userSecurityRepository.getInstancePorId(id);
-            this.instance.setAtendente(user);
-        } catch (Exception e) {
-        	e.printStackTrace();
-            this.instance.setAtendente(null);
-        }
-    	
-    }
+	}	   
 
 	public String getCpfConsulta() {
 		return cpfConsulta;
@@ -898,4 +865,3 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 		
 	
 }
-

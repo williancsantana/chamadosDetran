@@ -38,7 +38,7 @@ public class UserSecurity extends AbstractEntity implements Security{
     private String password;
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "setor", nullable = false)
+    @Column(name = "setor", nullable = true)
     private String setor;
     @Column(name = "user_status")
     @Enumerated(EnumType.STRING)

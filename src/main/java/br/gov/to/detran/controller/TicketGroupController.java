@@ -39,6 +39,7 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
     private GroupPermissions adminGrupos = new GroupPermissions("admin:grupos", Boolean.FALSE);
     private GroupPermissions adminServicos = new GroupPermissions("admin:servicos", Boolean.FALSE);
     private GroupPermissions adminChamados = new GroupPermissions("admin:chamados", Boolean.FALSE);
+    private GroupPermissions adminSetor = new GroupPermissions("admin:setor", Boolean.FALSE);
     private GroupPermissions relatorioAtendimento = new GroupPermissions("relatorio:atendimento", Boolean.FALSE);
     private GroupPermissions relatorioSistema = new GroupPermissions("relatorio:sistema", Boolean.FALSE);
 
@@ -116,6 +117,7 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
         permissions += this.genericPermission(adminGrupos);
         permissions += this.genericPermission(adminServicos);
         permissions += this.genericPermission(adminChamados);
+        permissions += this.genericPermission(adminSetor);
         permissions += this.genericPermission(relatorioAtendimento);
         permissions += this.genericPermission(relatorioSistema);
         return permissions;
@@ -129,6 +131,7 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
         this.genericRestorePermission(adminGrupos);
         this.genericRestorePermission(adminServicos);
         this.genericRestorePermission(adminChamados);
+        this.genericRestorePermission(adminSetor);
         this.genericRestorePermission(relatorioAtendimento);
         this.genericRestorePermission(relatorioSistema);
     }
@@ -218,4 +221,17 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
         this.relatorioSistema = relatorioSistema;
     }
 
+	public void setRepository(TicketGroupRepository repository) {
+		this.repository = repository;
+	}
+
+	public GroupPermissions getAdminSetor() {
+		return adminSetor;
+	}
+
+	public void setAdminSetor(GroupPermissions adminSetor) {
+		this.adminSetor = adminSetor;
+	}	
+
+	
 }
