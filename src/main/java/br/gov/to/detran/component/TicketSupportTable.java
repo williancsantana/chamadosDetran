@@ -14,6 +14,8 @@ import br.gov.to.detran.domain.view.ViewEstanteChamado;
 import br.gov.to.detran.repository.TicketSupportRepository;
 import br.gov.to.detran.util.FacesUtil;
 import com.querydsl.core.BooleanBuilder;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +61,9 @@ public class TicketSupportTable implements java.io.Serializable {
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
     private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
+    private Boolean ordemCrescente = true;
+    private String ordenacao = "desc";
+    private String ultimoCriterio = "ultimaResposta";
 
     public TicketSupportTable() {
         this.currentPage = 0;
@@ -185,12 +190,37 @@ public class TicketSupportTable implements java.io.Serializable {
             		QTicketSupport.ticketSupport.numero.containsIgnoreCase(filterValue),
             		QTicketSupport.ticketSupport.atendente.name.containsIgnoreCase(filterValue));
         }        
+        LazyResult<TicketSupport> lazyResult;
         
-        LazyResult<TicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
+        /*lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
                 "desc", filterHash, booleanBuilder, true);
+        */
+        lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, ultimoCriterio,
+                ordenacao, filterHash, booleanBuilder, true);
         
         this.setRowCount(lazyResult.getCount().intValue());
         return lazyResult.getResult();
+    }
+    
+    public void ordenarChamados(String argumento){
+    	if(ordemCrescente == true && argumento.equals(ultimoCriterio)){
+        	ordenacao = "asc";
+        	ordemCrescente = false;
+        	System.out.println("Ordem ascendente.");
+        }
+        else if(ordemCrescente == false && argumento.equals(ultimoCriterio)){
+        	ordenacao = "desc";
+        	ordemCrescente = true;
+        	System.out.println("Ordem descendente.");
+        }
+        else{
+        	ordenacao = "asc";
+        	System.out.println("Ordem padrão: ascendente");
+        }
+        ultimoCriterio = argumento;
+        this.data = this.load();
+        this.countUpdates();
+    	
     }
 
     public void countUpdates() {

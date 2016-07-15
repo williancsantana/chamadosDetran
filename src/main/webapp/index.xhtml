@@ -85,11 +85,21 @@
                         </tr>
                         <tr>
                             <th class="collapsing"></th>
-                            <th class="collapsing">Número</th>
-                            <th>Assunto</th>
-                            <th class="collapsing">Solicitante</th>
-                            <th class="collapsing">Atendente</th>
-                            <th class="collapsing">Última resposta</th>
+                            <th class="collapsing"><h:commandLink class="ui silver button"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('numero')}"
+                            							update=":tableData"> Número </h:commandLink></th>
+                            <th><h:commandLink class="ui silver button"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('assunto')}"
+                            							update=":tableData"> Assunto </h:commandLink></th>
+                            <th class="collapsing"><h:commandLink class="ui silver button"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('solicitante.name')}"
+                            							update=":tableData"> Solicitante </h:commandLink></th>
+                            <th class="collapsing"><h:commandLink class="ui silver button"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('atendente.name')}"
+                            							update=":tableData"> Atendente </h:commandLink></th>
+                            <th class="collapsing"><h:commandLink class="ui silver button"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('ultimaResposta')}"
+                            							update=":tableData"> Última resposta </h:commandLink></th>
                         </tr>
                     </thead>
                     <tbody jsf:id="tableData">                                                
