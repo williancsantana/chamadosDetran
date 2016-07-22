@@ -195,6 +195,8 @@ public class TicketSupportTable implements java.io.Serializable {
         /*lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
                 "desc", filterHash, booleanBuilder, true);
         */
+        System.out.println(ultimoCriterio);
+        System.out.println(ordenacao);
         lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, ultimoCriterio,
                 ordenacao, filterHash, booleanBuilder, true);
         
@@ -204,23 +206,29 @@ public class TicketSupportTable implements java.io.Serializable {
     
     public void ordenarChamados(String argumento){
     	if(ordemCrescente == true && argumento.equals(ultimoCriterio)){
-        	ordenacao = "asc";
+        	ordenacao = "desc";
         	ordemCrescente = false;
         	System.out.println("Ordem ascendente.");
         }
         else if(ordemCrescente == false && argumento.equals(ultimoCriterio)){
-        	ordenacao = "desc";
+        	ordenacao = "asc";
         	ordemCrescente = true;
         	System.out.println("Ordem descendente.");
         }
         else{
         	ordenacao = "asc";
+        	ordemCrescente = true;
         	System.out.println("Ordem padrão: ascendente");
         }
         ultimoCriterio = argumento;
         this.data = this.load();
         this.countUpdates();
     	
+    }
+    
+    public String criterioOrdenacao(){
+    	
+    	return "";
     }
 
     public void countUpdates() {
@@ -447,6 +455,30 @@ public class TicketSupportTable implements java.io.Serializable {
     public void setUpdateCount(TicketSupportCount updateCount) {
         this.updateCount = updateCount;
     }
+
+	public Boolean getOrdemCrescente() {
+		return ordemCrescente;
+	}
+
+	public void setOrdemCrescente(Boolean ordemCrescente) {
+		this.ordemCrescente = ordemCrescente;
+	}
+
+	public String getOrdenacao() {
+		return ordenacao;
+	}
+
+	public void setOrdenacao(String ordenacao) {
+		this.ordenacao = ordenacao;
+	}
+
+	public String getUltimoCriterio() {
+		return ultimoCriterio;
+	}
+
+	public void setUltimoCriterio(String ultimoCriterio) {
+		this.ultimoCriterio = ultimoCriterio;
+	}
 
     
 }
