@@ -226,9 +226,22 @@ public class TicketSupportTable implements java.io.Serializable {
     	
     }
     
-    public String criterioOrdenacao(){
+    public String preencherCabecalho(String coluna){
     	
-    	return "";
+    	String codigohtml="", ordemChamados="";
+    	
+    	if(ordenacao.equals("asc")){
+    		ordemChamados = "up";
+    	}
+    	else{
+    		ordemChamados = "down";
+    	}
+    	
+    	if(coluna.equals(ultimoCriterio)){
+    		codigohtml = "level "+ ordemChamados +" icon";
+    	}
+    	    	
+    	return codigohtml;
     }
 
     public void countUpdates() {
