@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="../../resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf">
+
+    <ui:param name="menu" value="admin" />
+    <ui:param name="menuItem" value="grupos" />
+
+    <ui:define name="page-title">
+        Detran - TO | #{ticketSetorAtendimentoController.instance.id == 0 ? 'Novo' : 'Editar'} Setor
+    </ui:define>    
+
+    <ui:define name="content">
+        <h4 class="ui top attached header">            
+            <h:outputText rendered="#{ticketSetorAtendimentoController.instance.id > 0}" value="Detalhe do Setor #{ticketSetorAtendimentoController.instance.setor}" />
+            <h:outputText rendered="#{ticketSetorAtendimentoController.instance.id == 0}" value="Adicionar Setor" />
+        </h4>
+        <div class="ui bottom attached segment">
+            <h:form id="group-form" class="ui form">                
+                     <div class="field">
+                    <label>SETOR</label>
+                    <p:autoComplete forceSelection="true" value="#{ticketSetorAtendimentoController.instance.idSetor}"
+                    		completeMethod="#{ticketSetorAtendimentoController.completeLotacao}" var="lotacao"
+                    		itemLabel="#{lotacao.nome}" itemValue="#{lotacao.id}" 
+                    		dropdown="true" style="width: 50%" required="true" requiredMessage="Selecione o Setor">                    		                 	
+                    </p:autoComplete>
+                </div>                                 
+                            
+
+                <div class="ui divider"></div>
+                <div class="ui buttons" jsf:id="insertButton">
+                    <p:commandLink actionListener="#{ticketSetorAtendimentoController.insert()}"
+                                     styleClass="ui blue button" rendered="#{ticketSetorAtendimentoController.instance.id == 0}"
+                                     value="Salvar alterações" update="removeButton insertButton"/>
+                    <p:commandLink actionListener="#{ticketSetorAtendimentoController.update()}"
+                                     styleClass="ui blue button" rendered="#{ticketSetorAtendimentoController.instance.id > 0}"
+                                     value="Salvar alterações" update="removeButton insertButton"/>
+                    <div class="or" data-text="ou"></div>
+                    <a href="#{facesContext.externalContext.applicationContextPath}/admin/setor/list.jsf" class="ui button">Descartar alterações</a>
+                </div>                
+                <div class="ui pull right buttons" jsf:id="removeButton">
+                    <p:commandLink styleClass="ui red button" rendered="#{ticketSetorAtendimentoController.instance.id > 0}"
+                                   value="Excluir Setor" actionListener="#{ticketSetorAtendimentoController.removeAndRedirect(ticketSetorAtendimentoController.instance, '/admin/setor/list.jsf')}">
+                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
+                    </p:commandLink>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+    <ui:define name="page-js">
+        <script>
+
+        </script>
+    </ui:define>
+
+</ui:composition>

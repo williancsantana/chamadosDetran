@@ -5,9 +5,9 @@
  */
 package br.gov.to.detran.managerfactory;
 
-import javax.enterprise.inject.Produces;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Default;
+import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -18,12 +18,17 @@ import javax.persistence.PersistenceContext;
  */
 @RequestScoped
 public class ManagerFactory implements java.io.Serializable {
-    
-    @PersistenceContext(unitName="application")
+        
+	private static final long serialVersionUID = 1L;
+
+	@PersistenceContext(unitName="application")
     EntityManager em;
     
     @PersistenceContext(unitName="detran-erp")
     EntityManager detranErp;
+    
+    @PersistenceContext(unitName="detranNet")
+    EntityManager detranNet;
 
     @Produces @RequestScoped @Default
     public EntityManager getEntityManager() {
@@ -33,6 +38,11 @@ public class ManagerFactory implements java.io.Serializable {
     @Produces @RequestScoped @DetranERP
     public EntityManager getDetranErpEntityManager() {
         return detranErp;
+    }
+    
+    @Produces @RequestScoped @DetranNET
+    public EntityManager getDetranNETEntityManager() {
+        return detranNet;
     }
     
            

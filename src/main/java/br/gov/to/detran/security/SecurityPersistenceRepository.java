@@ -7,6 +7,8 @@
 package br.gov.to.detran.security;
 
 import br.gov.to.detran.domain.UserSecurity;
+import br.gov.to.detran.domain.ViewDadosServidor;
+import br.gov.to.detran.repository.DetranERPRepository;
 import br.gov.to.detran.repository.UserSecurityRepository;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -20,9 +22,24 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 public class SecurityPersistenceRepository implements java.io.Serializable {
 
     private @Inject
-    UserSecurityRepository userPersistenceRepository;     
+    UserSecurityRepository userPersistenceRepository;
+    
+    private @Inject
+    DetranERPRepository detranErpRepository;
     
     public SecurityPersistenceRepository() {
+    }
+    
+    public void updateSetor(UserSecurity user){
+    	try{
+    		ViewDadosServidor viewDadosServidor = detranErpRepository.findDadosServidor(user.getCpf().replaceAll("\\.", "").replaceAll("-", ""));
+    		if(user.getSetor() == null || !user.getSetor().equalsIgnoreCase(viewDadosServidor.getNomesetor())){
+    			user.setSetor(viewDadosServidor.getNomesetor());
+    			userPersistenceRepository.update(user);
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
     }
     
     public boolean insertUser(UserSecurity user){
@@ -67,5 +84,7 @@ public class SecurityPersistenceRepository implements java.io.Serializable {
      */
     public void resetPassword(String username) throws Exception {        
     }
+    
+    
 
 }

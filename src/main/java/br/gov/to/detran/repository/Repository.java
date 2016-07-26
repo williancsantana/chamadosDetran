@@ -8,6 +8,9 @@ package br.gov.to.detran.repository;
 import br.gov.to.detran.dao.LazyResult;
 import br.gov.to.detran.domain.AbstractEntity;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,6 +41,8 @@ public interface Repository<T extends AbstractEntity> {
      * @return 
      */
     public LazyResult<T> lazyLoad(int first, int pageSize, String sortField, String order, Map<String, Object> values);
+    
+    public LazyResult<T> lazyLoad3(List<Predicate> predicates, int first, int pageSize, String sortField, String order, Map<String, Object> values);
     
     public LazyResult<T> lazyLoad(Map<String, Object> fkEntities, int first, int pageSize, String sortField, String order, Map<String, Object> values);
         

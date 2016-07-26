@@ -312,8 +312,7 @@ public class ProjectController extends BaseController<Project> implements java.i
     		}
     		people.setCreated(new Date());
         	people.setUpdated(new Date());
-        	people.setProject(instance);
-        	System.out.println(people.getUserSecurity().getName());
+        	people.setProject(instance);        	
             if(instance.getId() > 0){
             	projectUserRepository.insert(people);
             }else{            	

@@ -38,6 +38,8 @@ public class UserSecurity extends AbstractEntity implements Security{
     private String password;
     @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "setor", nullable = true)
+    private String setor;
     @Column(name = "user_status")
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
@@ -189,5 +191,13 @@ public class UserSecurity extends AbstractEntity implements Security{
 		}
 		return tempName;		
 	}
+
+	public String getSetor() {
+		return setor;
+	}
+
+	public void setSetor(String setor) {
+		this.setor = setor;
+	}	
 
 }

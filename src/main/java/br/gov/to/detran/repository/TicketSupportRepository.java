@@ -41,33 +41,35 @@ import static com.querydsl.core.group.GroupBy.set;
  */
 @Transactional
 public class TicketSupportRepository extends AbstractRepository<TicketSupport> implements java.io.Serializable {
-    
-    public static String jsonTransacoes = "{\n" +
-"            \"ABERTO\": {\n" +
-"                \"AUTO\": \"ABERTO\",\n" +
-"                \"FECHAR\": \"FECHADO\",\n" +
-"                \"PENDENTE_USUARIO\": \"PENDENTE_USUARIO\",\n" +
-"                \"PENDENTE_TERCEIROS\": \"PENDENTE_TERCEIROS\"\n" +
-"            },\n" +
-"            \"REABERTO\": {\n" +
-"                \"AUTO\": \"REABERTO\",\n" +
-"                \"FECHAR\": \"FECHADO\",\n" +
-"                \"PENDENTE_USUARIO\": \"PENDENTE_USUARIO\",\n" +
-"                \"PENDENTE_TERCEIROS\": \"PENDENTE_TERCEIROS\"\n" +
-"            },\n" +
-"            \"FECHADO\": {\n" +
-"                \"AUTO\": \"REABERTO\"\n" +
-"            },\n" +
-"            \"PENDENTE_TERCEIROS\": {\n" +
-"                \"AUTO\": \"PENDENTE_TERCEIROS\",\n" +
+    	
+	private static final long serialVersionUID = 1L;
+	
+	public static String jsonTransacoes = "{\n" +
+			"            \"ABERTO\": {\n" +
+			"                \"AUTO\": \"ABERTO\",\n" +
+			"                \"FECHAR\": \"FECHADO\",\n" +
+			"                \"PENDENTE_USUARIO\": \"PENDENTE_USUARIO\",\n" +
+			"                \"PENDENTE_TERCEIROS\": \"PENDENTE_TERCEIROS\"\n" +
+			"            },\n" +
+			"            \"REABERTO\": {\n" +
+			"                \"AUTO\": \"REABERTO\",\n" +
+			"                \"FECHAR\": \"FECHADO\",\n" +
+			"                \"PENDENTE_USUARIO\": \"PENDENTE_USUARIO\",\n" +
+			"                \"PENDENTE_TERCEIROS\": \"PENDENTE_TERCEIROS\"\n" +
+			"            },\n" +
+			"            \"FECHADO\": {\n" +
+			"                \"AUTO\": \"REABERTO\"\n" +
+			"            },\n" +
+			"            \"PENDENTE_TERCEIROS\": {\n" +
+			"                \"AUTO\": \"PENDENTE_TERCEIROS\",\n" +
 "                \"RETIRAR_PENDENCIA\": \"REABERTO\",\n" +
 "                \"RETIRAR_PENDENCIA_TERCEIROS_SOLICITANTE\": \"PENDENTE_USUARIO\"\n"+
-"            },\n" +
-"            \"PENDENTE_USUARIO\": {\n" +
-"                \"AUTO\": \"REABERTO\",\n" +
-"                \"FECHAR\": \"FECHADO\"\n" +
-"            }\n" +
-"        }";
+			"            },\n" +
+			"            \"PENDENTE_USUARIO\": {\n" +
+			"                \"AUTO\": \"REABERTO\",\n" +
+			"                \"FECHAR\": \"FECHADO\"\n" +
+			"            }\n" +
+			"        }";
     
     public HashMap<String, HashMap<String, Object>> getTransacoes(){
         Type stringStringMap = new TypeToken<HashMap<String, HashMap<String, Object>>>(){}.getType();

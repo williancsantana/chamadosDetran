@@ -17,7 +17,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPAQueryBase;
 
 import br.gov.to.detran.domain.QEscalaTrabalho;
-import br.gov.to.detran.domain.QTicketGroup;
 import br.gov.to.detran.domain.QTicketGroupService;
 import br.gov.to.detran.domain.QUserSecurity;
 import br.gov.to.detran.domain.QUserSecurityGroup;
@@ -25,7 +24,6 @@ import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.TicketGroupServiceType;
 import br.gov.to.detran.domain.TicketService;
 import br.gov.to.detran.domain.UserSecurity;
-import br.gov.to.detran.domain.UserSecurityGroup;
 import br.gov.to.detran.enumeration.DiaSemana;
 
 /**
@@ -34,8 +32,10 @@ import br.gov.to.detran.enumeration.DiaSemana;
  */
 @Transactional
 public class UserSecurityRepository extends AbstractRepository<UserSecurity> implements java.io.Serializable {
+	    
+	private static final long serialVersionUID = 1L;
 
-    @Override
+	@Override
     public EntityPathBase<UserSecurity> getEntityPath() {
         return QUserSecurity.userSecurity;
     }

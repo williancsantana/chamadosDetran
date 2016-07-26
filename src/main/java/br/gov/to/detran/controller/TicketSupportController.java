@@ -33,11 +33,11 @@ import org.joda.time.Hours;
 import org.jsoup.Jsoup;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
-import org.primefaces.push.EventBus.Reply;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import br.gov.to.detran.component.TicketEscalonador;
 import br.gov.to.detran.domain.TicketAttachment;
 import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
@@ -49,12 +49,14 @@ import br.gov.to.detran.domain.TicketServiceField;
 import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
-import br.gov.to.detran.domain.ViewServidorChamado;
 import br.gov.to.detran.domain.ViewDadosServidor;
+import br.gov.to.detran.domain.ViewServidorChamado;
+import br.gov.to.detran.domain.view.ViewOperadorDetrannet;
 import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.push.NotifyMessage;
 import br.gov.to.detran.push.NotifySessions;
 import br.gov.to.detran.repository.DetranERPRepository;
+import br.gov.to.detran.repository.DetranNETRepository;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.TicketServiceRepository;
 import br.gov.to.detran.repository.TicketSupportRepository;
@@ -68,8 +70,10 @@ import br.gov.to.detran.util.FacesUtil;
 @Named
 @ViewScoped
 public class TicketSupportController extends BaseController<TicketSupport> implements java.io.Serializable {
-
-    private @Inject
+    
+	private static final long serialVersionUID = 1L;
+	
+	private @Inject
     TicketSupportRepository repository;
     private @Inject
     TicketServiceRepository ticketServiceRepository;
@@ -79,6 +83,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     NotifySessions notifySessions;
     private @Inject
     DetranERPRepository detranERPRepository;
+    private @Inject
+    DetranNETRepository detranNetReposioty;
+    private @Inject
+    TicketEscalonador ticketEscalonador;       
     private String cpfServidor;
     private String categorieVoltar;
     private String categoriePath;
@@ -94,8 +102,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private String respostaModal = "";
     private String cpfConsulta = "";
     private Boolean resultadoConsultaCpf;
-    ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado();
-    ViewDadosServidor dadosServidor = new ViewDadosServidor();
+    private ViewServidorChamado servidorBuscaCpf = new ViewServidorChamado();
+    private ViewDadosServidor dadosServidor = new ViewDadosServidor();
+    private ViewOperadorDetrannet operador;
     private String lotacaoCiretran = "";
 
     @PostConstruct
@@ -150,6 +159,15 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         try {
             this.setFlash("chamadoInstance", chamado);
             this.redirect("/chamado.jsf?id=" + chamado.getId());
+        } catch (IOException ex) {
+            addMenssage(FacesMessage.SEVERITY_ERROR, "Redirecionar", "Não foi possivel redirecionar para o chamado");
+            Logger.getLogger(BaseController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void viewChamado(Long idChamado) {
+        try {            
+            this.redirect("/chamado.jsf?id=" + idChamado);
         } catch (IOException ex) {
             addMenssage(FacesMessage.SEVERITY_ERROR, "Redirecionar", "Não foi possivel redirecionar para o chamado");
             Logger.getLogger(BaseController.class.getName()).log(Level.SEVERE, null, ex);
@@ -231,7 +249,8 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         /* - Definindo o atendente do chamado de acordo com seu grupo e a quantidade de chamados
          * - Onde está solicitanteId era pra ser atendenteId
          */
-        atribuiChamadoAAtendenteDisponivel(FacesUtil.loggedUser(), service);
+        UserSecurity proximoAtendente = ticketEscalonador.selecionarProximoAtendente(FacesUtil.loggedUser(), service);
+        this.instance.setAtendente(proximoAtendente);
         
         SimpleDateFormat format = new SimpleDateFormat("yyyy");
         String sequence = String.valueOf(this.repository.getNextSequence());
@@ -245,6 +264,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         } catch (Exception e) {
             instance.setCamposJsonValues("");
         }
+        this.instance.setWithAttachment(!this.instance.getAnexos().isEmpty());
         this.repository.insert(instance);
         
         if(this.instance.getAtendente() != null){
@@ -358,6 +378,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                     this.instance.getRespostas().add(notification);
                     
                 }
+                this.instance.setWithAttachment(!this.reply.getAnexoRespostas().isEmpty());
                 this.update();                
                 if (!Objects.equals(user.getId(), this.instance.getAtendente().getId())) {
                     notifySessions.sendMensagem(this.instance.getAtendente().getId().intValue(),
@@ -382,7 +403,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     
     public void apropiarChamado() {
         try {               
-        	 UserSecurity user = FacesUtil.loggedUser();
+        	UserSecurity user = FacesUtil.loggedUser();
             if(!this.permissaoApropirar()){
             	throw new Exception("Você não tem permissão pra executar essa ação!");
             }
@@ -395,7 +416,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             notification.setCreated(new Date());
                                     
             this.instance.getRespostas().add(notification);
-            this.instance.setAtendente(user);
+            this.instance.setAtendente(user);            
             this.instance.setAtViewat(new Date());
             this.instance.setUltimaResposta(new Date());
             
@@ -427,7 +448,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
                                     
             this.instance.getRespostas().add(notification);
             this.instance.setAtendente(user);
-            this.instance.setAtViewat(new Date());
+            //this.instance.setAtViewat(new Date());
             this.instance.setUltimaResposta(new Date());
             
             UserSecurity userSecurity = FacesUtil.loggedUser();
@@ -458,8 +479,9 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     		TicketReply mensagem = new TicketReply();
     		
     		if(user == null){//Caso não tenha sido escolhido um atendente para o chamado, o escalonamento é automático
-            	System.out.println("Nenhum atendente selecionado");
-            	atribuiChamadoAAtendenteDisponivel(autor,this.instance.getServico());            	
+            	System.out.println("Nenhum atendente selecionado");            	
+            	UserSecurity proximoAtendente = ticketEscalonador.selecionarProximoAtendente(autor, this.instance.getServico());
+                this.instance.setAtendente(proximoAtendente);
             }
             else{//inserir os passos para escalonamento
             	System.out.println("Atendente escolhido: "+user.getName());
@@ -486,7 +508,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             
             mensagem.setMensagem("Escalonado para: "+this.instance.getAtendente().getName()+". <br/> Motivo do escalonamento: "+respostaModal);
             
-            this.instance.setAtViewat(new Date());
+            //this.instance.setAtViewat(new Date());
             this.instance.setUltimaResposta(new Date());
             
             this.update();
@@ -556,51 +578,41 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         return permissao;                    
     }
     
-	public Boolean consultarDadosSolicitante(String cpf){
-    	
-    	Boolean resultado = false;
-    	System.out.println(cpf);
+    public void pesquisarServidorSisrh(String cpf){
+    	this.cpfConsulta = cpf;
+    	this.consultarDadosSolicitante(cpf);    	
+    }
+    
+	public Boolean consultarDadosSolicitante(String cpf){    	
+    	Boolean resultado = false;    	
     	try{
-    		servidorBuscaCpf = detranERPRepository.findServidor(cpf);
-    		String cpfFormatado = cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9);
-    		dadosServidor = detranERPRepository.findDadosServidor(cpfFormatado);
-    		//System.out.println("Servidor: "+servidorBuscaCpf.getNome()+"\nCPF: "+servidorBuscaCpf.getCpf()+"\nSetor: "+viewDadosServidor.getNomesetor());
+    		servidorBuscaCpf = detranERPRepository.findServidor(cpf);    		
+    		dadosServidor = detranERPRepository.findDadosServidor(cpf);
+    		operador = detranNetReposioty.consultarOperador(cpf);
     		resultadoConsultaCpf =  resultado = true;
     	}catch(NullPointerException ex){
     		resultadoConsultaCpf = false;
     		ex.printStackTrace();
-    	}finally{
-    		System.out.println(servidorBuscaCpf.getNome());
-    		//System.out.println(dadosServidor);
-    		System.out.println(cpf.substring(0,3) + "." + cpf.substring(3,6)+ "." + cpf.substring(6,9)+ "-" + cpf.substring(9));
-    	}
-    	
+    	}    	
     	return resultado;
     	
     }
 	
-	public Boolean solicitanteCiretran(){
+	public void consultarDadosOperadorDetranNet(String cpf){		
+	}
+	
+	public String setorUsuario(UserSecurity user){
 		try{
-			UserSecurity solicitante = this.instance.getSolicitante();
-			String cpfFormatado = solicitante.getCpf();
-			cpfFormatado = cpfFormatado.substring(0,3)+"."+cpfFormatado.substring(3,6)+"."+
-								cpfFormatado.substring(6,9)+"-"+cpfFormatado.substring(9);
-			
-			ViewDadosServidor servidor = new ViewDadosServidor();
-			servidor = detranERPRepository.findDadosServidor(cpfFormatado);
-			
-			String lotacao = servidor.getNomesetor().toUpperCase();
-			if(lotacao.startsWith("CIRETRAN")){
-				System.out.println("Servidor: "+servidor.getNome()+"\nLotação: "+servidor.getNomesetor());
-				lotacaoCiretran = servidor.getNomesetor();
-				return true;
+			if(user.getSetor() != null && !user.getSetor().isEmpty()){
+				return user.getSetor();
 			}
-		}
-		catch(Exception ex){
-			ex.printStackTrace();
-		}
-		
-		return false;
+			user.setSetor(detranERPRepository.findDadosServidor(user.getCpf()).getNomesetor());
+			userSecurityRepository.update(user);
+			return user.getSetor();
+		}catch(Exception e){
+			e.printStackTrace();
+		}		
+		return "não foi possivel recuperar o setor";
 	}
 
     public void validar() {
@@ -801,45 +813,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 
 	public void setRespostaModal(String respostaModal) {
 		this.respostaModal = respostaModal;
-	}
-	
-    public void atribuiChamadoAAtendenteDisponivel(UserSecurity User, TicketService service){
-    	/**
-         * 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
-         */        
-        DiaSemana diaSemana = DiaSemana.getDiaSemana(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
-        List<Long> solicitanteIds = this.userSecurityRepository.solicitanteIds(FacesUtil.loggedUser(), service, diaSemana, new Date());
-        
-        System.out.println(Arrays.deepToString(solicitanteIds.toArray()));
-        Collections.shuffle(solicitanteIds);
-        Map<Long, Object> contarChamados = this.repository.contarChamados(solicitanteIds);        
-        Long id = Long.MAX_VALUE;
-        Long count = Long.MAX_VALUE;
-        for (Long atendente : solicitanteIds) {        	
-            Long tempCount = 0L;
-            Integer key = atendente.intValue();            
-            if (contarChamados.containsKey(atendente)) {
-            //if(lista.contains(atEscalonamento)){
-            	/*Group g = contarChamados.get(atendente);*/
-            	//.toArray()[2];
-            	LinkedHashSet obj = (LinkedHashSet) contarChamados.get(atendente);
-            	Long value = (Long) obj.toArray()[0];
-                tempCount = value;                 
-            }
-            if (tempCount < count) {
-                id = atendente;
-                count = tempCount;
-            }
-        }
-        try {
-            UserSecurity user = userSecurityRepository.getInstancePorId(id);
-            this.instance.setAtendente(user);
-        } catch (Exception e) {
-        	e.printStackTrace();
-            this.instance.setAtendente(null);
-        }
-    	
-    }
+	}	   
 
 	public String getCpfConsulta() {
 		return cpfConsulta;
@@ -880,7 +854,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 	public void setLotacaoCiretran(String lotacaoCiretran) {
 		this.lotacaoCiretran = lotacaoCiretran;
 	}
-	
+
+	public ViewOperadorDetrannet getOperador() {
+		return operador;
+	}
+
+	public void setOperador(ViewOperadorDetrannet operador) {
+		this.operador = operador;
+	}
+		
 	
 }
-

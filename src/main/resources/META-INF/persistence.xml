@@ -2,7 +2,7 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
     <persistence-unit name="application" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>java:/jboss/chamadosDS</jta-data-source>
+        <jta-data-source>java:/jboss/chamadosDSHM</jta-data-source>
         <class>br.gov.to.detran.domain.AbstractEntity</class>
         <class>br.gov.to.detran.domain.TicketGroup</class>
         <class>br.gov.to.detran.domain.TicketGroupService</class>
@@ -18,6 +18,8 @@
         <class>br.gov.to.detran.domain.PaginaSistema</class>
         <class>br.gov.to.detran.domain.RequisicaoAcesso</class>
         <class>br.gov.to.detran.domain.EscalaTrabalho</class>
+        <class>br.gov.to.detran.domain.SetorAtendimento</class>
+        <class>br.gov.to.detran.domain.MovimentacaoChamado</class>
         
         <class>br.gov.to.detran.project.domain.Project</class>
         <class>br.gov.to.detran.project.domain.ProjectComment</class>
@@ -25,14 +27,16 @@
         <class>br.gov.to.detran.project.domain.ProjectTask</class>
         <class>br.gov.to.detran.project.domain.ProjectUser</class>
         <class>br.gov.to.detran.project.domain.ProjectActivities</class>
+        <class>br.gov.to.detran.leilao.domain.ItemLeilao</class>
+        <class>br.gov.to.detran.leilao.domain.Categoria</class>        
         <class>br.gov.to.detran.domain.TicketAttachmentReply</class>
-        <class>br.gov.to.detran.domain.view.ViewEstanteChamado</class>
+        <class>br.gov.to.detran.domain.view.ViewTicketSupport</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.archive.autodetection" value="class, hbm"/>                                
-            <property name="hibernate.hbm2ddl.auto" value="none"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
             <property name="hibernate.default_schema" value="chamados"/>
             <property name="hibernate.show_sql" value="false"/>
@@ -43,6 +47,7 @@
     <persistence-unit name="detran-erp" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:/jboss/detranErpDS</jta-data-source>
+        <class>br.gov.to.detran.domain.view.ViewLotacao</class>
         <class>br.gov.to.detran.domain.ViewDadosServidor</class>
         <class>br.gov.to.detran.domain.ViewServidorChamado</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
@@ -52,6 +57,22 @@
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
             <property name="hibernate.default_schema" value="dbo"/>
         </properties>        
-    </persistence-unit>               
+    </persistence-unit>
+    
+    <persistence-unit name="detranNet" transaction-type="JTA">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+       	<jta-data-source>java:/jboss/detranNetDS</jta-data-source>
+       	<class>br.gov.to.detran.domain.view.ViewOperadorDetrannet</class>          
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>        
+        <properties>
+            <property name="hibernate.connection.driver_class" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServer2008Dialect"/>            
+            <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
+            <property name="hibernate.default_schema" value="dbo"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
+        </properties>        
+    </persistence-unit>
+    
+       
     
 </persistence>

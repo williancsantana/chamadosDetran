@@ -238,6 +238,12 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
         BooleanBuilder where = new BooleanBuilder();
         return lazyLoad(null, entity, first, pageSize, sortField, order, values, where, false);
     }
+    
+    public LazyResult<T> lazyLoad3(List<Predicate> predicates, EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values) {
+        BooleanBuilder where = new BooleanBuilder();
+        return lazyLoad2(predicates, null, entity, first, pageSize, sortField, order, values, where, false);
+    }
+
 
     public LazyResult<T> lazyLoad(EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values, BooleanBuilder where, Boolean or) {
         return lazyLoad(null, entity, first, pageSize, sortField, order, values, where, or);
@@ -296,6 +302,45 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
             }
             Predicate[] pred = new Predicate[predicados.size()]; 
             where.andAnyOf(predicados.toArray(pred));
+        }
+    }
+    
+    public LazyResult<T> lazyLoad2(List<Predicate> predicates, Map<String, Object> fkEntities, EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values, BooleanBuilder where, Boolean or) {
+    	if(predicates != null){
+         	for(Predicate e : predicates){
+             	where.and(e);
+             }
+        }   
+    	this.applyFilter(entity, fkEntities, where, false);
+        this.applyFilter(entity, values, where, or);      
+        BooleanPath removed = (BooleanPath) Expressions.booleanPath(entity, "removed");
+        where.and(removed.isFalse());
+        JPAQueryBase queryCount = (JPAQueryBase) this.query().from(entity).where(where);
+        Long count = queryCount.fetchCount();
+        JPAQueryBase query = (JPAQueryBase) this.query().from(entity).where(where).offset(first).limit(pageSize);
+        if (sortField != null && !sortField.isEmpty()) {
+            query.orderBy(new OrderSpecifier(order.equalsIgnoreCase("ASCENDING") ? Order.ASC : Order.DESC, Expressions.stringPath(entity, sortField)));
+        }
+        System.out.println(query.toString());
+        List<T> result = query.fetch();        
+        return new LazyResult<>(result, count);
+    }
+
+    private void applyFilter2(EntityPathBase<T> entity, Map<String, Object> attrs, BooleanBuilder where, Boolean or) {
+        if (attrs != null && !attrs.isEmpty()) {
+            for (String filterProperty : attrs.keySet()) {
+                Field field = this.getFieldFrom(filterProperty);
+                if (field != null) {
+                    String filterValue = String.valueOf(attrs.get(filterProperty));
+                    SimplePath path = Expressions.path(field.getType(), entity, filterProperty);
+                    StringExpression template = Expressions.stringTemplate("cast({0} as text)", path);
+                    if (or) {
+                        where.or(template.containsIgnoreCase(filterValue));
+                    } else {
+                        where.and(template.containsIgnoreCase(filterValue));
+                    }
+                }
+            }
         }
     }
 

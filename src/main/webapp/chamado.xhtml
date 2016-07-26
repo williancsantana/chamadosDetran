@@ -34,7 +34,8 @@
 				value="#{ticketSupportController.reply.mensagem}" />
 			<div class="ui segment">
 				<div class="ui tertiary raised segment">
-					<h3 class="ui pull left header no margin">
+					<div class="ui grid">
+						<h3 class="ui pull left header no margin eight wide column">
 						<i
 							class="circular #{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon segment"
 							title="{{iconTitle ticket.status}}"
@@ -45,7 +46,8 @@
 								#{ticketSupportController.instance.numero}</div>
 						</div>
 					</h3>
-					<div class="ui tiny pull right grey buttons">
+					<div class=" eight wide column">
+					<div class="ui tiny pull right grey buttons computer only">
 						<a class="ui button" href="#{request.contextPath}/index.jsf">
 							<i class="reply icon"></i> Voltar
 						</a>
@@ -56,7 +58,19 @@
 						<div id="details-btn" class="ui button">
 							<i class="chevron down icon"></i> Ver detalhes
 						</div>
+							
+						<p:commandLink styleClass="ui button" oncomplete="PF('dlg3').show()"
+			                           update=":formDialogConsulta" actionListener="#{ticketSupportController.pesquisarServidorSisrh(ticketSupportController.instance.solicitante.cpf)}">
+										<i class="search icon"></i> Consultar Servidor												 
+			                  </p:commandLink>											
+																						  				
+						
+					</div>									
+					
 					</div>
+										
+					</div>					
+					
 					<div class="clearer"></div>
 					<table id="details-tbl"
 						class="ui compact hidden standard top margin table">
@@ -79,14 +93,7 @@
 							</tr>
 							<tr>
 								<td class="collapsing"><strong>Solicitante:</strong></td>
-								<td>#{ticketSupportController.instance.solicitante.name} &ensp;
-                                	
-			                              <p:commandLink styleClass="ui blue action button"  onclick="PF('dlg3').show();"
-			                              update=":formDialogConsulta">
-												 <i class="search icon"></i> Consultar dados
-												 <f:setPropertyActionListener value="#{ticketSupportController.instance.solicitante.cpf}" target="#{ticketSupportController.cpfConsulta}" />
-			                            	</p:commandLink>	
-								</td>
+								<td>#{ticketSupportController.instance.solicitante.name}</td>
 							</tr>
 							<tr>
 								<td class="collapsing"><strong>Atendente:</strong></td>
@@ -146,8 +153,8 @@
 				<div class="ui secondary red reply segment">
 					<div class="ui bottom right attached label">
 						<i class="red user icon" title="Solicitante"></i>
-						#{ticketSupportController.instance.solicitante.name} <b jsf:rendered="#{ticketSupportController.solicitanteCiretran() == true}">(#{ticketSupportController.lotacaoCiretran})</b> <small
-							class="light gray">em <h:outputText
+						#{ticketSupportController.instance.solicitante.name} (#{ticketSupportController.setorUsuario(ticketSupportController.instance.solicitante)})<small
+							class="light gray"> em <h:outputText
 								value="#{ticketSupportController.instance.created}">
 								<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
 									locale="pt-BR" />
@@ -599,25 +606,36 @@
 					label="Escolher Arquivo"
 					fileUploadListener="#{ticketSupportController.enviarAnexoResposta}"
 					update="anexoListRespostasMensagem" oncomplete="PF('dlg2').hide()" auto="true"
-					sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
+					sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
 		
 			</h:form>
 		</p:dialog>
 			
-			<p:dialog header="Consultar servidor" widgetVar="dlg3" modal="true" height="300">
+			<p:dialog header="Consultar servidor" widgetVar="dlg3" modal="true" width="600"
+			position="center top">
 			<h:form prependId="false" id="formDialogConsulta" class="ui form">
-				<div class="field">
-				<label>CPF:</label><br/>
-				<h:inputText value="#{ticketSupportController.cpfConsulta}" id="tbCPFSolicitante"/>
 				
-				<div class="ui divider"></div>
-				<div>
-					<p:commandLink styleClass="ui vk fluid possibleattendant button"
+				<div class="field">
+			    <label>CPF</label>
+			    <div class="two fields">
+			      <div class="twelve wide field">
+			        <h:inputText value="#{ticketSupportController.cpfConsulta}" id="tbCPFSolicitante"/>
+			      </div>
+			      <div class="four wide field">
+			        <p:commandLink styleClass="ui vk fluid possibleattendant button"
 								actionListener="#{ticketSupportController.consultarDadosSolicitante(ticketSupportController.cpfConsulta)}"
 								update="@form">Consultar</p:commandLink>
-					</div>
+			      </div>
+			    </div>
+			  
+														
 					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == true}">
 						<table class="ui compact standard table">
+						<thead>
+						    <tr><th colspan="2">
+						      Dados SISRH
+						    </th>
+						  </tr></thead>
 							<tbody>
 								<tr>
 									<td class="collapsing"><strong>Nome: </strong></td>
@@ -629,7 +647,17 @@
 								</tr>
 								<tr>
 									<td class="collapsing"><strong>Setor: </strong></td>
-									<td>#{ticketSupportController.dadosServidor.nomesetor}</td>
+									<td>#{ticketSupportController.servidorBuscaCpf.nomeSetor}</td>
+								</tr>
+								
+								<tr>
+									<td class="collapsing"><strong>Situação Funcional: </strong></td>
+									<td>#{ticketSupportController.servidorBuscaCpf.situacaoFuncional}</td>
+								</tr>
+								
+								<tr>
+									<td class="collapsing"><strong>Ativado/Bloqueado: </strong></td>
+									<td><i jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.ativado}" class="red ban icon"></i><i jsf:rendered="#{ticketSupportController.servidorBuscaCpf.ativado}" class="green checkmark icon"></i>/<i jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.bloqueado}" class="checkmark icon"></i><i jsf:rendered="#{ticketSupportController.servidorBuscaCpf.bloqueado}" class="green checkmark icon"></i></td>
 								</tr>
 							
 							</tbody>
@@ -638,6 +666,50 @@
 					</div>
 					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
 						<h3 style="color:red;">Servidor não encontrado!</h3>
+					</div>
+					<div class="ui divider"></div>	
+					<div jsf:rendered="#{ticketSupportController.operador != null}">
+						<table class="ui compact standard table">
+						<thead>
+						    <tr><th colspan="2">
+						      Dados Operador DETRANNET
+						    </th>
+						  </tr></thead>
+							<tbody>								
+								<tr>
+									<td class="collapsing"><strong>Tipo de Usuário: </strong></td>
+									<td jsf:rendered="#{ticketSupportController.operador.tipo == 'U'}">Usuário</td>
+									<td jsf:rendered="#{ticketSupportController.operador.tipo == 'A'}">Admin</td>
+								</tr>
+								<tr>
+									<td class="collapsing"><strong>Ciretran: </strong></td>
+									<td>#{ticketSupportController.operador.ciretran}</td>
+								</tr>
+								
+								<tr>
+									<td class="collapsing"><strong>Bloqueado: </strong></td>
+									<td><b jsf:rendered="#{ticketSupportController.operador.bloqueado}">SIM</b>
+									<b jsf:rendered="#{!ticketSupportController.operador.bloqueado}">NÂO</b>
+									</td>
+								</tr>
+								
+								<tr>
+									<td class="collapsing"><strong>Perfis: </strong></td>
+									<td>
+										<ul class="ui list">
+											<ui:repeat var="perfil" value="#{ticketSupportController.operador.perfis}">
+												<li>#{perfil}</li>
+											</ui:repeat>										  										 
+										</ul>
+									</td>
+								</tr>															
+																
+							</tbody>
+						
+						</table>						
+					</div>
+					<div jsf:rendered="#{ticketSupportController.operador == null}">
+						<h3 style="color:red;">Operador não encontrado!</h3>
 					</div>
 				</div>			
 							
