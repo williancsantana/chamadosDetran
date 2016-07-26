@@ -60,6 +60,9 @@ public class ViewTicketSupportTable implements java.io.Serializable {
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
     private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
+    private Boolean ordemCrescente = true;
+    private String ordenacao = "desc";
+    private String ultimoCriterio = "ultimaResposta";
 
     public ViewTicketSupportTable() {
         this.currentPage = 0;
@@ -189,12 +192,56 @@ public class ViewTicketSupportTable implements java.io.Serializable {
             		QViewTicketSupport.viewTicketSupport.solicitante.containsIgnoreCase(filterValue));
         }        
         
-        LazyResult<ViewTicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
-                "desc", filterHash, booleanBuilder, true);
+        /*LazyResult<ViewTicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
+                "desc", filterHash, booleanBuilder, true);*/
+        
+        LazyResult<ViewTicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, ultimoCriterio,
+                ordenacao, filterHash, booleanBuilder, true);
         
         this.setRowCount(lazyResult.getCount().intValue());
         return lazyResult.getResult();
     }
+    
+    public void ordenarChamados(String argumento){
+    	if(ordemCrescente == true && argumento.equals(ultimoCriterio)){
+        	ordenacao = "desc";
+        	ordemCrescente = false;
+        	System.out.println("Ordem ascendente.");
+        }
+        else if(ordemCrescente == false && argumento.equals(ultimoCriterio)){
+        	ordenacao = "asc";
+        	ordemCrescente = true;
+        	System.out.println("Ordem descendente.");
+        }
+        else{
+        	ordenacao = "asc";
+        	ordemCrescente = true;
+        	System.out.println("Ordem padrão: ascendente");
+        }
+        ultimoCriterio = argumento;
+        this.data = this.load();
+        this.countUpdates();
+    	
+    }
+    
+    public String preencherCabecalho(String coluna){
+    	
+    	String codigohtml="", ordemChamados="";
+    	
+    	if(ordenacao.equals("asc")){
+    		ordemChamados = "up";
+    	}
+    	else{
+    		ordemChamados = "down";
+    	}
+    	
+    	if(coluna.equals(ultimoCriterio)){
+    		codigohtml = "level "+ ordemChamados +" icon";
+    	}
+    	    	
+    	return codigohtml;
+    }
+
 
     public void countUpdates() {
         UserSecurity onlineUser = FacesUtil.loggedUser();
@@ -285,6 +332,7 @@ public class ViewTicketSupportTable implements java.io.Serializable {
     	return info;
     }
 
+    
     public ViewTicketSupportRepository getRepository() {
         return repository;
     }
