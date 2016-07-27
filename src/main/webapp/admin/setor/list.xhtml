@@ -25,7 +25,7 @@
                                 <th colspan="2">
                                     <div class="ui small fluid icon input">
                                         <p:inputText id="groups-filter" placeholder="Filtrar" value="#{ticketSetorAtendimentoController.pagination.filterValue}" >
-                                            <p:ajax event="keyup" update="tableData paginationInfo" listener="#{ticketSetorAtendimentoController.pagination.actionFilter(fn:split('descricao', ','))}" />
+                                            <p:ajax event="keyup" update="tableData paginationInfo" listener="#{ticketSetorAtendimentoController.pagination.actionFilter(fn:split('setor', ','))}" />
                                         </p:inputText>                                            
                                         <i class="search icon"></i>
                                     </div>

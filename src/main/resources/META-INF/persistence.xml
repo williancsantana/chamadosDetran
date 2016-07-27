@@ -2,7 +2,7 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
     <persistence-unit name="application" transaction-type="JTA">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>java:/jboss/chamadosDSHM</jta-data-source>
+        <jta-data-source>java:/jboss/chamadosDS</jta-data-source>
         <class>br.gov.to.detran.domain.AbstractEntity</class>
         <class>br.gov.to.detran.domain.TicketGroup</class>
         <class>br.gov.to.detran.domain.TicketGroupService</class>
@@ -31,6 +31,7 @@
         <class>br.gov.to.detran.leilao.domain.Categoria</class>        
         <class>br.gov.to.detran.domain.TicketAttachmentReply</class>
         <class>br.gov.to.detran.domain.view.ViewTicketSupport</class>
+        <class>br.gov.to.detran.domain.TicketStickerSupport</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>        
         <properties>
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
@@ -39,8 +40,8 @@
             <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.JBossAppServerJtaPlatform"/>
             <property name="hibernate.default_schema" value="chamados"/>
-            <property name="hibernate.show_sql" value="false"/>
-            <property name="hibernate.format_sql" value="false"/>            
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>            
         </properties>        
     </persistence-unit>
     

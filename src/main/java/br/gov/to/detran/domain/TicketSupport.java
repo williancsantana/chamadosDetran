@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -60,6 +62,9 @@ public class TicketSupport extends AbstractEntity{
     @ManyToOne
     private UserSecurity atendente;
         
+    @Column(name = "prioridade", nullable = true, columnDefinition = "TEXT")
+    private String prioridade = "BAIXA	";
+    
     @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.LAZY)
     private List<TicketReply> respostas = new ArrayList<>();
@@ -91,6 +96,7 @@ public class TicketSupport extends AbstractEntity{
     @OneToMany(mappedBy = "chamado", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.EAGER)
     private List<TicketAttachment> anexos = new ArrayList<>();
+    
     
     @Column(name = "existe_anexo")
     private Boolean withAttachment = false;
@@ -347,7 +353,18 @@ public class TicketSupport extends AbstractEntity{
 
 	public void setWithAttachment(Boolean withAttachment) {
 		this.withAttachment = withAttachment;
-	}	
+	}
+	
+	public void setPrioridade(String prioridade){
+		this.prioridade = prioridade;
+		 FacesContext context = FacesContext.getCurrentInstance();
+		 context.addMessage(null, new FacesMessage("Prioridade Selecionada",  "A prioridade desse chamado é: " + prioridade) );
+		
+	}
+	
+	public String getPrioridade(){
+		return this.prioridade;
+	}
            
     
 }

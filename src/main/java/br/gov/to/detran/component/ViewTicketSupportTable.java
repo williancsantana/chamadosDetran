@@ -16,12 +16,15 @@ import org.joda.time.DateTime;
 import com.querydsl.core.BooleanBuilder;
 
 import br.gov.to.detran.dao.LazyResult;
+import br.gov.to.detran.domain.QTicketStickerSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.view.QViewTicketSupport;
 import br.gov.to.detran.domain.view.ViewTicketSupport;
+import br.gov.to.detran.repository.TicketStickerRepository;
 import br.gov.to.detran.repository.view.ViewTicketSupportRepository;
 import br.gov.to.detran.util.FacesUtil;
+import br.gov.to.detran.util.LDAP.User;
 
 /**
  * Classes responsavel para realizar a filtragem e paginação das tabelas do
@@ -37,18 +40,20 @@ public class ViewTicketSupportTable implements java.io.Serializable {
 	
 	private @Inject
     ViewTicketSupportRepository repository;   
-
+	
     public enum TicketSupportTablePeriod {
         HOJE, U7DIAS, U30DIAS, TODOS;
     }
 
     public enum TicketSupportTableFilter {
-        TODOS, ABERTOS, PENDENTES, FECHADOS, NAO_DEFINIDO;
+        TODOS, ABERTOS, PENDENTES, FECHADOS, NAO_DEFINIDO, LEMBRETES;
     }
 
     public enum TicketSupportTableGrupo {
         MEUS, TODOS;
     }
+    
+    
 
     private int currentPage;
     private int pageSize = 10;
@@ -59,7 +64,7 @@ public class ViewTicketSupportTable implements java.io.Serializable {
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
-    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
+    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L,0L);
 
     public ViewTicketSupportTable() {
         this.currentPage = 0;
@@ -130,6 +135,11 @@ public class ViewTicketSupportTable implements java.io.Serializable {
                 case NAO_DEFINIDO:
                     booleanBuilder.and(QViewTicketSupport.viewTicketSupport.idAtendente.isNull());
                     break;
+                    
+                case LEMBRETES:
+                	UserSecurity user = FacesUtil.loggedUser();
+                	booleanBuilder.andNot(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.FECHADO)).and(QViewTicketSupport.viewTicketSupport.idAtendente.eq(user.getId()));
+                break;
                 default:
             }
         }
@@ -203,6 +213,7 @@ public class ViewTicketSupportTable implements java.io.Serializable {
         this.updateCount.setFechados(this.repository.countFechados(onlineUser));
         this.updateCount.setPendentes(this.repository.countPendentes(onlineUser));
         this.updateCount.setNaoDefinido(this.repository.countNaoDefinido(onlineUser));
+        this.updateCount.setComLembretes(this.repository.countLembretes(onlineUser));
     }
 
     public boolean isNextPage(Integer next) {

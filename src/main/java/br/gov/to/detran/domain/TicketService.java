@@ -59,7 +59,17 @@ public class TicketService extends AbstractEntity{
     
     @Transient
     private List<TicketGroupService> solicitantes;
-
+    
+    @ManyToOne(optional = true)
+    @JoinColumn(name ="fk_servico_setor_atendimento", nullable = true)
+    private SetorAtendimento setorAtendimento;
+    
+    public void setSetorAtendimento(SetorAtendimento setorAtendimento){
+    	this.setorAtendimento = setorAtendimento;
+    }
+    public SetorAtendimento getSetorAtendimento(){
+    	return this.setorAtendimento;
+    }
     public String getDescricao() {
         return descricao;
     }

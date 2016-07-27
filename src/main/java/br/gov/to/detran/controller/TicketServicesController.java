@@ -5,6 +5,7 @@
  */
 package br.gov.to.detran.controller;
 
+import br.gov.to.detran.domain.SetorAtendimento;
 import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.TicketGroupService;
 import br.gov.to.detran.domain.TicketGroupServiceType;
@@ -13,8 +14,10 @@ import br.gov.to.detran.domain.TicketServiceField;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.TicketGroupRepository;
 import br.gov.to.detran.repository.TicketServiceRepository;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.view.ViewScoped;
@@ -39,7 +43,7 @@ public class TicketServicesController extends BaseController<TicketService> impl
     private @Inject TicketServiceRepository repository;
     private @Inject TicketGroupRepository ticketGroupRepository;
     private TicketServiceField field;
-    
+    private SetorAtendimento ticketSetor;
     private List<TicketGroup> listGrupos;
     private TicketGroup ticketGroup;    
     
@@ -55,6 +59,37 @@ public class TicketServicesController extends BaseController<TicketService> impl
         }  
         this.field = new TicketServiceField();        
     }
+    
+    public void addTicketSetor(SetorAtendimento setorAtendimento){
+    	this.ticketSetor = setorAtendimento;
+    	
+    }
+    
+    
+    public void removeTicketSetor(){
+    	
+    	this.instance.setSetorAtendimento(null);
+    	this.addMenssage(FacesMessage.SEVERITY_INFO, "Setor Removido", "O setor foi removido com sucesso");
+        
+        return;
+    }
+    
+    public void setSetorAtendimento(){
+    	if (this.ticketSetor != null) {            
+            this.instance.setSetorAtendimento(ticketSetor);
+            this.addMenssage(FacesMessage.SEVERITY_INFO, "Setor adicionado", "Adicionar");
+            
+            return;
+        }
+        this.addMenssage(FacesMessage.SEVERITY_ERROR, "Nenhum Setor selecionado", "Adicionar");
+    	
+    	
+    }
+    public boolean hasATicketSetor(){
+    	if(ticketSetor!=null) return true;
+    	return false;
+    }
+
 
     public void insert() {
         try {

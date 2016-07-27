@@ -16,6 +16,7 @@ public class SetorAtendimento extends AbstractEntity{
 	@Column(name = "id_setor")
 	private Integer idSetor;
 	
+	
 	public String getSetor() {
 		return setor;
 	}
@@ -28,5 +29,7 @@ public class SetorAtendimento extends AbstractEntity{
 	public void setIdSetor(Integer idSetor) {
 		this.idSetor = idSetor;
 	}
+	
+	
 		
 }

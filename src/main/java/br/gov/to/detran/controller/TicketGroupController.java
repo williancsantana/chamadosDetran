@@ -18,7 +18,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.to.detran.domain.GroupPermissions;
+import br.gov.to.detran.domain.SetorAtendimento;
 import br.gov.to.detran.domain.TicketGroup;
+import br.gov.to.detran.domain.TicketGroupService;
+import br.gov.to.detran.domain.TicketGroupServiceType;
+import br.gov.to.detran.repository.AbstractRepository;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.TicketGroupRepository;
 
@@ -42,7 +46,8 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
     private GroupPermissions adminSetor = new GroupPermissions("admin:setor", Boolean.FALSE);
     private GroupPermissions relatorioAtendimento = new GroupPermissions("relatorio:atendimento", Boolean.FALSE);
     private GroupPermissions relatorioSistema = new GroupPermissions("relatorio:sistema", Boolean.FALSE);
-
+    
+    private SetorAtendimento ticketSetor;
     @PostConstruct
     public void postConstruct() {
         super.postContruct();
@@ -104,7 +109,7 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
     }
 
     @Override
-    public Repository getRepository() {
+    public AbstractRepository getRepository() {
         return this.repository;
     }
 
@@ -141,14 +146,43 @@ public class TicketGroupController extends BaseController<TicketGroup> implement
             permission.setSelected(true);
         }
     }
+    
+    public void addTicketSetor(SetorAtendimento setorAtendimento){
+    	this.ticketSetor = setorAtendimento;
+    	
+    }
+    
+    public void removeTicketSetor(){
+    	
+    	this.instance.setSetorAtendimento(null);
+    	this.addMenssage(FacesMessage.SEVERITY_INFO, "Setor Removido", "O setor foi removido com sucesso");
+        
+        return;
+    }
+    
+    public void setSetorAtendimento(){
+    	if (this.ticketSetor != null) {            
+            this.instance.setSetorAtendimento(ticketSetor);
+            this.addMenssage(FacesMessage.SEVERITY_INFO, "Setor adicionado", "Adicionar");
+            
+            return;
+        }
+        this.addMenssage(FacesMessage.SEVERITY_ERROR, "Nenhum Setor selecionado", "Adicionar");
+    	
+    	
+    }
 
     public String genericPermission(GroupPermissions permission) {
         if (permission.getSelected()) {
             return permission.getKey() + ";";
         }
+        
         return "";
     }
-    
+    public boolean hasATicketSetor(){
+    	if(ticketSetor!=null) return true;
+    	return false;
+    }
     public GroupPermissions getChamadoAbrir() {
         return chamadoAbrir;
     }

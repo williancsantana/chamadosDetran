@@ -66,6 +66,16 @@
                         #{ticketSupportTableController.supportTable.updateCount.fechados}
                     </div>
                 </p:commandLink>
+                <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('LEMBRETES') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('LEMBRETES')}"
+                               ajax="false"
+                               action="index?faces-redirect=true">
+                    <i class="calendar outline icon"></i>
+                    Lembretes
+                    <div class="badge4 ui bottom right attached red label" style="margin-bottom: 0px;"
+                         jsf:rendered="#{ticketSupportTableController.supportTable.updateCount.comLembretes > 0}">
+                        #{ticketSupportTableController.supportTable.updateCount.comLembretes}
+                    </div>
+                </p:commandLink>
                 <p:commandLink styleClass="#{ticketSupportTableController.supportTable.isStatus('NAO_DEFINIDO') ? 'active' : ''} item filterable" actionListener="#{ticketSupportTableController.supportTable.changeStatus('NAO_DEFINIDO')}"
                                ajax="false"
                                action="index?faces-redirect=true">
@@ -76,6 +86,7 @@
                         #{ticketSupportTableController.supportTable.updateCount.naoDefinido}
                     </div>
                 </p:commandLink>
+                
             </div>
         </h:form>
     </div>

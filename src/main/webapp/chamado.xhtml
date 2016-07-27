@@ -36,41 +36,50 @@
 				<div class="ui tertiary raised segment">
 					<div class="ui grid">
 						<h3 class="ui pull left header no margin eight wide column">
-						<i
-							class="circular #{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon segment"
-							title="{{iconTitle ticket.status}}"
-							style="background-color: white; border: none !important"></i>
-						<div class="content">
-							#{ticketSupportController.instance.assunto}
-							<div class="sub header">Chamado n&deg;
-								#{ticketSupportController.instance.numero}</div>
+							<i
+								class="circular #{ticketSupportController.instance.ticketColor()} #{ticketSupportController.instance.ticketIcon()} icon segment"
+								title="{{iconTitle ticket.status}}"
+								style="background-color: white; border: none !important"></i>
+							<div class="content">
+								#{ticketSupportController.instance.assunto}
+								<div class="sub header">Chamado n&deg;
+									#{ticketSupportController.instance.numero}</div>
+							</div>
+						</h3>
+						<div class=" eight wide column">
+							<div class="ui tiny pull right grey buttons computer only">
+								<a class="ui button" href="#{request.contextPath}/index.jsf">
+									<i class="reply icon"></i> Voltar
+								</a>
+								<div id="reply-btn" class="ui button"
+									jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
+									<i class="comments icon"></i> Responder
+								</div>
+								<p:commandLink styleClass="ui button" update="@form" rendered="#{ticketStickerController.naoExisteLembrete(ticketSupportController.instance, userLogged.user)}"
+									oncomplete="PF('stickerDialog').show()" 	>
+									<i class="calendar outline icon"></i> Adicionar Lembrete												 
+			                  	</p:commandLink>
+			                  	<p:commandLink styleClass="ui button" update="@form" rendered="#{ticketStickerController.existeLembrete(ticketSupportController.instance, userLogged.user)}"
+									actionListener="#{ticketStickerController.removeLembrete(ticketSupportController.instance)}" 	>
+									<i class="calendar outline icon"></i> Remover Lembrete												 
+			                  	</p:commandLink>
+								<div id="details-btn" class="ui button">
+									<i class="chevron down icon"></i> Ver detalhes
+								</div>
+
+								<p:commandLink styleClass="ui button"
+									oncomplete="PF('dlg3').show()" update=":formDialogConsulta"
+									actionListener="#{ticketSupportController.pesquisarServidorSisrh(ticketSupportController.instance.solicitante.cpf)}">
+									<i class="search icon"></i> Consultar Servidor												 
+			                  </p:commandLink>
+
+
+							</div>
+
 						</div>
-					</h3>
-					<div class=" eight wide column">
-					<div class="ui tiny pull right grey buttons computer only">
-						<a class="ui button" href="#{request.contextPath}/index.jsf">
-							<i class="reply icon"></i> Voltar
-						</a>
-						<div id="reply-btn" class="ui button"
-							jsf:rendered="#{userLogged.canReply(ticketSupportController.instance)}">
-							<i class="comments icon"></i> Responder
-						</div>
-						<div id="details-btn" class="ui button">
-							<i class="chevron down icon"></i> Ver detalhes
-						</div>
-							
-						<p:commandLink styleClass="ui button" oncomplete="PF('dlg3').show()"
-			                           update=":formDialogConsulta" actionListener="#{ticketSupportController.pesquisarServidorSisrh(ticketSupportController.instance.solicitante.cpf)}">
-										<i class="search icon"></i> Consultar Servidor												 
-			                  </p:commandLink>											
-																						  				
-						
-					</div>									
-					
+
 					</div>
-										
-					</div>					
-					
+
 					<div class="clearer"></div>
 					<table id="details-tbl"
 						class="ui compact hidden standard top margin table">
@@ -153,7 +162,8 @@
 				<div class="ui secondary red reply segment">
 					<div class="ui bottom right attached label">
 						<i class="red user icon" title="Solicitante"></i>
-						#{ticketSupportController.instance.solicitante.name} (#{ticketSupportController.setorUsuario(ticketSupportController.instance.solicitante)})<small
+						#{ticketSupportController.instance.solicitante.name}
+						(#{ticketSupportController.setorUsuario(ticketSupportController.instance.solicitante)})<small
 							class="light gray"> em <h:outputText
 								value="#{ticketSupportController.instance.created}">
 								<f:convertDateTime pattern="dd 'de' MMMM 'de' yyyy HH:mm"
@@ -478,12 +488,29 @@
 
 							</div>
 
-
-							<div class="item" jsf:rendered="#{ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
-								<p:commandLink styleClass="ui blue action button"
-									onclick="PF('dlg1').show();">
-									<i class="level up icon"></i> Escalonar
-                            	</p:commandLink>
+							<div class="item"
+								jsf:rendered="#{ticketSupportController.instance.atendenteNotStatus('FECHADO')}">
+								<div class="ui blue floating dropdown button">
+									<i class="level up icon"></i> Movimentar Chamado
+									<div class="menu">
+										<div class="item">
+											<p:commandLink styleClass="ui blue action fluid button"
+												onclick="PF('dlg1').show();"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												update="@form">
+												<i class="level up icon"></i> Escalonar para outro atendente
+                                            </p:commandLink>
+										</div>
+										<div class="item">
+											<p:commandLink styleClass="ui green action fluid button"
+												onclick="PF('movimentacaoDlg').show();"
+												oncomplete="setEditor(); setReply(); setDetails();"
+												update="@form">
+												<i class="level up icon"></i> Movimentar para outro setor
+                                            </p:commandLink>
+										</div>
+									</div>
+								</div>
 							</div>
 
 
@@ -562,80 +589,137 @@
 
 
 
-       
-	        <p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true" height="300">
-	        	<h:form class="ui form">
-	    					 <div class="field">
-                    <label>Grupo Atendente</label>
-	    					 	<h:selectOneMenu value="#{ticketSupportController.tempGroup}" id="ticketGroupList"
-	    					 		converter="baseEntityConverter">
-	    					 		<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo"/>
-	    							<f:selectItems value="#{ticketGroupController.allGroups}" 
-	    								var="ticketGroup" 
-		    							itemLabel="#{ticketGroup.descricao}" itemValue="#{ticketGroup}"/>
-		    						<f:ajax event="change" execute="@form" listener="#{ticketSupportController.groupListener}" render="@form"/>
-		    					</h:selectOneMenu>
-                </div>
-	    					<div class="field" jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">			    					
-		    							 <div class="field">
-		    						<label>Atendentes:</label>
-		    						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
-		    						id="atendentesList" converter="baseEntityConverter">
-		    						<f:selectItem noSelectOption="true" itemLabel="Selecione um atendente"/>
-		    							<f:selectItems value="#{ticketSupportController.atendentesGrupo}" var="atendente" itemLabel="#{atendente.name}" itemValue="#{atendente}"/>
-		    						</h:selectOneMenu></div>
-		    							 <div class="field">
-		    						<label>Mensagem</label>
-		    						<h:inputTextarea cols="40" value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
-	    							</div>
-	    							<div class="ui divider"></div>
-	    							
-	    							 <div class="ui buttons">
-	    							<h:commandLink styleClass="ui vk fluid possibleattendant button"
-	    										actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
-	    										oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink>
-	    										</div> 
-		    					</div>
-	    						
-	    						</h:form>
-	    	</p:dialog>	
-		
+
+		<p:dialog header="Escalonar Chamado" widgetVar="dlg1" modal="true"
+			height="300">
+			<h:form class="ui form">
+				<div class="field">
+					<label>Grupo Atendente</label>
+					<h:selectOneMenu value="#{ticketSupportController.tempGroup}"
+						id="ticketGroupList" converter="baseEntityConverter">
+						<f:selectItem noSelectOption="true" itemLabel="Selecione um Grupo" />
+						<f:selectItems value="#{ticketGroupController.allGroups}"
+							var="ticketGroup" itemLabel="#{ticketGroup.descricao}"
+							itemValue="#{ticketGroup}" />
+						<f:ajax event="change" execute="@form"
+							listener="#{ticketSupportController.groupListener}"
+							render="@form" />
+					</h:selectOneMenu>
+				</div>
+				<div class="field"
+					jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
+					<div class="field">
+						<label>Atendentes:</label>
+						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
+							id="atendentesList" converter="baseEntityConverter">
+							<f:selectItem noSelectOption="true"
+								itemLabel="Selecione um atendente" />
+							<f:selectItems value="#{ticketSupportController.atendentesGrupo}"
+								var="atendente" itemLabel="#{atendente.name}"
+								itemValue="#{atendente}" />
+						</h:selectOneMenu>
+					</div>
+					<div class="field">
+						<label>Mensagem</label>
+						<h:inputTextarea cols="40"
+							value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
+					</div>
+					<div class="ui divider"></div>
+
+					<div class="ui buttons">
+						<h:commandLink styleClass="ui vk fluid possibleattendant button"
+							actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
+							oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink>
+					</div>
+				</div>
+
+			</h:form>
+		</p:dialog>
+		<p:dialog header="Movimentar Chamado" widgetVar="movimentacaoDlg"
+			modal="true" height="300">
+			<h:form class="ui form">
+				<div class="field">
+					<label>Setor Atendente</label>
+					<h:selectOneMenu value="#{ticketSupportController.tempSetor}"
+						id="ticketGroupList" converter="baseEntityConverter">
+						<f:selectItem noSelectOption="true" itemLabel="Selecione um Setor" />
+						<f:selectItems
+							value="#{ticketSetorAtendimentoController.allGroups}"
+							var="ticketSetor" itemLabel="#{ticketSetor.setor}"
+							itemValue="#{ticketSetor}" />
+						<f:ajax event="change" execute="@form" render="@form" />
+					</h:selectOneMenu>
+				</div>
+				<div class="field"
+					jsf:rendered="#{ticketSupportController.tempGroup != null and ticketSupportController.tempGroup.id > 0}">
+					<div class="field">
+						<label>Atendentes:</label>
+						<h:selectOneMenu value="#{ticketSupportController.tempAtendente}"
+							id="atendentesList" converter="baseEntityConverter">
+							<f:selectItem noSelectOption="true"
+								itemLabel="Selecione um atendente" />
+							<f:selectItems value="#{ticketSupportController.atendentesGrupo}"
+								var="atendente" itemLabel="#{atendente.name}"
+								itemValue="#{atendente}" />
+						</h:selectOneMenu>
+					</div>
+					<div class="field">
+						<label>Mensagem</label>
+						<h:inputTextarea cols="40"
+							value="#{ticketSupportController.respostaModal}"></h:inputTextarea>
+					</div>
+					<div class="ui divider"></div>
+
+					<div class="ui buttons">
+						<h:commandLink styleClass="ui vk fluid possibleattendant button"
+							actionListener="#{ticketSupportController.escalonarAtendenteGrupo(ticketSupportController.tempAtendente)}"
+							oncomplete="handleDialogSubmit(xhr, status, args, PF('dlg1'))">Escalonar</h:commandLink>
+					</div>
+				</div>
+
+			</h:form>
+		</p:dialog>
+
+
 		<p:dialog widgetVar="dlg2" minHeight="40">
 			<h:form>
 				<p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo"
 					label="Escolher Arquivo"
 					fileUploadListener="#{ticketSupportController.enviarAnexoResposta}"
-					update="anexoListRespostasMensagem" oncomplete="PF('dlg2').hide()" auto="true"
-					sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
-		
+					update="anexoListRespostasMensagem" oncomplete="PF('dlg2').hide()"
+					auto="true" sizeLimit="10000000"
+					allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
+
 			</h:form>
 		</p:dialog>
-			
-			<p:dialog header="Consultar servidor" widgetVar="dlg3" modal="true" width="600"
-			position="center top">
+
+		<p:dialog header="Consultar servidor" widgetVar="dlg3" modal="true"
+			width="600" position="center top">
 			<h:form prependId="false" id="formDialogConsulta" class="ui form">
-				
+
 				<div class="field">
-			    <label>CPF</label>
-			    <div class="two fields">
-			      <div class="twelve wide field">
-			        <h:inputText value="#{ticketSupportController.cpfConsulta}" id="tbCPFSolicitante"/>
-			      </div>
-			      <div class="four wide field">
-			        <p:commandLink styleClass="ui vk fluid possibleattendant button"
+					<label>CPF</label>
+					<div class="two fields">
+						<div class="twelve wide field">
+							<h:inputText value="#{ticketSupportController.cpfConsulta}"
+								id="tbCPFSolicitante" />
+						</div>
+						<div class="four wide field">
+							<p:commandLink styleClass="ui vk fluid possibleattendant button"
 								actionListener="#{ticketSupportController.consultarDadosSolicitante(ticketSupportController.cpfConsulta)}"
 								update="@form">Consultar</p:commandLink>
-			      </div>
-			    </div>
-			  
-														
-					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == true}">
+						</div>
+					</div>
+
+
+					<div
+						jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == true}">
 						<table class="ui compact standard table">
-						<thead>
-						    <tr><th colspan="2">
-						      Dados SISRH
-						    </th>
-						  </tr></thead>
+							<thead>
+								<tr>
+									<th colspan="2">Dados SISRH</th>
+								</tr>
+							</thead>
 							<tbody>
 								<tr>
 									<td class="collapsing"><strong>Nome: </strong></td>
@@ -649,74 +733,114 @@
 									<td class="collapsing"><strong>Setor: </strong></td>
 									<td>#{ticketSupportController.servidorBuscaCpf.nomeSetor}</td>
 								</tr>
-								
+
 								<tr>
-									<td class="collapsing"><strong>Situação Funcional: </strong></td>
+									<td class="collapsing"><strong>Situação
+											Funcional: </strong></td>
 									<td>#{ticketSupportController.servidorBuscaCpf.situacaoFuncional}</td>
 								</tr>
-								
+
 								<tr>
-									<td class="collapsing"><strong>Ativado/Bloqueado: </strong></td>
-									<td><i jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.ativado}" class="red ban icon"></i><i jsf:rendered="#{ticketSupportController.servidorBuscaCpf.ativado}" class="green checkmark icon"></i>/<i jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.bloqueado}" class="checkmark icon"></i><i jsf:rendered="#{ticketSupportController.servidorBuscaCpf.bloqueado}" class="green checkmark icon"></i></td>
+									<td class="collapsing"><strong>Ativado/Bloqueado:
+									</strong></td>
+									<td><i
+										jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.ativado}"
+										class="red ban icon"></i><i
+										jsf:rendered="#{ticketSupportController.servidorBuscaCpf.ativado}"
+										class="green checkmark icon"></i>/<i
+										jsf:rendered="#{!ticketSupportController.servidorBuscaCpf.bloqueado}"
+										class="checkmark icon"></i><i
+										jsf:rendered="#{ticketSupportController.servidorBuscaCpf.bloqueado}"
+										class="green checkmark icon"></i></td>
 								</tr>
-							
+
 							</tbody>
-						
-						</table>						
+
+						</table>
 					</div>
-					<div jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
-						<h3 style="color:red;">Servidor não encontrado!</h3>
+					<div
+						jsf:rendered="#{ticketSupportController.resultadoConsultaCpf == false}">
+						<h3 style="color: red;">Servidor não encontrado!</h3>
 					</div>
-					<div class="ui divider"></div>	
+					<div class="ui divider"></div>
 					<div jsf:rendered="#{ticketSupportController.operador != null}">
 						<table class="ui compact standard table">
-						<thead>
-						    <tr><th colspan="2">
-						      Dados Operador DETRANNET
-						    </th>
-						  </tr></thead>
-							<tbody>								
+							<thead>
+								<tr>
+									<th colspan="2">Dados Operador DETRANNET</th>
+								</tr>
+							</thead>
+							<tbody>
 								<tr>
 									<td class="collapsing"><strong>Tipo de Usuário: </strong></td>
-									<td jsf:rendered="#{ticketSupportController.operador.tipo == 'U'}">Usuário</td>
-									<td jsf:rendered="#{ticketSupportController.operador.tipo == 'A'}">Admin</td>
+									<td
+										jsf:rendered="#{ticketSupportController.operador.tipo == 'U'}">Usuário</td>
+									<td
+										jsf:rendered="#{ticketSupportController.operador.tipo == 'A'}">Admin</td>
 								</tr>
 								<tr>
 									<td class="collapsing"><strong>Ciretran: </strong></td>
 									<td>#{ticketSupportController.operador.ciretran}</td>
 								</tr>
-								
+
 								<tr>
 									<td class="collapsing"><strong>Bloqueado: </strong></td>
-									<td><b jsf:rendered="#{ticketSupportController.operador.bloqueado}">SIM</b>
-									<b jsf:rendered="#{!ticketSupportController.operador.bloqueado}">NÂO</b>
+									<td><b
+										jsf:rendered="#{ticketSupportController.operador.bloqueado}">SIM</b>
+										<b
+										jsf:rendered="#{!ticketSupportController.operador.bloqueado}">NÂO</b>
 									</td>
 								</tr>
-								
+
 								<tr>
 									<td class="collapsing"><strong>Perfis: </strong></td>
 									<td>
 										<ul class="ui list">
-											<ui:repeat var="perfil" value="#{ticketSupportController.operador.perfis}">
+											<ui:repeat var="perfil"
+												value="#{ticketSupportController.operador.perfis}">
 												<li>#{perfil}</li>
-											</ui:repeat>										  										 
+											</ui:repeat>
 										</ul>
 									</td>
-								</tr>															
-																
+								</tr>
+
 							</tbody>
-						
-						</table>						
+
+						</table>
 					</div>
 					<div jsf:rendered="#{ticketSupportController.operador == null}">
-						<h3 style="color:red;">Operador não encontrado!</h3>
+						<h3 style="color: red;">Operador não encontrado!</h3>
 					</div>
-				</div>			
-							
-			</h:form>			
-			</p:dialog>
-					
-    </ui:define>
+				</div>
+
+			</h:form>
+		</p:dialog>
+
+		<p:dialog header="Adicionar Lembrete ao chamado" widgetVar="stickerDialog"
+			modal="true" width="600" position="center top">
+			<h:form prependId="false" id="formDialogLembrete" class="ui form">
+
+				<div class="field">
+					<label>Selecione a data e horário do lembrete</label>
+					<div class="two fields">
+						<div class="twelve wide field">
+							 <p:calendar id="datetime"  value="#{ticketStickerController.dataLembrete}" pattern="dd/MM/yyyy HH:mm:ss" />
+						</div>
+						<div class="four wide field">
+							<p:commandLink styleClass="ui vk fluid possibleattendant button"
+								actionListener="#{ticketStickerController.adicionarLembrete(ticketSupportController.instance)}"
+								update=":chamadoForm:" oncomplete="PF('stickerDialog').hide()">Adicionar</p:commandLink>
+						</div>
+					</div>
+
+
+				</div>
+
+			</h:form>
+		</p:dialog>
+
+
+	</ui:define>
 
 	<ui:define name="page-js">
 		<h:outputScript library="js" name="quill.min.js" />

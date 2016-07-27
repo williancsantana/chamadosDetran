@@ -236,7 +236,8 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
      */
     public LazyResult<T> lazyLoad(EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values) {
         BooleanBuilder where = new BooleanBuilder();
-        return lazyLoad(null, entity, first, pageSize, sortField, order, values, where, false);
+        System.out.println("Entidade:"+entity);
+        return lazyLoad(null, entity, first, pageSize, sortField, order, values, where, true);
     }
     
     public LazyResult<T> lazyLoad3(List<Predicate> predicates, EntityPathBase<T> entity, int first, int pageSize, String sortField, String order, Map<String, Object> values) {
@@ -289,17 +290,20 @@ public class PersistenceDao<T extends AbstractEntity> implements java.io.Seriali
         	List<Predicate> predicados = new ArrayList<>();
             for (String filterProperty : attrs.keySet()) {
                 Field field = this.getFieldFrom(filterProperty);
+                
                 if (field != null) {
                     String filterValue = String.valueOf(attrs.get(filterProperty));
+                    
                     SimplePath path = Expressions.path(field.getType(), entity, filterProperty);
                     StringExpression template = Expressions.stringTemplate("cast({0} as text)", path);
-                    //predicados.add(template.containsIgnoreCase(filterValue));
+                    predicados.add(template.containsIgnoreCase(filterValue));
                     Predicate predicateOperation = Expressions.predicate(Ops.LIKE,
                     		path, Expressions.constant("1%"));
                     //predicados.add(template.equalsIgnoreCase(filterValue));
                     predicados.add(predicateOperation);
                 }
             }
+            
             Predicate[] pred = new Predicate[predicados.size()]; 
             where.andAnyOf(predicados.toArray(pred));
         }

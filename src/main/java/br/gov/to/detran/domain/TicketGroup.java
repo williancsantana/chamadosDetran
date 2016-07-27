@@ -8,8 +8,14 @@ package br.gov.to.detran.domain;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -31,7 +37,19 @@ public class TicketGroup extends AbstractEntity{
     
     @Transient
     private HashMap<String, Boolean> mapPermissoes;
-        
+    
+    @ManyToOne(optional = true)
+    @JoinColumn(name="fk_setor_grupo", nullable=true)
+    private SetorAtendimento setorAtendimento;
+    
+    
+    public void setSetorAtendimento(SetorAtendimento setorAtendimento){
+    	this.setorAtendimento = setorAtendimento;
+    }
+    
+    public SetorAtendimento getSetorAtendimento(){
+    	return this.setorAtendimento;
+    }
     public String getDescricao() {
         return descricao;
     }

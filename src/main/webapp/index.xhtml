@@ -87,6 +87,7 @@
                             <th class="collapsing"></th>
                             <th class="collapsing">Número</th>
                             <th>Assunto</th>
+                            <th >Lembrete</th>
                             <th class="collapsing">Solicitante</th>
                             <th class="collapsing">Atendente</th>
                             <th class="collapsing">Última resposta</th>
@@ -103,6 +104,7 @@
                                 </td>
                                 <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                             #{chamado.numero}</h:commandLink></td>
+                                
                                 <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                         <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
                                         <i class="warning sign orange icon" jsf:rendered="#{chamado.status == 'PENDENTE_USUARIO'}"
@@ -111,6 +113,18 @@
                                     </h:commandLink>      
                                     <i class="attach icon" jsf:rendered="#{chamado.existeAnexo}"> </i>                              
                                    </td>
+                                <td jsf:rendered="#{chamado.stickerID!=null}" ><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
+                                        <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
+                                        <i class="wait red icon" jsf:rendered="#{chamado.atrasado()}"
+                                           title="Este lembrete expirou"></i>
+                                           <i class="Checked calendar green icon" title="Este lembrete ainda não expirou" jsf:rendered="#{!chamado.atrasado()}"></i>                                    
+                                        #{chamado.stickerDate}
+                                    </h:commandLink>      
+                                    <i class="attach icon" jsf:rendered="#{chamado.existeAnexo}"> </i>                              
+                                   </td>
+                                <td jsf:rendered="#{chamado.stickerID==null}" class="collapsing">
+                                    Não há lembrete
+                                </td>
                                 <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante}</td>
                                 <td class="collapsing" title="{{ifNeedsTitle attendant.name}}">
                                     <h:outputText value="#{chamado.atendente}" rendered="#{chamado.idAtendente != null}"/>

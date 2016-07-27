@@ -8,8 +8,11 @@ package br.gov.to.detran.util;
 import br.gov.to.detran.dao.LazyResult;
 import br.gov.to.detran.domain.AbstractEntity;
 import br.gov.to.detran.repository.Repository;
+
 import java.util.HashMap;
 import java.util.List;
+
+import com.querydsl.core.BooleanBuilder;
 
 /**
  * Classes responsavel para realizar a filtragem e paginação das tabelas do
@@ -55,16 +58,17 @@ public class SimplePagination<T extends AbstractEntity> {
     
     public void actionFilter(String[] columns){
         this.currentPage = 0;
-        this.pageSize = 3;
         this.filterColumns = columns;
         this.data = this.load();
     }
 
     public List<T> load() {
+    	
         HashMap<String, Object> filterHash = new HashMap<>();
         if(this.filterValue != null && !this.filterValue.isEmpty()){
             for(String filterColumn : filterColumns){
                 filterHash.put(filterColumn, filterValue);
+                
             }            
         }                
         LazyResult<T> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "id", "desc", filterHash);

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.gov.to.detran.domain.SetorAtendimento;
+import br.gov.to.detran.domain.TicketGroup;
 import br.gov.to.detran.domain.view.ViewLotacao;
 import br.gov.to.detran.repository.SetorAtendimentoRepository;
 import br.gov.to.detran.repository.view.ViewLotacaoRepository;
@@ -34,7 +35,7 @@ public class TicketSetorAtendimentoController extends BaseController<SetorAtendi
 	
 	private @Inject SetorAtendimentoRepository repository;   
     private @Inject ViewLotacaoRepository viewLotacaoRepository;
-
+    private List<SetorAtendimento> listSetores;
     @PostConstruct
     public void postConstruct() {
         super.postContruct();
@@ -110,6 +111,17 @@ public class TicketSetorAtendimentoController extends BaseController<SetorAtendi
     @Override
     public SetorAtendimentoRepository getRepository() {
         return this.repository;
+    }
+    
+    public void setListSetores(List<SetorAtendimento> listSetores){
+    	this.listSetores = listSetores;
+    }
+    
+    public List<SetorAtendimento> getListSetores(){
+    	if (this.listSetores == null) {
+            this.listSetores = this.repository.getAll();
+        }
+    	return listSetores;
     }
 	
 }

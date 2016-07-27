@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import br.gov.to.detran.component.TicketEscalonador;
+import br.gov.to.detran.domain.SetorAtendimento;
 import br.gov.to.detran.domain.TicketAttachment;
 import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
@@ -46,6 +48,7 @@ import br.gov.to.detran.domain.TicketReply;
 import br.gov.to.detran.domain.TicketReplyType;
 import br.gov.to.detran.domain.TicketService;
 import br.gov.to.detran.domain.TicketServiceField;
+import br.gov.to.detran.domain.TicketStickerSupport;
 import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
@@ -59,6 +62,7 @@ import br.gov.to.detran.repository.DetranERPRepository;
 import br.gov.to.detran.repository.DetranNETRepository;
 import br.gov.to.detran.repository.Repository;
 import br.gov.to.detran.repository.TicketServiceRepository;
+import br.gov.to.detran.repository.TicketStickerRepository;
 import br.gov.to.detran.repository.TicketSupportRepository;
 import br.gov.to.detran.repository.UserSecurityRepository;
 import br.gov.to.detran.util.FacesUtil;
@@ -72,6 +76,7 @@ import br.gov.to.detran.util.FacesUtil;
 public class TicketSupportController extends BaseController<TicketSupport> implements java.io.Serializable {
     
 	private static final long serialVersionUID = 1L;
+	
 	
 	private @Inject
     TicketSupportRepository repository;
@@ -97,6 +102,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private ViewServidorChamado servidor = new ViewServidorChamado();
     private List<UserSecurity> possibleAttendants;
     private TicketGroup tempGroup = null;
+    private SetorAtendimento tempSetor = null;
     private List<UserSecurity> atendentesGrupo;
     private UserSecurity tempAtendente;
     private String respostaModal = "";
@@ -106,7 +112,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private ViewDadosServidor dadosServidor = new ViewDadosServidor();
     private ViewOperadorDetrannet operador;
     private String lotacaoCiretran = "";
-
+   
+    
+    
+    private List<String> prioridades = new ArrayList<String>(); 
     @PostConstruct
     public void postConstruct() {
         super.postContruct();
@@ -119,6 +128,22 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.service = serviceInstance;
             this.service.mountFields();
         }
+        prioridades.add("BAIXA");
+        prioridades.add("MEDIA");
+        prioridades.add("ALTA");
+   
+    }
+    
+    
+    
+    public void setPrioridades(List<String> prioridades){
+    	this.prioridades = prioridades;
+    }
+    
+   
+    
+    public List getPrioridades(){
+    	return this.prioridades;
     }
 
     public void checkChamado() throws IOException {
@@ -471,6 +496,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     }
     
+    
+    
+
+    
     public void escalonarAtendenteGrupo(UserSecurity user){
     	try{
     		
@@ -533,6 +562,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     	user = null;
         tempGroup = null;
+        tempSetor = null;
         tempAtendente = null;
         respostaModal = "";
     	
@@ -598,8 +628,6 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	
     }
 	
-	public void consultarDadosOperadorDetranNet(String cpf){		
-	}
 	
 	public String setorUsuario(UserSecurity user){
 		try{
@@ -615,9 +643,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 		return "não foi possivel recuperar o setor";
 	}
 
-    public void validar() {
 
-    }
 
     @Override
     public Repository getRepository() {
@@ -781,6 +807,13 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 			possibleAttendants.remove(instance.getAtendente());
 		}
 		return possibleAttendants;
+	}
+	public SetorAtendimento getTempSetor(){
+		return this.tempSetor;
+	}
+	
+	public void setTempSetor(SetorAtendimento tempSetor){
+		 this.tempSetor = tempSetor;
 	}
 
 	public TicketGroup getTempGroup() {
