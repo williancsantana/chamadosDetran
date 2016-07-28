@@ -60,7 +60,7 @@ public class TicketSupportTable implements java.io.Serializable {
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
-    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
+    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L, 0L);
     private Boolean ordemCrescente = true;
     private String ordenacao = "desc";
     private String ultimoCriterio = "ultimaResposta";

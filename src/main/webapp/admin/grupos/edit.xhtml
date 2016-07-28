@@ -1,154 +1,247 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="../../resources/layout/main.xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:jsf="http://xmlns.jcp.org/jsf">
+	template="../../resources/layout/main.xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-    <ui:param name="menu" value="admin" />
-    <ui:param name="menuItem" value="grupos" />
+	<ui:param name="menu" value="admin" />
+	<ui:param name="menuItem" value="grupos" />
 
-    <ui:define name="page-title">
+	<ui:define name="page-title">
         Detran - TO | #{ticketGroupController.instance.id == 0 ? 'Novo' : 'Editar'} Grupo
-    </ui:define>    
-
-    <ui:define name="content">
-        <h4 class="ui top attached header">            
-            <h:outputText rendered="#{ticketGroupController.instance.id > 0}" value="Detalhe do Grupo #{ticketGroupController.instance.descricao}" />
-            <h:outputText rendered="#{ticketGroupController.instance.id == 0}" value="Novo Grupo" />
-        </h4>
-        <div class="ui bottom attached segment">
-            <h:form id="group-form" class="ui form">
-                <div class="field">
-                    <label>Nome do Grupo</label>
-                    <p:inputText id="group-name" type="text" value="#{ticketGroupController.instance.descricao}" 
-                                 required="true" requiredMessage="O Nome do Grupo não pode ser vazio!"
-                                 maxlength="255"/>
-                </div>
-
-                <div class="field">
-                    <label>Permissões</label>
-
-                    <h5 class="ui horizontal header divider">
-                        <i class="inbox icon"></i>
-                        Chamados
-                    </h5>
-
-                    <div class="inline field">
-                        <div class="ui toggle checkbox">
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.chamadoAbrir.selected}" styleClass="green box" />
-                            <label><i class="plus icon"></i>Abrir chamados</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.chamadoAtender.selected}" styleClass="green box" />
-                            <label><i class="comments outline icon"></i>Atender chamados</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.chamadoVisualizar.selected}" styleClass="green box" />
-                            <label><i class="comments outline icon"></i>Visualizar chamados</label>
-                        </div>
-                    </div>
-
-                    <h5 class="ui horizontal header divider">
-                        <i class="settings icon"></i>
-                        Administrador
-                    </h5>
-
-                    <div class="inline field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.adminUsuarios.selected}" styleClass="red box" />
-                            <label><i class="user icon"></i>Gerenciar usuários</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.adminGrupos.selected}" styleClass="red box" />
-                            <label><i class="users icon"></i>Gerenciar grupos</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.adminServicos.selected}" styleClass="red box" />
-                            <label><i class="configure icon"></i>Gerenciar catálogo de serviços</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.adminChamados.selected}" styleClass="red box" />
-                            <label><i class="inbox icon"></i>Gerenciar chamados</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.adminSetor.selected}" styleClass="red box" />
-                            <label><i class="fork icon"></i>Gerenciar setores</label>
-                        </div>
-                    </div>                       
-
-                    <ui:remove>
-                        <h5 class="ui horizontal header divider">
-                            <i class="code icon"></i>
-                            Desenvolvedor
-                        </h5>
-
-                        <div class="inline field">
-                            <div class="ui toggle checkbox">                            
-                                <h:selectBooleanCheckbox value="#{ticketGroupController.adminChamados.selected}" styleClass="blue box" />
-                                <label><i class="privacy icon"></i>Gerenciar chaves de API</label>
-                            </div>
-                        </div>          
-                    </ui:remove>
-
-                    <h5 class="ui horizontal header divider">
-                        <i class="bar chart icon"></i>
-                        Relatórios
-                    </h5>
-
-                    <div class="inline field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.relatorioAtendimento.selected}" styleClass="orange box" />
-                            <label><i class="bar chart icon"></i>Ver relatórios de atendimento</label>
-                        </div>
-                    </div>
-                    <div class="inline small margin top field">
-                        <div class="ui toggle checkbox">                            
-                            <h:selectBooleanCheckbox value="#{ticketGroupController.relatorioSistema.selected}" styleClass="orange box" />
-                            <label><i class="database icon"></i>Ver relatórios do sistema</label>
-                        </div>
-                    </div>
-                                        
-                </div>
-
-                <div class="ui divider"></div>
-                <div class="ui buttons" jsf:id="insertButton">
-                    <p:commandLink actionListener="#{ticketGroupController.insert()}"
-                                     styleClass="ui blue button" rendered="#{ticketGroupController.instance.id == 0}"
-                                     value="Salvar alterações" update="removeButton insertButton"/>
-                    <p:commandLink actionListener="#{ticketGroupController.update()}"
-                                     styleClass="ui blue button" rendered="#{ticketGroupController.instance.id > 0}"
-                                     value="Salvar alterações" update="removeButton insertButton"/>
-                    <div class="or" data-text="ou"></div>
-                    <a href="#{facesContext.externalContext.applicationContextPath}/admin/grupos/list.jsf" class="ui button">Descartar alterações</a>
-                </div>                
-                <div class="ui pull right buttons" jsf:id="removeButton">
-                    <p:commandLink styleClass="ui red button" rendered="#{ticketGroupController.instance.id > 0}"
-                                   value="Excluir Grupo" actionListener="#{ticketGroupController.removeAndRedirect(ticketGroupController.instance, '/admin/grupos/list.jsf')}">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
-                    </p:commandLink>
-                </div>
-            </h:form>
-        </div>
     </ui:define>
 
-    <ui:define name="page-js">
-        <script>
+	<ui:define name="content">
+		<h4 class="ui top attached header">
+			<h:outputText rendered="#{ticketGroupController.instance.id > 0}"
+				value="Detalhe do Grupo #{ticketGroupController.instance.descricao}" />
+			<h:outputText rendered="#{ticketGroupController.instance.id == 0}"
+				value="Novo Grupo" />
+		</h4>
+		<div class="ui bottom attached segment">
+			<h:form id="group-form" class="ui form">
+				<div class="field">
+					<label>Nome do Grupo</label>
+					<p:inputText id="group-name" type="text"
+						value="#{ticketGroupController.instance.descricao}"
+						required="true"
+						requiredMessage="O Nome do Grupo não pode ser vazio!"
+						maxlength="255" />
+				</div>
+				<div class="inline field" jsf:id="groups">
+                        <label class="small padding">Setor Selecionado</label>
+                        <div class="ui segment no padding">
+                            <div id="requester-list" class="ui divided list">
+                              <ui:repeat var="setor" value="#{ticketGroupController.instance.setorAtendimento}">
+                                    <div class="user item small padding" data-value="#{setor.setor}">
+                                        <i class="fork icon"></i>
+                                        <div class="content">
+                                            <div class="header">#{setor.setor}</div>
+                                        </div>
+                                    </div>
+                               </ui:repeat>
+                                <div id="empty-requesters" class="item small padding"
+                                     jsf:rendered="#{empty ticketGroupController.instance.setorAtendimento}">
+                                    <i class="blue info icon"></i>
+                                    <div class="content">
+                                        <div class="header">Setor não selecionado</div>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+				<div class="inline field" >
+                    <table class="ui very basic table">
+                        <tbody>
+                            <tr>
+                                <td class="collapsing center aligned"><strong>Selecionar Setor:  </strong><small>(opcional)</small> </td>
+                                <td class="center aligned">
+                                    <div id="add-group-dropdown" class="ui fluid selection dropdown">
+                                        <i class="dropdown icon"></i>
+                                        <input id="add-group-input" name="group-input" type="hidden" value="default" />
+                                        <div class="default text"><i class="fork icon"></i> Adicionar Setor</div>
+                                        <div class="menu">
+                                            <ui:repeat var="ticketSetor" value="#{ticketSetorAtendimentoController.listSetores}" >
+                                                <div class="item" data-value="#{ticketSetor.idSetor}" data-text="#{ticketSetor.setor}"
+                                                     jsf:onclick="rc_#{ticketSetor.idSetor}();">
+                                                    <p:remoteCommand name="rc_#{ticketSetor.idSetor}" actionListener="#{ticketGroupController.addTicketSetor(ticketSetor)}" update=":group-form:addButtons" />
+                    
+                                                    <i class="fork icon"></i> #{ticketSetor.setor}
+                                                </div>
+                                            </ui:repeat>
+
+                                        </div>
+                                    </div>
+                                    <script>$('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();</script>
+                                </td>
+                                <td  class="center aligned servico btns" jsf:id="addButtons">
+                                    <div class="ui buttons">
+                                        <p:commandLink styleClass="ui green button" value="Adicionar" actionListener="#{ticketGroupController.setSetorAtendimento()}"
+                                                        update=":group-form:groups :group-form:addButtons" disabled="#{!ticketGroupController.hasATicketSetor()}" ></p:commandLink>
+                                        <div class="or"  data-text="ou"></div>                                        
+                                        <p:commandLink styleClass="ui red button" value="Remover" actionListener="#{ticketGroupController.removeTicketSetor()}"
+                                                       update=":group-form:groups :group-form:addButtons" disabled="#{ticketGroupController.instance.setorAtendimento==null}"></p:commandLink>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+				
+								<div class="field">
+					<label>Permissões</label>
+
+					<h5 class="ui horizontal header divider">
+						<i class="inbox icon"></i> Chamados
+					</h5>
+
+					<div class="inline field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.chamadoAbrir.selected}"
+								styleClass="green box" />
+							<label><i class="plus icon"></i>Abrir chamados</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.chamadoAtender.selected}"
+								styleClass="green box" />
+							<label><i class="comments outline icon"></i>Atender
+								chamados</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.chamadoVisualizar.selected}"
+								styleClass="green box" />
+							<label><i class="comments outline icon"></i>Visualizar
+								chamados</label>
+						</div>
+					</div>
+
+					<h5 class="ui horizontal header divider">
+						<i class="settings icon"></i> Administrador
+					</h5>
+
+					<div class="inline field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.adminUsuarios.selected}"
+								styleClass="red box" />
+							<label><i class="user icon"></i>Gerenciar usuários</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.adminGrupos.selected}"
+								styleClass="red box" />
+							<label><i class="users icon"></i>Gerenciar grupos</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.adminServicos.selected}"
+								styleClass="red box" />
+							<label><i class="configure icon"></i>Gerenciar catálogo
+								de serviços</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.adminChamados.selected}"
+								styleClass="red box" />
+							<label><i class="inbox icon"></i>Gerenciar chamados</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.adminSetor.selected}"
+								styleClass="red box" />
+							<label><i class="fork icon"></i>Gerenciar setores</label>
+						</div>
+					</div>
+
+					<ui:remove>
+						<h5 class="ui horizontal header divider">
+							<i class="code icon"></i> Desenvolvedor
+						</h5>
+
+						<div class="inline field">
+							<div class="ui toggle checkbox">
+								<h:selectBooleanCheckbox
+									value="#{ticketGroupController.adminChamados.selected}"
+									styleClass="blue box" />
+								<label><i class="privacy icon"></i>Gerenciar chaves de
+									API</label>
+							</div>
+						</div>
+					</ui:remove>
+
+					<h5 class="ui horizontal header divider">
+						<i class="bar chart icon"></i> Relatórios
+					</h5>
+
+					<div class="inline field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.relatorioAtendimento.selected}"
+								styleClass="orange box" />
+							<label><i class="bar chart icon"></i>Ver relatórios de
+								atendimento</label>
+						</div>
+					</div>
+					<div class="inline small margin top field">
+						<div class="ui toggle checkbox">
+							<h:selectBooleanCheckbox
+								value="#{ticketGroupController.relatorioSistema.selected}"
+								styleClass="orange box" />
+							<label><i class="database icon"></i>Ver relatórios do
+								sistema</label>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="ui divider"></div>
+				<div class="ui buttons" jsf:id="insertButton">
+					<p:commandLink actionListener="#{ticketGroupController.insert()}"
+						styleClass="ui blue button"
+						rendered="#{ticketGroupController.instance.id == 0}"
+						value="Salvar alterações" update="removeButton insertButton" />
+					<p:commandLink actionListener="#{ticketGroupController.update()}"
+						styleClass="ui blue button"
+						rendered="#{ticketGroupController.instance.id > 0}"
+						value="Salvar alterações" update="removeButton insertButton" />
+					<div class="or" data-text="ou"></div>
+					<a
+						href="#{facesContext.externalContext.applicationContextPath}/admin/grupos/list.jsf"
+						class="ui button">Descartar alterações</a>
+				</div>
+				<div class="ui pull right buttons" jsf:id="removeButton">
+					<p:commandLink styleClass="ui red button"
+						rendered="#{ticketGroupController.instance.id > 0}"
+						value="Excluir Grupo"
+						actionListener="#{ticketGroupController.removeAndRedirect(ticketGroupController.instance, '/admin/grupos/list.jsf')}">
+						<p:confirm header="Confirmation" message="Are you sure?"
+							icon="ui-icon-alert" />
+					</p:commandLink>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+
+	<ui:define name="page-js">
+		<script>
 
         </script>
-    </ui:define>
+	</ui:define>
 
 </ui:composition>

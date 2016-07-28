@@ -5,6 +5,7 @@
  */
 package br.gov.to.detran.repository.view;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -48,9 +49,25 @@ public class ViewTicketSupportRepository extends AbstractRepository<ViewTicketSu
         return where;
     }
     
+    private BooleanBuilder getStickersWhere(){
+    	UserSecurity userOnline = FacesUtil.loggedUser();
+    	BooleanBuilder where = new BooleanBuilder();
+    	where.and(QTicketStickerSupport.ticketStickerSupport.ticketSupport.solicitante.id.eq(userOnline.getId()));
+    	return where;
+    }
+    
     public Long countTodos(UserSecurity onlineUser) {
         BooleanBuilder where = this.getDefaultWhere();
         JPAQueryBase query = this.getPersistenceDao().query();        
+        query.select(QViewTicketSupport.viewTicketSupport.id.count()).from(QViewTicketSupport.viewTicketSupport).where(where);
+        return (Long) query.fetchFirst();
+    }
+    
+    public Long countLembretesAtrasados(UserSecurity onlineUser){
+    	BooleanBuilder where = this.getDefaultWhere();
+        JPAQueryBase query = this.getPersistenceDao().query();
+        where.and(QViewTicketSupport.viewTicketSupport.stickerDate.before(new Date()))
+        .andNot(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.FECHADO));
         query.select(QViewTicketSupport.viewTicketSupport.id.count()).from(QViewTicketSupport.viewTicketSupport).where(where);
         return (Long) query.fetchFirst();
     }
@@ -59,6 +76,18 @@ public class ViewTicketSupportRepository extends AbstractRepository<ViewTicketSu
         BooleanBuilder where = this.getDefaultWhere();
         JPAQueryBase query = this.getPersistenceDao().query();        
         where.and(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.ABERTO).or(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.REABERTO)));
+        query.select(QViewTicketSupport.viewTicketSupport.id.count()).from(QViewTicketSupport.viewTicketSupport).where(where);
+        return (Long) query.fetchFirst();
+    }
+    
+    /*
+     * Metodo para contagem de lembretes
+     */
+    public Long countLembretes(UserSecurity onlineUser){
+    	BooleanBuilder where = new BooleanBuilder();
+        JPAQueryBase query = this.getPersistenceDao().query();        
+        where.andNot(QViewTicketSupport.viewTicketSupport.status.eq(TicketSupportStatus.FECHADO)).and(QViewTicketSupport.viewTicketSupport.stickerDate.before(new Date()))
+        .and(QViewTicketSupport.viewTicketSupport.idAtendente.eq(onlineUser.getId())).and(QViewTicketSupport.viewTicketSupport.stickerID.isNotNull());
         query.select(QViewTicketSupport.viewTicketSupport.id.count()).from(QViewTicketSupport.viewTicketSupport).where(where);
         return (Long) query.fetchFirst();
     }

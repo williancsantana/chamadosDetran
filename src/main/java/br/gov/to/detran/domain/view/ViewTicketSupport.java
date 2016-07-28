@@ -70,8 +70,37 @@ public class ViewTicketSupport extends AbstractEntity{
 	@Column(name = "at_viewat")
 	private Date atViewat;
 
+	@Column(name = "lembreteid")
+	private Long stickerID;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "horalembrete")
+	private Date stickerDate;
+	
+	public void setStickerDate(Date stickerDate){
+		this.stickerDate = stickerDate;
+	}
+	
+	public Date getStickerDate(){
+		return this.stickerDate;
+	}
+	public void setStickerID(Long stickerID){
+		this.stickerID = stickerID;
+	}
+	
+	public Long getStickerID(){
+		return this.stickerID;
+	}
+	
 	public String getNumero() {
 		return numero;
+	}
+	
+	public boolean atrasado(){
+		if(this.getStickerID()!=null && new Date().compareTo(this.getStickerDate())>=0){
+			return true;
+		}
+		return false;
 	}
 
 	public void setNumero(String numero) {

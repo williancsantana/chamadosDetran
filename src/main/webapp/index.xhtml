@@ -88,10 +88,12 @@
                             <th class="collapsing"><h:commandLink class=""
                             							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('numero')}"
                             							update=":tableData :col-numero"> Número 
-                            							<i jsf:id="col-numero" class="#{ticketSupportTableController.supportTable.preencherCabecalho('numero')}"/></h:commandLink></th>
+                            							<i jsf:id="col-numero" class="#{ticketSupportTableController.supportTable.preencherCabecalho('numero')}"/></h:commandLink>
+                           	</th>
                             <th>				<h:commandLink class=""
                             							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('assunto')}"
                             							update=":tableData :col-assunto"> Assunto <i jsf:id="col-assunto" class="#{ticketSupportTableController.supportTable.preencherCabecalho('assunto')}"/></h:commandLink></th>
+                            <th >Lembrete</th>
                             <th class="collapsing"><h:commandLink class="col-assunto"
                             							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('solicitante')}"
                             							update=":tableData :col-solicitante"> Solicitante <i jsf:id="col-solicitante" class="#{ticketSupportTableController.supportTable.preencherCabecalho('solicitante')}"/></h:commandLink></th>
@@ -114,6 +116,7 @@
                                 </td>
                                 <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                             #{chamado.numero}</h:commandLink></td>
+                                
                                 <td><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
                                         <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
                                         <i class="warning sign orange icon" jsf:rendered="#{chamado.status == 'PENDENTE_USUARIO'}"
@@ -122,6 +125,18 @@
                                     </h:commandLink>      
                                     <i class="attach icon" jsf:rendered="#{chamado.existeAnexo}"> </i>                              
                                    </td>
+                                <td jsf:rendered="#{chamado.stickerID!=null}" ><h:commandLink actionListener="#{ticketSupportController.viewChamado(chamado.id)}">
+                                        <h:outputText escape="false" value="#{chamado.printUnseenBadge()}" />
+                                        <i class="wait red icon" jsf:rendered="#{chamado.atrasado()}"
+                                           title="Este lembrete expirou"></i>
+                                           <i class="Checked calendar green icon" title="Este lembrete ainda não expirou" jsf:rendered="#{!chamado.atrasado()}"></i>                                    
+                                        #{chamado.stickerDate}
+                                    </h:commandLink>      
+                                    <i class="attach icon" jsf:rendered="#{chamado.existeAnexo}"> </i>                              
+                                   </td>
+                                <td jsf:rendered="#{chamado.stickerID==null}" class="collapsing">
+                                    Não há lembrete
+                                </td>
                                 <td class="collapsing" title="{{ifNeedsTitle requester.name}}">#{chamado.solicitante}</td>
                                 <td class="collapsing" title="{{ifNeedsTitle attendant.name}}">
                                     <h:outputText value="#{chamado.atendente}" rendered="#{chamado.idAtendente != null}"/>

@@ -9,14 +9,9 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +33,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import br.gov.to.detran.component.TicketEscalonador;
+import br.gov.to.detran.domain.SetorAtendimento;
 import br.gov.to.detran.domain.TicketAttachment;
 import br.gov.to.detran.domain.TicketAttachmentReply;
 import br.gov.to.detran.domain.TicketGroup;
@@ -52,7 +48,6 @@ import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.ViewDadosServidor;
 import br.gov.to.detran.domain.ViewServidorChamado;
 import br.gov.to.detran.domain.view.ViewOperadorDetrannet;
-import br.gov.to.detran.enumeration.DiaSemana;
 import br.gov.to.detran.push.NotifyMessage;
 import br.gov.to.detran.push.NotifySessions;
 import br.gov.to.detran.repository.DetranERPRepository;
@@ -72,6 +67,7 @@ import br.gov.to.detran.util.FacesUtil;
 public class TicketSupportController extends BaseController<TicketSupport> implements java.io.Serializable {
     
 	private static final long serialVersionUID = 1L;
+	
 	
 	private @Inject
     TicketSupportRepository repository;
@@ -97,6 +93,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private ViewServidorChamado servidor = new ViewServidorChamado();
     private List<UserSecurity> possibleAttendants;
     private TicketGroup tempGroup = null;
+    private SetorAtendimento tempSetor = null;
     private List<UserSecurity> atendentesGrupo;
     private UserSecurity tempAtendente;
     private String respostaModal = "";
@@ -106,7 +103,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private ViewDadosServidor dadosServidor = new ViewDadosServidor();
     private ViewOperadorDetrannet operador;
     private String lotacaoCiretran = "";
-
+   
+    
+    
+    private List<String> prioridades = new ArrayList<String>(); 
     @PostConstruct
     public void postConstruct() {
         super.postContruct();
@@ -119,6 +119,22 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
             this.service = serviceInstance;
             this.service.mountFields();
         }
+        prioridades.add("BAIXA");
+        prioridades.add("MEDIA");
+        prioridades.add("ALTA");
+   
+    }
+    
+    
+    
+    public void setPrioridades(List<String> prioridades){
+    	this.prioridades = prioridades;
+    }
+    
+   
+    
+    public List getPrioridades(){
+    	return this.prioridades;
     }
 
     public void checkChamado() throws IOException {
@@ -471,6 +487,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     }
     
+    
+    
+
+    
     public void escalonarAtendenteGrupo(UserSecurity user){
     	try{
     		
@@ -533,6 +553,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     	user = null;
         tempGroup = null;
+        tempSetor = null;
         tempAtendente = null;
         respostaModal = "";
     	
@@ -598,8 +619,6 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     	
     }
 	
-	public void consultarDadosOperadorDetranNet(String cpf){		
-	}
 	
 	public String setorUsuario(UserSecurity user){
 		try{
@@ -615,9 +634,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 		return "não foi possivel recuperar o setor";
 	}
 
-    public void validar() {
 
-    }
 
     @Override
     public Repository getRepository() {
@@ -781,6 +798,13 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 			possibleAttendants.remove(instance.getAtendente());
 		}
 		return possibleAttendants;
+	}
+	public SetorAtendimento getTempSetor(){
+		return this.tempSetor;
+	}
+	
+	public void setTempSetor(SetorAtendimento tempSetor){
+		 this.tempSetor = tempSetor;
 	}
 
 	public TicketGroup getTempGroup() {

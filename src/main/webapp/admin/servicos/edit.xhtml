@@ -1,248 +1,360 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="../../resources/layout/main.xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:ph="http://java.sun.com/jsf/passthrough"
-                xmlns:jsf="http://xmlns.jcp.org/jsf">
+	template="../../resources/layout/main.xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ph="http://java.sun.com/jsf/passthrough"
+	xmlns:jsf="http://xmlns.jcp.org/jsf">
 
-    <ui:param name="menu" value="admin" />
-    <ui:param name="menuItem" value="servicos" />
+	<ui:param name="menu" value="admin" />
+	<ui:param name="menuItem" value="servicos" />
 
-    <ui:define name="page-title">
+	<ui:define name="page-title">
         Detran - TO | #{ticketServicesController.instance.id == 0 ? 'Novo' : 'Editar'} Serviço
-    </ui:define>    
-
-    <ui:define name="content">
-        <h4 class="ui top attached header">
-            <h:outputText rendered="#{ticketServicesController.instance.id > 0}" value="Detalhe do Grupo #{ticketServicesController.instance.descricao}" />
-            <h:outputText rendered="#{ticketServicesController.instance.id == 0}" value="Novo Grupo" />
-        </h4>
-        <div class="ui bottom attached segment">
-            <h:form id="service-form" class="ui form" prependId="false">
-                <div class="field">
-                    <label>Nome do Serviço</label>
-                    <p:inputText value="#{ticketServicesController.instance.descricao}" id="serviceName" onkeyup="servicePathMarkup(this)"/>
-                </div>
-                <div class="ui divider"></div>
-                <div class="field">
-                    <label>Categoria</label>
-                    <p:inputText class="text" id="service-path" placeholder="Digite a categoria aqui, separando subcategorias por sinais de : (dois pontos)" 
-                                 value="#{ticketServicesController.instance.categoria}" onkeyup="pathMarkup(this)"/>
-                    <div id="service-path-preview" class="ui breadcrumb no margin" style="padding-top: 5px;">
-                        <div class="active section">Prévia:&nbsp;&nbsp;&nbsp;</div>                                                
-                        <span id="path"></span>
-                        <i class="right chevron icon divider no margin"></i>
-                        <div class="active section" id="serviceNamePath"></div>                        
-                    </div>
-                </div>
-                <div class="ui divider"></div>
-                <div class="two fields" jsf:id="groups">
-                    <div class="inline field">
-                        <label class="small padding">Grupos solicitantes</label>
-                        <div class="ui segment no padding">
-                            <div id="requester-list" class="ui divided list">
-                                <ui:repeat var="grupo" value="#{ticketServicesController.instance.permissoes}">
-                                    <div class="user item small padding" data-value="#{grupo.grupo.descricao}"
-                                         jsf:rendered="#{grupo.isSolicitante()}">
-                                        <i class="users icon"></i>
-                                        <div class="content">
-                                            <div class="header">#{grupo.grupo.descricao}</div>
-                                            <div class="description">
-                                                <p:commandLink value="Remover" styleClass="remove-group-btn"
-                                                                 update="groups" actionListener="#{ticketServicesController.removeGrupo(grupo)}" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ui:repeat>
-                                <div id="empty-requesters" class="item small padding"
-                                     jsf:rendered="#{empty ticketServicesController.instance.permissoes}">
-                                    <i class="blue info icon"></i>
-                                    <div class="content">
-                                        <div class="header">Nenhum grupo</div>
-                                    </div>
-                                </div>                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="inline field">
-                        <label class="small padding">Grupos atendentes</label>
-                        <div class="ui segment no padding">
-                            <div id="attendant-list" class="ui divided list">
-                                <ui:repeat var="grupo" value="#{ticketServicesController.instance.permissoes}">                                           
-                                    <div class="user item small padding" data-value="#{grupo.grupo.descricao}"
-                                         jsf:rendered="#{grupo.isAtendente()}">
-                                        <i class="users icon"></i>
-                                        <div class="content">
-                                            <div class="header">#{grupo.grupo.descricao}</div>
-                                            <div class="description">
-                                                <p:commandLink value="Remover" styleClass="remove-group-btn"
-                                                                 update="groups" actionListener="#{ticketServicesController.removeGrupo(grupo)}" />                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                </ui:repeat>
-                                <div id="empty-requesters" class="item small padding"
-                                     jsf:rendered="#{empty ticketServicesController.instance.permissoes}">
-                                    <i class="blue info icon"></i>
-                                    <div class="content">
-                                        <div class="header">Nenhum grupo</div>
-                                    </div>
-                                </div>   
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="inline field">
-                    <table class="ui very basic table">
-                        <tbody>
-                            <tr>
-                                <td class="collapsing center aligned"><strong>Adicionar</strong></td>
-                                <td class="center aligned">
-                                    <div id="add-group-dropdown" class="ui fluid selection dropdown">
-                                        <i class="dropdown icon"></i>
-                                        <input id="add-group-input" name="group-input" type="hidden" value="default" />
-                                        <div class="default text"><i class="users icon"></i> Adicionar grupo</div>
-                                        <div class="menu">
-                                            <ui:repeat var="ticketGroup" value="#{ticketServicesController.listGrupos}" >
-                                                <div class="item" data-value="#{ticketGroup.id}" data-text="#{ticketGroup.descricao}"
-                                                     jsf:onclick="rc_#{ticketGroup.id}();">
-                                                    <p:remoteCommand name="rc_#{ticketGroup.id}" actionListener="#{ticketServicesController.addTicketGroup(ticketGroup)}" 
-                                                                     update="addButtons"/>
-                                                    <i class="users icon"></i> #{ticketGroup.descricao}
-                                                    <div class="right floated">
-                                                        <i class="{{#if call.open}}green{{else}}disabled{{/if}} add icon"></i>
-                                                        <i class="{{#if call.answer}}green{{else}}disabled{{/if}} comments outline icon"></i>
-                                                    </div>
-                                                </div>
-                                            </ui:repeat>
-
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="center aligned servico btns" jsf:id="addButtons">
-                                    <div class="ui buttons">
-                                        <p:commandLink styleClass="ui green button" value="Solicitante" actionListener="#{ticketServicesController.adicionarPermissaoSolicitante()}"
-                                                       update="groups" disabled="#{!ticketServicesController.groupSelectedSolicitante}"></p:commandLink>
-                                        <div class="or" data-text="ou"></div>                                        
-                                        <p:commandLink styleClass="ui green button" value="Atendente" actionListener="#{ticketServicesController.adicionarPermissaoAtendente()}"
-                                                       update="groups" disabled="#{!ticketServicesController.groupSelectedAtendente}"></p:commandLink>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="ui divider"></div>
-                <div class="field" jsf:id="serviceFields">
-                    <label>Campos de entrada <small class="light gray"><i>(opcional)</i></small></label>
-                    <table class="ui striped table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th class="collapsing">Obrigatório</th>
-                                <th>Tipo</th>
-                                <th>Definições</th>
-                                <th class="collapsing">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="service-fields">
-                            <tr jsf:rendered="#{empty ticketServicesController.instance.fields}">
-                                <td colspan="5" class="center aligned">nenhum campo adiconado</td>
-                            </tr>                
-                            <ui:repeat var="field" value="#{ticketServicesController.instance.fields}">                        
-                                <tr>
-                                    <td>#{field.descricao}</td>
-                                    <td class="center aligned">                                        
-                                        <i class="checkmark green icon" jsf:rendered="#{field.obrigatorio}"></i>                                        
-                                    </td>
-                                    <td>#{field.tipo}</td>
-                                    <td>#{field.itens}</td>
-                                    <td class="center aligned">
-                                        <p:commandLink styleClass="mini red ui icon button remove field" update="serviceFields"
-                                                       actionListener="#{ticketServicesController.removeField(field)}">
-                                            <i class="remove icon"></i>
-                                        </p:commandLink>                                        
-                                    </td>
-                                </tr>                        
-                            </ui:repeat>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>
-                                    <div class="ui input">
-                                        <p:inputText id="new-field-name" placeholder="Nome" value="#{ticketServicesController.field.descricao}"/>
-                                    </div>
-                                </th>
-                                <th class="center aligned">
-                                    <div class="ui checkbox">                                    
-                                        <h:selectBooleanCheckbox value="#{ticketServicesController.field.obrigatorio}" />
-                                    </div>
-                                </th>
-                                <th class="collapsing">
-                                    <div id="new-field-drop" class="ui selection dropdown">
-                                        <h:inputHidden id="new-field-type" value="#{ticketServicesController.field.tipo}" />
-                                        <div class="default text">Tipo</div>
-                                        <i class="dropdown icon"></i>
-                                        <div class="menu">
-                                            <div class="item" data-value="input">input</div>
-                                            <div class="item" data-value="select">select</div>
-                                            <div class="item" data-value="radio">radio</div>
-                                            <div class="item" data-value="checkbox">checkbox</div>
-                                        </div>
-                                    </div>
-                                    <script>$('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();</script>
-                                </th>
-                                <th id="new-field-options">
-                                    <span class="light gray">
-                                        <p:inputText value="#{ticketServicesController.field.itens}" />
-                                    </span>
-                                </th>
-                                <th class="center aligned">
-                                    <p:commandLink update="serviceFields" styleClass="mini green ui icon button"
-                                                   actionListener="#{ticketServicesController.insertField()}">
-                                        <i class="plus icon"></i>
-                                    </p:commandLink>                                
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="ui divider"></div>
-                <div class="field">
-                    <label>Possíveis soluções <small class="light gray"><i>(opcional)</i></small></label>
-                    <p:inputTextarea id="service-tips" ph:placeholder="Uma solução por linha" value="#{ticketServicesController.instance.solucoes}"></p:inputTextarea>
-                </div>
-                <div class="field">                    
-                    <div id="user-form-away" class="ui checkbox">                        
-                        <h:selectBooleanCheckbox value="#{ticketServicesController.instance.padrao}"/>
-                        <label><strong>Serviço é padrão para novos usuários? </strong><small class="light gray"><i>(opcional)</i></small></label>
-                    </div>
-                </div>
-                <div class="ui divider"></div>
-                <div class="ui buttons" jsf:id="insertButton">
-                    <p:commandLink actionListener="#{ticketServicesController.insert()}"
-                                   styleClass="ui blue button" rendered="#{ticketServicesController.instance.id == 0}"
-                                   value="Salvar alterações" update="removeButton insertButton"/>
-                    <p:commandLink actionListener="#{ticketServicesController.update()}"
-                                   styleClass="ui blue button" rendered="#{ticketServicesController.instance.id > 0}"
-                                   value="Salvar alterações" update="removeButton insertButton"/>
-                    <div class="or" data-text="ou"></div>
-                    <a href="#{facesContext.externalContext.applicationContextPath}/admin/servicos/list.jsf" class="ui button">Descartar alterações</a>
-                </div>                
-                <div class="ui pull right buttons" jsf:id="removeButton">
-                    <p:commandLink styleClass="ui red button" rendered="#{ticketServicesController.instance.id > 0}"
-                                   value="Excluir Grupo" actionListener="#{ticketServicesController.removeAndRedirect(ticketServicesController.instance, '/admin/servicos/list.jsf')}">
-                        <p:confirm header="Confirmation" message="Are you sure?" icon="ui-icon-alert" />
-                    </p:commandLink>
-                </div>
-            </h:form>
-        </div>
     </ui:define>
 
-    <ui:define name="page-js">
-        <script>
+	<ui:define name="content">
+		<h4 class="ui top attached header">
+			<h:outputText rendered="#{ticketServicesController.instance.id > 0}"
+				value="Detalhe do Grupo #{ticketServicesController.instance.descricao}" />
+			<h:outputText rendered="#{ticketServicesController.instance.id == 0}"
+				value="Novo Grupo" />
+		</h4>
+		<div class="ui bottom attached segment">
+			<h:form id="service-form" class="ui form" prependId="false">
+				<div class="field">
+					<label>Nome do Serviço</label>
+					<p:inputText value="#{ticketServicesController.instance.descricao}"
+						id="serviceName" onkeyup="servicePathMarkup(this)" />
+				</div>
+				<div class="ui divider"></div>
+				<div class="field">
+					<label>Categoria</label>
+					<p:inputText class="text" id="service-path"
+						placeholder="Digite a categoria aqui, separando subcategorias por sinais de : (dois pontos)"
+						value="#{ticketServicesController.instance.categoria}"
+						onkeyup="pathMarkup(this)" />
+					<div id="service-path-preview" class="ui breadcrumb no margin"
+						style="padding-top: 5px;">
+						<div class="active section">Prévia:&nbsp;&nbsp;&nbsp;</div>
+						<span id="path"></span> <i
+							class="right chevron icon divider no margin"></i>
+						<div class="active section" id="serviceNamePath"></div>
+					</div>
+				</div>
+				<div class="ui divider"></div>
+				<div class="two fields" jsf:id="groups">
+					<div class="inline field">
+						<label class="small padding">Grupos solicitantes</label>
+						<div class="ui segment no padding">
+							<div id="requester-list" class="ui divided list">
+								<ui:repeat var="grupo"
+									value="#{ticketServicesController.instance.permissoes}">
+									<div class="user item small padding"
+										data-value="#{grupo.grupo.descricao}"
+										jsf:rendered="#{grupo.isSolicitante()}">
+										<i class="users icon"></i>
+										<div class="content">
+											<div class="header">#{grupo.grupo.descricao}</div>
+											<div class="description">
+												<p:commandLink value="Remover" styleClass="remove-group-btn"
+													update="groups"
+													actionListener="#{ticketServicesController.removeGrupo(grupo)}" />
+											</div>
+										</div>
+									</div>
+								</ui:repeat>
+								<div id="empty-requesters" class="item small padding"
+									jsf:rendered="#{empty ticketServicesController.instance.permissoes}">
+									<i class="blue info icon"></i>
+									<div class="content">
+										<div class="header">Nenhum grupo</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="inline field">
+						<label class="small padding">Grupos atendentes</label>
+						<div class="ui segment no padding">
+							<div id="attendant-list" class="ui divided list">
+								<ui:repeat var="grupo"
+									value="#{ticketServicesController.instance.permissoes}">
+									<div class="user item small padding"
+										data-value="#{grupo.grupo.descricao}"
+										jsf:rendered="#{grupo.isAtendente()}">
+										<i class="users icon"></i>
+										<div class="content">
+											<div class="header">#{grupo.grupo.descricao}</div>
+											<div class="description">
+												<p:commandLink value="Remover" styleClass="remove-group-btn"
+													update="groups"
+													actionListener="#{ticketServicesController.removeGrupo(grupo)}" />
+											</div>
+										</div>
+									</div>
+								</ui:repeat>
+								<div id="empty-requesters" class="item small padding"
+									jsf:rendered="#{empty ticketServicesController.instance.permissoes}">
+									<i class="blue info icon"></i>
+									<div class="content">
+										<div class="header">Nenhum grupo</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="inline field">
+					<table class="ui very basic table">
+						<tbody>
+							<tr>
+								<td class="collapsing center aligned"><strong>Adicionar</strong></td>
+								<td class="center aligned">
+									<div id="add-group-dropdown"
+										class="ui fluid selection dropdown">
+										<i class="dropdown icon"></i> <input id="add-group-input"
+											name="group-input" type="hidden" value="default" />
+										<div class="default text">
+											<i class="users icon"></i> Adicionar grupo
+										</div>
+										<div class="menu">
+											<ui:repeat var="ticketGroup"
+												value="#{ticketServicesController.listGrupos}">
+												<div class="item" data-value="#{ticketGroup.id}"
+													data-text="#{ticketGroup.descricao}"
+													jsf:onclick="rc_#{ticketGroup.id}();">
+													<p:remoteCommand name="rc_#{ticketGroup.id}"
+														actionListener="#{ticketServicesController.addTicketGroup(ticketGroup)}"
+														update="addButtons" />
+													<i class="users icon"></i> #{ticketGroup.descricao}
+													<div class="right floated">
+														<i
+															class="{{#if call.open}}green{{else}}disabled{{/if}} add icon"></i>
+														<i
+															class="{{#if call.answer}}green{{else}}disabled{{/if}} comments outline icon"></i>
+													</div>
+												</div>
+											</ui:repeat>
+
+										</div>
+									</div>
+								</td>
+								<td class="center aligned servico btns" jsf:id="addButtons">
+									<div class="ui buttons">
+										<p:commandLink styleClass="ui green button"
+											value="Solicitante"
+											actionListener="#{ticketServicesController.adicionarPermissaoSolicitante()}"
+											update="groups"
+											disabled="#{!ticketServicesController.groupSelectedSolicitante}"></p:commandLink>
+										<div class="or" data-text="ou"></div>
+										<p:commandLink styleClass="ui green button" value="Atendente"
+											actionListener="#{ticketServicesController.adicionarPermissaoAtendente()}"
+											update="groups"
+											disabled="#{!ticketServicesController.groupSelectedAtendente}"></p:commandLink>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="inline field" jsf:id="sectors">
+					<label class="small padding">Setor Selecionado</label>
+					<div class="ui segment no padding">
+						<div id="requester-list2" class="ui divided list">
+							<ui:repeat var="setor"
+								value="#{ticketServicesController.instance.setorAtendimento}">
+								<div class="user item small padding" data-value="#{setor.setor}">
+									<i class="fork icon"></i>
+									<div class="content">
+										<div class="header">#{setor.setor}</div>
+									</div>
+								</div>
+							</ui:repeat>
+							<div id="empty-requesters2" class="item small padding"
+								jsf:rendered="#{empty ticketServicesController.instance.setorAtendimento}">
+								<i class="blue info icon"></i>
+								<div class="content">
+									<div class="header">Setor não selecionado</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="inline field">
+					<table class="ui very basic table">
+						<tbody>
+							<tr>
+								<td class="collapsing center aligned"><strong>Selecionar
+										Setor: </strong></td>
+								<td class="center aligned">
+									<div id="add-sector-dropdown"
+										class="ui fluid selection dropdown">
+										<i class="dropdown icon"></i> <input id="add-sector-input"
+											name="sector-input" type="hidden" value="default" />
+										<div class="default text">
+											<i class="fork icon"></i> Adicionar Setor
+										</div>
+										<div class="menu">
+											<ui:repeat var="ticketSetor"
+												value="#{ticketSetorAtendimentoController.listSetores}">
+												<div class="item" data-value="#{ticketSetor.idSetor}"
+													data-text="#{ticketSetor.setor}"
+													jsf:onclick="rc_#{ticketSetor.idSetor}();">
+													<p:remoteCommand name="rc_#{ticketSetor.idSetor}"
+														actionListener="#{ticketServicesController.addTicketSetor(ticketSetor)}"
+														update="newButtons" />
+
+													<i class="fork icon"></i> #{ticketSetor.setor}
+												</div>
+											</ui:repeat>
+
+										</div>
+									</div> <script>$('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();</script>
+								</td>
+								<td class="center aligned servico btns" jsf:id="newButtons">
+									<div class="ui buttons">
+										<p:commandLink styleClass="ui green button" value="Adicionar"
+											actionListener="#{ticketServicesController.setSetorAtendimento()}"
+											update="sectors newButtons"
+											disabled="#{!ticketServicesController.hasATicketSetor()}"></p:commandLink>
+										<div class="or" data-text="ou"></div>
+										<p:commandLink styleClass="ui red button" value="Remover"
+											actionListener="#{ticketServicesController.removeTicketSetor()}"
+											update="sectors newButtons"
+											disabled="#{ticketServicesController.instance.setorAtendimento==null}"></p:commandLink>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="ui divider"></div>
+				<div class="field" jsf:id="serviceFields">
+					<label>Campos de entrada <small class="light gray"><i>(opcional)</i></small></label>
+					<table class="ui striped table">
+						<thead>
+							<tr>
+								<th>Nome</th>
+								<th class="collapsing">Obrigatório</th>
+								<th>Tipo</th>
+								<th>Definições</th>
+								<th class="collapsing">Ações</th>
+							</tr>
+						</thead>
+						<tbody id="service-fields">
+							<tr
+								jsf:rendered="#{empty ticketServicesController.instance.fields}">
+								<td colspan="5" class="center aligned">nenhum campo
+									adiconado</td>
+							</tr>
+							<ui:repeat var="field"
+								value="#{ticketServicesController.instance.fields}">
+								<tr>
+									<td>#{field.descricao}</td>
+									<td class="center aligned"><i class="checkmark green icon"
+										jsf:rendered="#{field.obrigatorio}"></i></td>
+									<td>#{field.tipo}</td>
+									<td>#{field.itens}</td>
+									<td class="center aligned"><p:commandLink
+											styleClass="mini red ui icon button remove field"
+											update="serviceFields"
+											actionListener="#{ticketServicesController.removeField(field)}">
+											<i class="remove icon"></i>
+										</p:commandLink></td>
+								</tr>
+							</ui:repeat>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th>
+									<div class="ui input">
+										<p:inputText id="new-field-name" placeholder="Nome"
+											value="#{ticketServicesController.field.descricao}" />
+									</div>
+								</th>
+								<th class="center aligned">
+									<div class="ui checkbox">
+										<h:selectBooleanCheckbox
+											value="#{ticketServicesController.field.obrigatorio}" />
+									</div>
+								</th>
+								<th class="collapsing">
+									<div id="new-field-drop" class="ui selection dropdown">
+										<h:inputHidden id="new-field-type"
+											value="#{ticketServicesController.field.tipo}" />
+										<div class="default text">Tipo</div>
+										<i class="dropdown icon"></i>
+										<div class="menu">
+											<div class="item" data-value="input">input</div>
+											<div class="item" data-value="select">select</div>
+											<div class="item" data-value="radio">radio</div>
+											<div class="item" data-value="checkbox">checkbox</div>
+										</div>
+									</div> <script>$('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();</script>
+								</th>
+								<th id="new-field-options"><span class="light gray">
+										<p:inputText value="#{ticketServicesController.field.itens}" />
+								</span></th>
+								<th class="center aligned"><p:commandLink
+										update="serviceFields" styleClass="mini green ui icon button"
+										actionListener="#{ticketServicesController.insertField()}">
+										<i class="plus icon"></i>
+									</p:commandLink></th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+				<div class="ui divider"></div>
+				<div class="field">
+					<label>Possíveis soluções <small class="light gray"><i>(opcional)</i></small></label>
+					<p:inputTextarea id="service-tips"
+						ph:placeholder="Uma solução por linha"
+						value="#{ticketServicesController.instance.solucoes}"></p:inputTextarea>
+				</div>
+				<div class="field">
+					<div id="user-form-away" class="ui checkbox">
+						<h:selectBooleanCheckbox
+							value="#{ticketServicesController.instance.padrao}" />
+						<label><strong>Serviço é padrão para novos
+								usuários? </strong><small class="light gray"><i>(opcional)</i></small></label>
+					</div>
+				</div>
+				<div class="ui divider"></div>
+				<div class="ui buttons" jsf:id="insertButton">
+					<p:commandLink
+						actionListener="#{ticketServicesController.insert()}"
+						styleClass="ui blue button"
+						rendered="#{ticketServicesController.instance.id == 0}"
+						disabled="#{!ticketServicesController.hasATicketSetor()}"
+						value="Salvar alterações" update="removeButton insertButton" />
+					<p:commandLink
+						actionListener="#{ticketServicesController.update()}"
+						styleClass="ui blue button"
+						rendered="#{ticketServicesController.instance.id > 0}"
+						disabled="#{!ticketServicesController.hasATicketSetor()}"
+						value="Salvar alterações" update="removeButton insertButton" />
+					<div class="or" data-text="ou"></div>
+					<a
+						href="#{facesContext.externalContext.applicationContextPath}/admin/servicos/list.jsf"
+						class="ui button">Descartar alterações</a>
+				</div>
+				<div class="ui pull right buttons" jsf:id="removeButton">
+					<p:commandLink styleClass="ui red button"
+						rendered="#{ticketServicesController.instance.id > 0}"
+						value="Excluir Grupo"
+						actionListener="#{ticketServicesController.removeAndRedirect(ticketServicesController.instance, '/admin/servicos/list.jsf')}">
+						<p:confirm header="Confirmation" message="Are you sure?"
+							icon="ui-icon-alert" />
+					</p:commandLink>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+
+	<ui:define name="page-js">
+		<script>
             function servicePathMarkup(p) {
                 p = $(p).val();                
                 $('#serviceNamePath').html(p);
@@ -261,6 +373,6 @@
             pathMarkup($('#service-path'));
             $('.ui.checkbox').checkbox();
         </script>
-    </ui:define>
+	</ui:define>
 
 </ui:composition>

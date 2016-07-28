@@ -1,193 +1,256 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-                template="../resources/layout/main.xhtml"
-                xmlns:h="http://xmlns.jcp.org/jsf/html"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:jsf="http://xmlns.jcp.org/jsf"
-                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
-                xmlns:f="http://xmlns.jcp.org/jsf/core">
+	template="../resources/layout/main.xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:p="http://primefaces.org/ui" xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
 
-    <ui:param name="menu" value="abrir" />
+	<ui:param name="menu" value="abrir" />
 
-    <ui:define name="head-include">
-        <h:outputStylesheet library="css" name="quill.base.css" />
-        <h:outputStylesheet library="css" name="quill.snow.css" />
-        <h:outputStylesheet library="css" name="ql-snow-override.css" />
+	<ui:define name="head-include">
+		<h:outputStylesheet library="css" name="quill.base.css" />
+		<h:outputStylesheet library="css" name="quill.snow.css" />
+		<h:outputStylesheet library="css" name="ql-snow-override.css" />
+	</ui:define>
+
+	<ui:define name="page-title">
+        Detran - TO | Abrir Chamado
     </ui:define>
 
-    <ui:define name="page-title">
-        Detran - TO | Abrir Chamado
-    </ui:define>    
+	<ui:define name="content">
+		<h4 class="ui top attached header">Novo chamado</h4>
+		<div class="ui bottom attached segment">
+			<h:form id="novo-chamado-form" class="ui form" prependId="false">
+				<p:growl id="msgs" showDetail="true" />
+				<h:inputHidden id="ticket-content"
+					value="#{ticketSupportController.instance.descricao}" />
+				<p:remoteCommand name="createTicket"
+					actionListener="#{ticketSupportController.insert()}" />
+				<div class="field">
+					<label>Serviço solicitado</label>
+					<div class="ui huge breadcrumb small top margin"></div>
+				</div>
+				<div class="ui divider"></div>
+				<div class="field">
+					<label>Assunto</label>
+					<h:inputText value="#{ticketSupportController.instance.assunto}" />
+				</div>
+				<ui:insert name="formDefinicao" />
+				<div class="ui divider"></div>
 
-    <ui:define name="content">
-        <h4 class="ui top attached header">Novo chamado</h4>
-        <div class="ui bottom attached segment">
-            <h:form id="novo-chamado-form" class="ui form" prependId="false">
-                <h:inputHidden id="ticket-content" value="#{ticketSupportController.instance.descricao}" />
-                <p:remoteCommand name="createTicket" actionListener="#{ticketSupportController.insert()}" />
-                <div class="field">
-                    <label>Serviço solicitado</label>
-                    <div class="ui huge breadcrumb small top margin"></div>
-                </div>
-                <div class="ui divider"></div>
-                <div class="field">
-                    <label>Assunto</label>                    
-                    <h:inputText value="#{ticketSupportController.instance.assunto}" />
-                </div>
-                <ui:insert name="formDefinicao" />                
-                <div class="ui divider"></div>
+				<ui:repeat var="field"
+					value="#{ticketSupportController.service.fields}">
+					<div class="field ticket-field"
+						jsf:rendered="#{field.tipo == 'input'}">
+						<label>#{field.descricao} <small class="light gray"
+							jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
+						<h:inputText value="#{field.value}"
+							required="#{field.obrigatorio}"
+							requiredMessage="Campo #{field.descricao} é obrigatório!" />
+					</div>
 
-                <ui:repeat var="field" value="#{ticketSupportController.service.fields}">
-                    <div class="field ticket-field" jsf:rendered="#{field.tipo == 'input'}">
-                        <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
-                        <h:inputText value="#{field.value}" required="#{field.obrigatorio}"
-                        	requiredMessage="Campo #{field.descricao} é obrigatório!" />
-                    </div>
+					<div class="field ticket-field"
+						jsf:rendered="#{field.tipo == 'select'}">
+						<label>#{field.descricao} <small class="light gray"
+							jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
+						<h:selectOneMenu value="#{field.value}"
+							rendered="#{field.obrigatorio}"
+							requiredMessage="Campo #{field.descricao} é obrigatório!"
+							styleClass="ui dropdown">
+							<f:selectItems var="item" value="#{field.itensArray}"
+								itemLabel="#{item}" />
+						</h:selectOneMenu>
+					</div>
 
-                    <div class="field ticket-field" jsf:rendered="#{field.tipo == 'select'}">
-                        <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
-                        <h:selectOneMenu value="#{field.value}" rendered="#{field.obrigatorio}"
-                        					requiredMessage="Campo #{field.descricao} é obrigatório!"
-                                         styleClass="ui dropdown">
-                            <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" />                        
-                        </h:selectOneMenu>
-                    </div>                    
+					<div class="field ticket-field"
+						jsf:rendered="#{field.tipo == 'checkbox'}">
+						<label>#{field.descricao} <small class="light gray"
+							jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
+						<h:selectManyCheckbox value="#{field.selectedOptions}"
+							required="#{field.obrigatorio}"
+							requiredMessage="Campo #{field.descricao} é obrigatório!"
+							styleClass="ui checkbox" layout="pageDirection">
+							<f:selectItems var="item" value="#{field.itensArray}"
+								itemLabel="#{item}" itemValue="#{item}" />
+						</h:selectManyCheckbox>
+					</div>
 
-                    <div class="field ticket-field" jsf:rendered="#{field.tipo == 'checkbox'}">
-                        <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>                       
-                        <h:selectManyCheckbox value="#{field.selectedOptions}" required="#{field.obrigatorio}"
-                        						requiredMessage="Campo #{field.descricao} é obrigatório!"
-                                              styleClass="ui checkbox" layout="pageDirection">
-                            <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" itemValue="#{item}"/>
-                        </h:selectManyCheckbox>                                                                        
-                    </div>                    
+					<div class="field ticket-field"
+						jsf:rendered="#{field.tipo == 'radio'}">
+						<label>#{field.descricao} <small class="light gray"
+							jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
+						<h:selectOneRadio value="#{field.value}"
+							required="#{field.obrigatorio}" layout="pageDirection"
+							requiredMessage="Campo #{field.descricao} é obrigatório!">
+							<f:selectItems var="item" value="#{field.itensArray}"
+								itemLabel="#{item}" itemValue="#{item}" />
+						</h:selectOneRadio>
+					</div>
+					<div class="ui divider"></div>
+				</ui:repeat>
+				<div class="inline field">
+					<table class="ui very basic table">
+						<tbody>
+							<tr>
+								<td class="collapsing center aligned"><strong>Prioridade
+										deste Chamado</strong></td>
+								<td class="center aligned">
+									<div id="add-group-dropdown"
+										class="ui fluid selection dropdown">
+										<i class="dropdown icon"></i> <input id="add-group-input"
+											name="group-input" type="hidden" value="default" />
+										<div class="default text">
+											<i class="warning circle icon"></i> Prioridade
+										</div>
+										<div class="menu">
+											<ui:repeat var="ticketPrioridade"
+												value="#{ticketSupportController.prioridades}">
+												<div class="item" data-value="#{ticketPrioridade}"
+													data-text="#{ticketPrioridade}"
+													jsf:onclick="rc_#{ticketPrioridade}();">
+													<p:remoteCommand name="rc_#{ticketPrioridade}"
+														actionListener="#{ticketSupportController.instance.setPrioridade(ticketPrioridade)}" />
+													<i class="warning circle icon"></i> #{ticketPrioridade}
 
-                    <div class="field ticket-field" jsf:rendered="#{field.tipo == 'radio'}">
-                        <label>#{field.descricao} <small class="light gray" jsf:rendered="#{field.obrigatorio}"><i>(obrigatório)</i></small></label>
-                        <h:selectOneRadio value="#{field.value}" required="#{field.obrigatorio}" layout="pageDirection" 
-                        					requiredMessage="Campo #{field.descricao} é obrigatório!">
-                            <f:selectItems var="item" value="#{field.itensArray}" itemLabel="#{item}" 
-                                           itemValue="#{item}"/>
-                        </h:selectOneRadio>                        
-                    </div>
-                    <div class="ui divider"></div>                    
-                </ui:repeat>
+												</div>
+											</ui:repeat>
 
-                <div class="field">
-                    <label>Mensagem</label>
-                    <div class="ui top attached no padding tertiary segment">
-                        <div class="ql-toolbar-container wysiwyg toolbar">
-                            <select class="ql-font">
-                                <option value="sans-serif" selected="selected">Sans Serif</option>
-                                <option value="serif">Serif</option>
-                                <option value="monospace">Monospace</option>
-                            </select>
-                            <select class="ql-size">
-                                <option value="10px">Pequeno</option>
-                                <option value="13px" selected="selected">Normal</option>
-                                <option value="18px">Grande</option>
-                            </select>
-                            <span class="ql-format-separator"></span>
-                            <div class="ql-format-group">
-                                <span class="ql-bold ql-format-button"></span>
-                                <span class="ql-italic ql-format-button"></span>
-                                <span class="ql-strike ql-format-button"></span>
-                                <span class="ql-underline ql-format-button"></span>
-                                <span class="ql-link ql-format-button"></span>
-                                <span class="ql-format-separator"></span>
-                                <select title="Alignment" class="ql-align">
-                                    <option value="left" label="Esquerda" selected=""></option>
-                                    <option value="center" label="Centralizado"></option>
-                                    <option value="right" label="Direita"></option>
-                                    <option value="justify" label="Justificado"></option>
-                                </select>
-                                <span title="List" class="ql-format-button ql-list"></span>
-                                <span title="Bullet" class="ql-format-button ql-bullet"></span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="ui attached no padding segment">
-                        <div id="new-ticket-message" class="wysiwyg editor"></div>
-                    </div>
-                </div>
-                <div class="field" jsf:id="anexoList">
-                    <label jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">Anexos</label>
-                    <section class="proj-page-section" jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">							
-						<ui:repeat var="anexo" value="#{ticketSupportController.instance.anexos}">
-							<div class="proj-page-attach">
-								<i class="font-icon attach icon"></i>
-								<p class="name">#{anexo.name}</p>
-								<p class="date"><h:outputText value="#{anexo.created}">
-                                        <f:convertDateTime pattern="dd MMMM yyyy',' HH:MM" locale="pt-BR"/>
-                                    </h:outputText></p>
-								<p>
-									<a href="#">Visualizar</a>
-									<p:commandLink actionListener="#{ticketSupportController.removerAnexo(anexo)}"
-										update="anexoList">Remover</p:commandLink>
-								</p>
-							</div>		
-						</ui:repeat>										
-					</section>						                   
-                </div>
-                <div class="ui divider"></div>
-                <div class="ui buttons">                                        
-                    <a href="#" class="ui submit blue button" onclick="createChamado();">Enviar chamado</a>
-                    <div class="or" data-text="ou"></div>
-                    <a href="#{facesContext.externalContext.applicationContextPath}" class="ui button">Cancelar</a>
-                </div>
+										</div>
+									</div>
+								</td>
+								<script>$('.ui.dropdown').dropdown(); $('.ui.checkbox').checkbox();</script>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="field">
+					<label>Mensagem</label>
+					<div class="ui top attached no padding tertiary segment">
+						<div class="ql-toolbar-container wysiwyg toolbar">
+							<select class="ql-font">
+								<option value="sans-serif" selected="selected">Sans
+									Serif</option>
+								<option value="serif">Serif</option>
+								<option value="monospace">Monospace</option>
+							</select> <select class="ql-size">
+								<option value="10px">Pequeno</option>
+								<option value="13px" selected="selected">Normal</option>
+								<option value="18px">Grande</option>
+							</select> <span class="ql-format-separator"></span>
+							<div class="ql-format-group">
+								<span class="ql-bold ql-format-button"></span> <span
+									class="ql-italic ql-format-button"></span> <span
+									class="ql-strike ql-format-button"></span> <span
+									class="ql-underline ql-format-button"></span> <span
+									class="ql-link ql-format-button"></span> <span
+									class="ql-format-separator"></span> <select title="Alignment"
+									class="ql-align">
+									<option value="left" label="Esquerda" selected=""></option>
+									<option value="center" label="Centralizado"></option>
+									<option value="right" label="Direita"></option>
+									<option value="justify" label="Justificado"></option>
+								</select> <span title="List" class="ql-format-button ql-list"></span> <span
+									title="Bullet" class="ql-format-button ql-bullet"></span>
+							</div>
+						</div>
+					</div>
 
-                <div class="pull right">
-                	 <p:commandLink styleClass="ui blue action button" onclick="PF('dlg1').show();">
-                     		<i class="upload icon"></i> Enviar Anexo
+					<div class="ui attached no padding segment">
+						<div id="new-ticket-message" class="wysiwyg editor"></div>
+					</div>
+				</div>
+				<div class="field" jsf:id="anexoList">
+					<label
+						jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">Anexos</label>
+					<section class="proj-page-section"
+						jsf:rendered="#{ticketSupportController.instance.anexos.size() > 0}">
+					<ui:repeat var="anexo"
+						value="#{ticketSupportController.instance.anexos}">
+						<div class="proj-page-attach">
+							<i class="font-icon attach icon"></i>
+							<p class="name">#{anexo.name}</p>
+							<p class="date">
+								<h:outputText value="#{anexo.created}">
+									<f:convertDateTime pattern="dd MMMM yyyy',' HH:MM"
+										locale="pt-BR" />
+								</h:outputText>
+							</p>
+							<p>
+								<a href="#">Visualizar</a>
+								<p:commandLink
+									actionListener="#{ticketSupportController.removerAnexo(anexo)}"
+									update="anexoList">Remover</p:commandLink>
+							</p>
+						</div>
+					</ui:repeat> </section>
+				</div>
+				<div class="ui divider"></div>
+				<div class="ui buttons">
+					<a href="#" class="ui submit blue button"
+						onclick="createChamado();">Enviar chamado</a>
+					<div class="or" data-text="ou"></div>
+					<a href="#{facesContext.externalContext.applicationContextPath}"
+						class="ui button">Cancelar</a>
+				</div>
+
+				<div class="pull right">
+					<p:commandLink styleClass="ui blue action button"
+						onclick="PF('dlg1').show();">
+						<i class="upload icon"></i> Enviar Anexo
                      </p:commandLink>
-                    <a href="#{facesContext.externalContext.applicationContextPath}/servicos.jsf" class="ui button">Voltar para o catálogo de serviços</a>
-                </div>
-            </h:form>
-        </div>
+					<a
+						href="#{facesContext.externalContext.applicationContextPath}/servicos.jsf"
+						class="ui button">Voltar para o catálogo de serviços</a>
+				</div>
+			</h:form>
+		</div>
 
-        <div id="tips-dimmer" class="ui page dimmer" jsf:rendered="#{ticketSupportController.service.getTips().size() > 0}">
-            <div class="content">
-                <div class="center">
-                    <h2 class="ui inverted blue icon header">
-                        <i class="blue help circle icon"></i>
-                        Você já tentou as seguintes soluções?
-                        <div class="sub header">
-                            <ol>
-                                <ui:repeat var="tip" value="#{ticketSupportController.service.tips}">
-                                    <li style="text-align: left">#{tip}</li>
-                                </ui:repeat>
-                            </ol>
-                        </div>
-                    </h2>
-                    <br/>
-                    <div id="frown-btn" class="ui approve blue basic inverted button">
-                        <i class="frown icon"></i>
-                        Não funcionou. Quero abrir o chamado
-                    </div>
-                    <div id="smile-btn" class="ui approve green basic inverted button">
-                        <i class="smile icon"></i>
-                        Funcionou. Obrigado!
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <h:form>
-	        <p:dialog widgetVar="dlg1" minHeight="40">
-			    <p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo" label="Escolher Arquivo"
-			    		fileUploadListener="#{ticketSupportController.enviarAnexo}" update="anexoList"
-			    		 oncomplete="PF('dlg1').hide()" 
-	                     auto="true" sizeLimit="10000000" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
+		<div id="tips-dimmer" class="ui page dimmer"
+			jsf:rendered="#{ticketSupportController.service.getTips().size() > 0}">
+			<div class="content">
+				<div class="center">
+					<h2 class="ui inverted blue icon header">
+						<i class="blue help circle icon"></i> Você já tentou as seguintes
+						soluções?
+						<div class="sub header">
+							<ol>
+								<ui:repeat var="tip"
+									value="#{ticketSupportController.service.tips}">
+									<li style="text-align: left">#{tip}</li>
+								</ui:repeat>
+							</ol>
+						</div>
+					</h2>
+					<br />
+					<div id="frown-btn" class="ui approve blue basic inverted button">
+						<i class="frown icon"></i> Não funcionou. Quero abrir o chamado
+					</div>
+					<div id="smile-btn" class="ui approve green basic inverted button">
+						<i class="smile icon"></i> Funcionou. Obrigado!
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<h:form>
+			<p:dialog widgetVar="dlg1" minHeight="40">
+				<p:fileUpload mode="advanced" uploadLabel="Escolher Arquivo"
+					label="Escolher Arquivo"
+					fileUploadListener="#{ticketSupportController.enviarAnexo}"
+					update="anexoList" oncomplete="PF('dlg1').hide()" auto="true"
+					sizeLimit="10000000"
+					allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xlsx|ppt|pptx)$/" />
 			</p:dialog>
 		</h:form>
 
-    </ui:define>
+	</ui:define>
 
-    <ui:define name="page-js">
-        <h:outputScript library="js" name="quill.min.js" />                
-        <script>
+	<ui:define name="page-js">
+		<h:outputScript library="js" name="quill.min.js" />
+		<script>
             this.editor = new Quill('.wysiwyg.editor', {
                 modules: {
                     'toolbar': {container: '.wysiwyg.toolbar'},
@@ -230,6 +293,6 @@
             });                         
             
         </script>
-    </ui:define>
+	</ui:define>
 
 </ui:composition>

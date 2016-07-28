@@ -46,6 +46,8 @@ public class UserSecurity extends AbstractEntity implements Security{
     @Enumerated(EnumType.STRING)
     private AuthenticationType authenticationType;
     
+    private Boolean showNotification = true;
+    
     @Column(name = "ausente")
     private Boolean ausente;
             
@@ -63,8 +65,16 @@ public class UserSecurity extends AbstractEntity implements Security{
     UserSecurityLogins lastLogin;
 
     public UserSecurity() {
+    	showNotification = true;
     }        
 
+    public void setShowNotification(Boolean showNotification){
+    	this.showNotification = showNotification;
+    }
+    
+    public Boolean getShowNotification(){
+    	return this.showNotification;
+    }
     @Override
     public String getName() 
     {        
