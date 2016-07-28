@@ -16,9 +16,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPAQueryBase;
 
 import br.gov.to.detran.domain.QTicketGroupService;
-import br.gov.to.detran.domain.QTicketStickerSupport;
 import br.gov.to.detran.domain.QUserSecurityGroup;
-import br.gov.to.detran.domain.QViewServidorChamado;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.view.QViewTicketSupport;

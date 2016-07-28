@@ -14,6 +14,8 @@ import br.gov.to.detran.domain.view.ViewTicketSupport;
 import br.gov.to.detran.repository.TicketSupportRepository;
 import br.gov.to.detran.util.FacesUtil;
 import com.querydsl.core.BooleanBuilder;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,7 +60,10 @@ public class TicketSupportTable implements java.io.Serializable {
     private TicketSupportTableFilter status = TicketSupportTableFilter.TODOS;
     private TicketSupportTablePeriod periodo = TicketSupportTablePeriod.TODOS;
     private TicketSupportTableGrupo grupos = TicketSupportTableGrupo.MEUS;
-    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L);
+    private TicketSupportCount updateCount = new TicketSupportCount(0L, 0L, 0L, 0L, 0L, 0L);
+    private Boolean ordemCrescente = true;
+    private String ordenacao = "desc";
+    private String ultimoCriterio = "ultimaResposta";
 
     public TicketSupportTable() {
         this.currentPage = 0;
@@ -185,12 +190,58 @@ public class TicketSupportTable implements java.io.Serializable {
             		QTicketSupport.ticketSupport.numero.containsIgnoreCase(filterValue),
             		QTicketSupport.ticketSupport.atendente.name.containsIgnoreCase(filterValue));
         }        
+        LazyResult<TicketSupport> lazyResult;
         
-        LazyResult<TicketSupport> lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
+        /*lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, "ultimaResposta",
                 "desc", filterHash, booleanBuilder, true);
+        */
+        System.out.println(ultimoCriterio);
+        System.out.println(ordenacao);
+        lazyResult = this.repository.lazyLoad(this.currentPage * pageSize, pageSize, ultimoCriterio,
+                ordenacao, filterHash, booleanBuilder, true);
         
         this.setRowCount(lazyResult.getCount().intValue());
         return lazyResult.getResult();
+    }
+    
+    public void ordenarChamados(String argumento){
+    	if(ordemCrescente == true && argumento.equals(ultimoCriterio)){
+        	ordenacao = "desc";
+        	ordemCrescente = false;
+        	System.out.println("Ordem ascendente.");
+        }
+        else if(ordemCrescente == false && argumento.equals(ultimoCriterio)){
+        	ordenacao = "asc";
+        	ordemCrescente = true;
+        	System.out.println("Ordem descendente.");
+        }
+        else{
+        	ordenacao = "asc";
+        	ordemCrescente = true;
+        	System.out.println("Ordem padrão: ascendente");
+        }
+        ultimoCriterio = argumento;
+        this.data = this.load();
+        this.countUpdates();
+    	
+    }
+    
+    public String preencherCabecalho(String coluna){
+    	
+    	String codigohtml="", ordemChamados="";
+    	
+    	if(ordenacao.equals("asc")){
+    		ordemChamados = "up";
+    	}
+    	else{
+    		ordemChamados = "down";
+    	}
+    	
+    	if(coluna.equals(ultimoCriterio)){
+    		codigohtml = "level "+ ordemChamados +" icon";
+    	}
+    	    	
+    	return codigohtml;
     }
 
     public void countUpdates() {
@@ -417,6 +468,30 @@ public class TicketSupportTable implements java.io.Serializable {
     public void setUpdateCount(TicketSupportCount updateCount) {
         this.updateCount = updateCount;
     }
+
+	public Boolean getOrdemCrescente() {
+		return ordemCrescente;
+	}
+
+	public void setOrdemCrescente(Boolean ordemCrescente) {
+		this.ordemCrescente = ordemCrescente;
+	}
+
+	public String getOrdenacao() {
+		return ordenacao;
+	}
+
+	public void setOrdenacao(String ordenacao) {
+		this.ordenacao = ordenacao;
+	}
+
+	public String getUltimoCriterio() {
+		return ultimoCriterio;
+	}
+
+	public void setUltimoCriterio(String ultimoCriterio) {
+		this.ultimoCriterio = ultimoCriterio;
+	}
 
     
 }

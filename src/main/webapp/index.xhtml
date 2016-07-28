@@ -83,14 +83,26 @@
                                 </div>
                             </th>
                         </tr>
-                        <tr>
+                        <tr jsf:id="cabecalho-tabela">
                             <th class="collapsing"></th>
-                            <th class="collapsing">Número</th>
-                            <th>Assunto</th>
+                            <th class="collapsing"><h:commandLink class=""
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('numero')}"
+                            							update=":tableData :col-numero"> Número 
+                            							<i jsf:id="col-numero" class="#{ticketSupportTableController.supportTable.preencherCabecalho('numero')}"/></h:commandLink>
+                           	</th>
+                            <th>				<h:commandLink class=""
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('assunto')}"
+                            							update=":tableData :col-assunto"> Assunto <i jsf:id="col-assunto" class="#{ticketSupportTableController.supportTable.preencherCabecalho('assunto')}"/></h:commandLink></th>
                             <th >Lembrete</th>
-                            <th class="collapsing">Solicitante</th>
-                            <th class="collapsing">Atendente</th>
-                            <th class="collapsing">Última resposta</th>
+                            <th class="collapsing"><h:commandLink class="col-assunto"
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('solicitante')}"
+                            							update=":tableData :col-solicitante"> Solicitante <i jsf:id="col-solicitante" class="#{ticketSupportTableController.supportTable.preencherCabecalho('solicitante')}"/></h:commandLink></th>
+                            <th class="collapsing"><h:commandLink class=""
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('atendente')}"
+                            							update=":tableData :col-atendente"> Atendente <i jsf:id="col-atendente" class="#{ticketSupportTableController.supportTable.preencherCabecalho('atendente')}"/></h:commandLink></th>
+                            <th class="collapsing"><h:commandLink class=""
+                            							actionListener="#{ticketSupportTableController.supportTable.ordenarChamados('ultimaResposta')}"
+                            							update=":tableData :col-ultimaresposta"> Última resposta <i jsf:id="col-ultimaresposta" class="#{ticketSupportTableController.supportTable.preencherCabecalho('ultimaResposta')}"/></h:commandLink></th>
                         </tr>
                     </thead>
                     <tbody jsf:id="tableData">                                                
