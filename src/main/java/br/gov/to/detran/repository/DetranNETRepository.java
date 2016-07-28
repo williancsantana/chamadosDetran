@@ -47,6 +47,25 @@ public class DetranNETRepository extends AbstractRepositoryDetranNET implements 
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Object[] pesquisarVeiculoChassi(String chassi) {
+		Session session = this.getEm().unwrap(Session.class);
+		ProcedureCall call = session
+			    .createStoredProcedureCall("stp_Rev_Ws_DetranMovel");		    
+		call.registerParameter(2, String.class, 
+			    ParameterMode.IN).bindValue(chassi);
+		
+		Output output = call.getOutputs().getCurrent();
+		if (output.isResultSet()) {		    
+			List<Object[]> veiculo = ((ResultSetOutput) output).getResultList();
+		    if(!veiculo.isEmpty()){
+		    	return veiculo.get(0);
+		    }
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public Object[] pesquisarVeiculoPlacaVistoria(String p) {
 		Session session = this.getEm().unwrap(Session.class);
 		ProcedureCall call = session

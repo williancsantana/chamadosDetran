@@ -161,12 +161,30 @@ public class ItemLeilaoController extends BaseController<ItemLeilao> implements 
         }
     }
     
-    public void pesquisarPlaca(){
+    public void pesquisarPlaca(){    	
+    	this.pesquisarVeiculo(placa, null);
+    }
+    
+    public void pesquisarChassi(){
+    	this.pesquisarVeiculo(null, placa);    	
+    }
+    
+    public void pesquisarVeiculo(String placa, String chassi){
     	try{
-    		if(repository.existePlacaCadastrada(this.placa)){
+    		if(!placa.isEmpty() && placa != null && repository.existePlacaCadastrada(placa)){
     			throw new Exception("Placa já cadastrada!");
     		}
-    		Object[] veiculo = detranRepository.pesquisarVeiculoPlaca(placa);
+    		if(!chassi.isEmpty() && chassi != null && repository.existeChassiCadastrado(chassi)){
+    			throw new Exception("Chassi já cadastrado!");
+    		}
+    		
+    		Object[] veiculo = null;
+    		if(!placa.isEmpty() && placa != null){
+    			veiculo = detranRepository.pesquisarVeiculoPlaca(placa);
+    		}    		
+    		if(!chassi.isEmpty() && chassi != null){
+    			veiculo = detranRepository.pesquisarVeiculoPlaca(placa);
+    		}
         	ItemLeilao item = new ItemLeilao();
         	item.setPlaca(String.valueOf(veiculo[3]));    	
         	item.setChassi(String.valueOf(veiculo[2]));
@@ -224,7 +242,7 @@ public class ItemLeilaoController extends BaseController<ItemLeilao> implements 
     	}catch(Exception e){
     		e.printStackTrace();
     		FacesContext.getCurrentInstance().validationFailed();
-    		addMenssage(FacesMessage.SEVERITY_ERROR, "Validação", "Placa já cadastrada na base!");
+    		addMenssage(FacesMessage.SEVERITY_ERROR, "Validação", e.getMessage());
     	}
     	
     }

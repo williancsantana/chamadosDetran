@@ -28,22 +28,31 @@
             <h:form id="service-form" class="ui form" prependId="false">
                 <div class="field">
                     <label>Placa</label>                    
-                   	<div class="two fields">
+                   	<div class="tree fields">
 				      <div class="field">
 				        <p:inputText value="#{itemLeilaoController.placa}" id="placaInput"
-	                    	required="true" requiredMessage="A placa do Veiculo é obrigatório!"
-	                    	placeholder="Informe a Placa do Veiculo"
+	                    	required="true" requiredMessage="A placa do Veiculo ou o Chassi é obrigatório!"
+	                    	placeholder="Informe a Placa do Veiculo ou Chassi"
 	                    	disabled="#{itemLeilaoController.instance.id > 0}"/>
 				      </div>
 				      <div class="field">
 				        <p:commandLink actionListener="#{itemLeilaoController.pesquisarPlaca()}"
                                    styleClass="ui blue button" disabled="#{itemLeilaoController.instance.id > 0}"
-                                   value="Consultar Veiculo" update="@form"/>
+                                   value="Consultar Veiculo Placa" update="@form"/>
+				      </div>
+				      <div class="field">
+				        <p:commandLink actionListener="#{itemLeilaoController.pesquisarChassi()}"
+                                   styleClass="ui blue button" disabled="#{itemLeilaoController.instance.id > 0}"
+                                   value="Consultar Veiculo por Chassi" update="@form"/>
 				      </div>
 				    </div>
                 </div>
                 <h4 class="ui dividing header">Informações Veiculo</h4>
-                <div class="three fields">
+                <div class="four fields">
+                	<div class="field">
+				      <label>Placa</label>
+				      <p:inputText value="#{itemLeilaoController.instance.placa}" readonly="true" />
+				    </div>
 				    <div class="field">
 				      <label>Chassi</label>
 				      <p:inputText value="#{itemLeilaoController.instance.chassi}" readonly="true" />

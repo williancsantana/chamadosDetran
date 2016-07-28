@@ -42,9 +42,21 @@ public class ItemLeilaoRepository extends AbstractRepository<ItemLeilao> impleme
 	    return query.fetch();
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean existePlacaCadastrada(String placa) {
 		BooleanBuilder where = new BooleanBuilder();
 		where.and(QItemLeilao.itemLeilao.placa.equalsIgnoreCase(placa));
+		where.and(QItemLeilao.itemLeilao.removed.isFalse());				
+		JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
+		query = (JPAQueryBase) query.from(QItemLeilao.itemLeilao).where(where);
+		Long count = query.fetchCount();
+		return count != 0;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public boolean existeChassiCadastrado(String chassi) {
+		BooleanBuilder where = new BooleanBuilder();
+		where.and(QItemLeilao.itemLeilao.chassi.equalsIgnoreCase(chassi));
 		where.and(QItemLeilao.itemLeilao.removed.isFalse());		
 		JPAQueryBase query = (JPAQueryBase) this.getPersistenceDao().query();
 		query = (JPAQueryBase) query.from(QItemLeilao.itemLeilao).where(where);
