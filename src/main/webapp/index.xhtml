@@ -23,7 +23,7 @@
                 <table id="chamados-table" class="ui table striped">
                     <thead>
                         <tr>
-                            <th colspan="6">
+                            <th colspan="7">
                                 <div id="chamados-table-dropdowns" class="pull left">
                                     <div jsf:id="with-groups-dropdown"
                                          class="ui icon top left pointing dropdown button" title="{{groupsDropdownTitle}}">
@@ -107,7 +107,7 @@
                     </thead>
                     <tbody jsf:id="tableData">                                                
                         <tr jsf:rendered="#{ticketSupportTableController.supportTable.data.isEmpty()}">
-                            <td colspan="6" class="center aligned"><i class="comments outline icon"></i> <b>Nenhum chamado localizado</b></td>
+                            <td colspan="7" class="center aligned"><i class="comments outline icon"></i> <b>Nenhum chamado localizado</b></td>
                         </tr> 
                         <ui:repeat var="chamado" value="#{ticketSupportTableController.supportTable.data}" >
                             <tr class="#{chamado.unseen ? 'bold active' : ''}">
@@ -152,7 +152,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th class="right aligned" colspan="6">
+                            <th class="right aligned" colspan="7">
                                 <div class="ui small pagination menu">
                                     <div id="pagination-dropdown" class="ui dropdown link item">
                                         <span class="text"><h:outputText value="#{ticketSupportTableController.supportTable.getPaginationInfor()}" 

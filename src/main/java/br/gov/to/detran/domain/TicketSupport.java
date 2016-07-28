@@ -356,9 +356,7 @@ public class TicketSupport extends AbstractEntity{
 	}
 	
 	public void setPrioridade(String prioridade){
-		this.prioridade = prioridade;
-		 FacesContext context = FacesContext.getCurrentInstance();
-		 context.addMessage(null, new FacesMessage("Prioridade Selecionada",  "A prioridade desse chamado é: " + prioridade) );
+		this.prioridade = prioridade;		 
 		
 	}
 	

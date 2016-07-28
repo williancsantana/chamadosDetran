@@ -57,7 +57,7 @@
 								</div>
 								<p:commandLink styleClass="ui button" update="@form" rendered="#{ticketStickerController.naoExisteLembrete(ticketSupportController.instance, userLogged.user)}"
 									oncomplete="PF('stickerDialog').show()" 	>
-									<i class="calendar outline icon"></i> Adicionar Lembrete												 
+									<i class="calendar outline icon"></i> Lembrete												 
 			                  	</p:commandLink>
 			                  	<p:commandLink styleClass="ui button" update="@form" rendered="#{ticketStickerController.existeLembrete(ticketSupportController.instance, userLogged.user)}"
 									actionListener="#{ticketStickerController.removeLembrete(ticketSupportController.instance)}" 	>
@@ -67,7 +67,7 @@
 									<i class="chevron down icon"></i> Ver detalhes
 								</div>
 
-								<p:commandLink styleClass="ui button"
+								<p:commandLink styleClass="ui button" rendered="#{ticketSupportController.permissaoConsultarServidor()}"
 									oncomplete="PF('dlg3').show()" update=":formDialogConsulta"
 									actionListener="#{ticketSupportController.pesquisarServidorSisrh(ticketSupportController.instance.solicitante.cpf)}">
 									<i class="search icon"></i> Consultar Servidor												 

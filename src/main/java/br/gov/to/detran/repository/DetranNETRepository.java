@@ -51,8 +51,12 @@ public class DetranNETRepository extends AbstractRepositoryDetranNET implements 
 	public Object[] pesquisarVeiculoChassi(String chassi) {
 		Session session = this.getEm().unwrap(Session.class);
 		ProcedureCall call = session
-			    .createStoredProcedureCall("stp_Rev_Ws_DetranMovel");		    
+			    .createStoredProcedureCall("stp_Rev_Ws_DetranMovel");
+		call.registerParameter(1, String.class, 
+			    ParameterMode.IN).bindValue("NULL");
 		call.registerParameter(2, String.class, 
+			    ParameterMode.IN).bindValue("NULL");
+		call.registerParameter(3, String.class, 
 			    ParameterMode.IN).bindValue(chassi);
 		
 		Output output = call.getOutputs().getCurrent();

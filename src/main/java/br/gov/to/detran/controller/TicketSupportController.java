@@ -576,6 +576,14 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         return permissao;                    
     }
     
+    public boolean permissaoConsultarServidor() throws Exception{    	
+        UserSecurity user = FacesUtil.loggedUser();
+        if(instance.getAtendente() != null && Objects.equals(user.getId(), this.instance.getSolicitante().getId())){
+        	return false;
+        }        
+        return true;                    
+    }
+    
     public boolean permissaoApropirar() throws Exception{    	
         UserSecurity user = FacesUtil.loggedUser();
         if(instance.getAtendente() != null){

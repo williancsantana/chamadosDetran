@@ -171,19 +171,19 @@ public class ItemLeilaoController extends BaseController<ItemLeilao> implements 
     
     public void pesquisarVeiculo(String placa, String chassi){
     	try{
-    		if(!placa.isEmpty() && placa != null && repository.existePlacaCadastrada(placa)){
+    		if(placa != null  && !placa.isEmpty() && repository.existePlacaCadastrada(placa)){
     			throw new Exception("Placa já cadastrada!");
     		}
-    		if(!chassi.isEmpty() && chassi != null && repository.existeChassiCadastrado(chassi)){
+    		if(placa != null && !chassi.isEmpty() && chassi != null && repository.existeChassiCadastrado(chassi)){
     			throw new Exception("Chassi já cadastrado!");
     		}
     		
     		Object[] veiculo = null;
-    		if(!placa.isEmpty() && placa != null){
+    		if(placa != null && !placa.isEmpty()){
     			veiculo = detranRepository.pesquisarVeiculoPlaca(placa);
     		}    		
-    		if(!chassi.isEmpty() && chassi != null){
-    			veiculo = detranRepository.pesquisarVeiculoPlaca(placa);
+    		if(chassi != null && !chassi.isEmpty()){
+    			veiculo = detranRepository.pesquisarVeiculoChassi(chassi);
     		}
         	ItemLeilao item = new ItemLeilao();
         	item.setPlaca(String.valueOf(veiculo[3]));    	
