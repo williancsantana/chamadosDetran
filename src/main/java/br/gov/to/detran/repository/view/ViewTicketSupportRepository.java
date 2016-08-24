@@ -18,6 +18,7 @@ import com.querydsl.jpa.JPAQueryBase;
 import br.gov.to.detran.domain.QTicketGroupService;
 import br.gov.to.detran.domain.QTicketStickerSupport;
 import br.gov.to.detran.domain.QUserSecurityGroup;
+import br.gov.to.detran.domain.TicketSupport;
 import br.gov.to.detran.domain.TicketSupportStatus;
 import br.gov.to.detran.domain.UserSecurity;
 import br.gov.to.detran.domain.view.QViewTicketSupport;
@@ -132,4 +133,11 @@ public class ViewTicketSupportRepository extends AbstractRepository<ViewTicketSu
         return query.fetch();
     }
 
+    public List<TicketSupport> getChamadosAgendados(){
+    	
+    	JPAQueryBase query = this.getPersistenceDao().query();
+    	
+    	return query.fetch();
+    }
+    
 }

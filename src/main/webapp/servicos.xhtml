@@ -40,6 +40,10 @@
                     <div id="categories-grid" class="doubling two column calls row"></div>
                 </div>
                 <div id="categories-divider" class="ui divider small top margin"></div>
+                <div id="row">
+                	<h:commandLink styleClass="small compact ui button"
+                					actionListener="#{ticketRecurrentServiceController.click(ticketrecurrentservice, 'servicoRecorrenteInstance', '/servicorecorrente.jsf')}">Novo serviço recorrente</h:commandLink>
+                </div>                
                 <table class="ui striped no margin table" jsf:id="tableServices">
                     <thead>
                         <tr>

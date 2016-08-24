@@ -82,7 +82,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private @Inject
     DetranNETRepository detranNetReposioty;
     private @Inject
-    TicketEscalonador ticketEscalonador;       
+    TicketEscalonador ticketEscalonador;
     private String cpfServidor;
     private String categorieVoltar;
     private String categoriePath;
@@ -103,10 +103,10 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
     private ViewDadosServidor dadosServidor = new ViewDadosServidor();
     private ViewOperadorDetrannet operador;
     private String lotacaoCiretran = "";
-   
     
     
     private List<String> prioridades = new ArrayList<String>(); 
+    
     @PostConstruct
     public void postConstruct() {
         super.postContruct();
@@ -122,7 +122,6 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         prioridades.add("BAIXA");
         prioridades.add("MEDIA");
         prioridades.add("ALTA");
-   
     }
     
     
@@ -487,10 +486,7 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
         }
     }
     
-    
-    
-
-    
+        
     public void escalonarAtendenteGrupo(UserSecurity user){
     	try{
     		
@@ -894,6 +890,5 @@ public class TicketSupportController extends BaseController<TicketSupport> imple
 	public void setOperador(ViewOperadorDetrannet operador) {
 		this.operador = operador;
 	}
-		
-	
+				
 }

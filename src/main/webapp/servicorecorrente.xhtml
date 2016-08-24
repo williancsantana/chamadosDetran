@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./resources/layout/main.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:param name="menu" value="abrir" />
+	<ui:param name="cancelar" value="true" />
+
+	<ui:define name="page-title">
+		DETRAN - TO | Novo serviço recorrente
+	</ui:define>
+
+	<ui:define name="content">
+
+		<h4 class="ui top attached header">Novo serviço recorrente</h4>
+		<div class="ui bottom attached segment">
+			<h:form id="novo-servico-recorrente-form" class="ui form">
+			
+				<div class="field">
+						<h5>Serviço </h5>
+						<h:selectOneMenu value="#{ticketRecurrentServiceController.servico}"
+							id="TicketServiceList" converter="baseEntityConverter">
+							<f:selectItem noSelectOption="true" itemLabel="Selecione um Serviço"/>
+							<f:selectItems
+								value="#{ticketRecurrentServiceController.listaServicos}"
+								var="ticketService" itemLabel="#{ticketService.categoria}"/>
+						</h:selectOneMenu>
+				</div>
+				<div class="ui divider"></div>
+				<div class="field">
+					<h5>Nome do serviço recorrente</h5>
+					<h:inputText value="#{ticketRecurrentServiceController.nomeServicoRecorrente}" required="true"/>				
+				</div>
+				<div class="ui divider"></div>
+				<div class="field">
+					<h5>Mensagem padrão do serviço recorrente</h5>
+					<h:inputTextarea value="#{ticketRecurrentServiceController.mensagemPadrao}" required="true"/>
+				</div>
+				<!-- 
+				<div class="field">
+					<h5>Peridiocidade</h5>
+					<h:selectOneMenu value="#{ticketRecurrentServiceController.peridiocidade}"
+							id="PeridiocidadeList">
+							<f:selectItem noSelectOption="true" itemLabel="Selecione a peridiocidade"/>
+							<f:selectItems
+								value="#{ticketRecurrentServiceController.listaPeridiocidade}"
+								var="peridiocidade" itemLabel="#{peridiocidade}"/>
+						</h:selectOneMenu>
+				</div> -->
+				
+			<div class="ui buttons">
+				<h:commandButton value="Criar" actionListener="#{ticketRecurrentServiceController.insert()}" class="ui submit blue button"></h:commandButton>
+				<a href="#{facesContext.externalContext.applicationContextPath}" class="ui button">Cancelar</a>
+			</div>
+			</h:form>
+		</div>
+		<!--
+		
+		Novo serviço recorrente
+		
+		Serviço:
+		'caixa de seleção com lista de serviços disponíveis'
+		
+		Nome do serviço recorrente:
+		'caixa de texto para que o usuário preencha'
+		
+		
+		Mensagem padrão do serviço recorrente:
+		'textbox (talvez com opção de estilização)'
+		
+		
+		
+		 -->
+
+	</ui:define>
+
+
+</ui:composition>
